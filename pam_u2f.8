@@ -1,0 +1,83 @@
+'\" t
+.\"     Title: pam_u2f
+.\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: Version 0.0.0
+.\"    Manual: PAM U2F Module Manual
+.\"    Source: pam-u2f
+.\"  Language: English
+.\"
+.TH "PAM_U2F" "8" "Version 0\&.0\&.0" "pam\-u2f" "PAM U2F Module Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+pam_u2f \- Module for U2F authentication
+.SH "SYNOPSIS"
+.sp
+\fBpam_u2f\fR [\&...]
+.SH "DESCRIPTION"
+.sp
+The module provides U2F authentication against Yubikeys and other compliant authenticators\&.
+.SH "OPTIONS"
+.PP
+\fBdebug\fR
+.RS 4
+Turns on debugging to STDOUT
+.RE
+.PP
+\fBorigin\fR=\fIorigin\fR
+.RS 4
+Set the origin for the U2F authentication procedure\&. If no value is specified, the origin "pam://$HOSTNAME" is used\&.
+.RE
+.PP
+\fBappid\fR=\fIappid\fR
+.RS 4
+Set the application ID for the U2F authentication procedure\&. If no value is specified, the same value used for origin is taken ("pam://$HOSTNAME" if also origin is not specified)\&.
+.RE
+.PP
+\fBauthfile\fR=\fIfile\fR
+.RS 4
+Set the location of the file that holds the mappings of user names to keyHandles and user keys\&. The format is username:number_of_devices:first_keyHandle,first_public_key:second_keyHandle,second_public_key:\&... default location of the file is $HOME/\&.yubico/u2f_keys\&.
+.RE
+.PP
+\fBalwaysok\fR
+.RS 4
+Set to enable all authentication attempts to succeed (aka presentation mode)\&.
+.RE
+.PP
+\fBmax_devices\fR=\fIn_devices\fR
+.RS 4
+Maximum number of devices allowed per user (default is 24)\&. Devices specified in the authentication file that exceed this value will be ignored\&.
+.RE
+.SH "EXAMPLES"
+.sp
+auth sufficient pam_u2f\&.so debug origin=pam://$HOSTNAME appid=pam://$HOSTNAME
+.sp
+auth required pam_u2f\&.so origin=http://example\&.com appid=http://example\&.com authfile=/etc/yubikey_mappings
+.SH "BUGS"
+.sp
+Report pam\-u2f bugs in the issue tracker: https://github\&.com/Yubico/pam\-u2f/issues
+.SH "SEE ALSO"
+.sp
+\fBpam\fR(7)
+.sp
+The pam\-u2f home page: https://developers\&.yubico\&.com/pam\-u2f/
+.sp
+YubiKeys can be obtained from Yubico: http://www\&.yubico\&.com/

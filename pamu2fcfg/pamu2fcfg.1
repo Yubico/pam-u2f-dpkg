@@ -1,0 +1,82 @@
+'\" t
+.\"     Title: pamu2fcfg
+.\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: Version 0.0.0
+.\"    Manual: PAM U2F Configuration Tool
+.\"    Source: pamu2fcfg
+.\"  Language: English
+.\"
+.TH "PAMU2FCFG" "1" "Version 0\&.0\&.0" "pamu2fcfg" "PAM U2F Configuration Tool"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+pamu2fcfg \- Configuration tool for the U2F PAM module\&.
+.SH "SYNOPSIS"
+.sp
+\fBpamu2fcfg\fR [\fIOPTION\fR]\&...
+.SH "DESCRIPTION"
+.sp
+Perform a U2F registration procedure using a connected U2F token and output a configuration line that can be used with the U2F PAM module\&.
+.SH "OPTIONS"
+.PP
+\fB\-d\fR, \fB\-\-debug\fR
+.RS 4
+Print debug information (highly verbose)
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Print help and exit
+.RE
+.PP
+\fB\-i\fR, \fB\-\-appid\fR=\fISTRING\fR
+.RS 4
+Application ID to use during registration\&. Defaults to pam://hostname
+.RE
+.PP
+\fB\-o\fR, \fB\-\-origin\fR=\fISTRING\fR
+.RS 4
+Origin URL to use during registration\&. Defaults to pam://hostname
+.RE
+.sp
+\fB\-V\fR, \fB\-\-version\fR \fBPrint version and exit\fR
+.sp
+Group: user (mutually exclusive)
+.PP
+\fB\-u\fR, \fB\-\-username\fR=\fISTRING\fR
+.RS 4
+The name of the user registering the device\&. Defaults to the current user name
+.RE
+.PP
+\fB\-n\fR, \fB\-\-nouser\fR
+.RS 4
+Print only registration information (keyHandle and public key)\&. Useful for appending
+.RE
+.SH "BUGS"
+.sp
+Report pamu2fcfg bugs in the issue tracker: https://github\&.com/Yubico/pam\-u2f/issues
+.SH "SEE ALSO"
+.sp
+\fBpam_u2f\fR(8), \fBpam\fR(7)
+.sp
+The pam\-u2f home page: https://developers\&.yubico\&.com/pam\-u2f/
+.sp
+YubiKeys can be obtained from Yubico: http://www\&.yubico\&.com/
