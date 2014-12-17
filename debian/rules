@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --parallel --with autoreconf --builddirectory=build
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		--disable-silent-rules \
+		--with-pam-dir=$(DESTDIR)/lib/$(DEB_HOST_MULTIARCH)/security
+
+override_dh_install:
+	rm /lib/$(DEB_HOST_MULTIARCH)/security/pam_u2f.la
+	dh_install --fail-missing

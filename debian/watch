@@ -1,0 +1,2 @@
+version=3
+opts=pgpsigurlmangle=s/$/.sig/ https://developers.yubico.com/pam-u2f/Releases/ pam_u2f-(\d[\d.]*)\.tar\.gz

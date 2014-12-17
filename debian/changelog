@@ -1,0 +1,5 @@
+pam-u2f (0.0.0-1~ppa1~vivid1) vivid; urgency=medium
+
+  * Initial release. (Closes: #XXXXXX)
+
+ -- Alessio Di Mauro <alessio@yubico.com>  Wed, 17 Dec 2014 13:37:02 +0100

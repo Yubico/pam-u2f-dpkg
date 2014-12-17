@@ -1,0 +1,31 @@
+Source: pam-u2f
+Maintainer: Debian Authentication Maintainers <pkg-auth-maintainers@lists.alioth.debian.org>
+Uploaders: Alessio Di Mauro <alessio@yubico.com>
+Section: admin
+Priority: optional
+Build-Depends: debhelper (>= 9),
+	       autotools-dev,
+	       dh-autoreconf,
+	       pkg-config,
+	       libpam0g-dev,
+         libu2f-host-dev,
+         libu2f-server-dev
+Standards-Version: 3.9.6
+Homepage: https://developers.yubico.com/pam-u2f/
+Vcs-Browser: https://github.com/Yubico/pam-u2f-dpkg
+Vcs-Git: git://github.com/Yubico/pam-u2f-dpkg.git
+
+Package: pam-u2f
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: This module implements PAM authentication over U2F.
+ Registration should be performed using the provided tool.
+ Multiple devices are supported. For details check the Multiple Devices section.
+ For more information visit the project page
+ https://developers.yubico.com/pam-u2f/.
+
+Package: pamu2fcfg
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Command line tool to perform U2F registration and produce
+ configuration file to be used with pam-u2f.
