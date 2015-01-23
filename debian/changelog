@@ -1,5 +1,5 @@
-pam-u2f (0.0.0-1~ppa1~vivid1) vivid; urgency=medium
+pam-u2f (0.0.1-1) unstable; urgency=low
 
-  * Initial release. (Closes: #XXXXXX)
+  * Initial release. (Closes: #776091)
 
- -- Alessio Di Mauro <alessio@yubico.com>  Wed, 17 Dec 2014 13:37:02 +0100
+ -- Alessio Di Mauro <alessio@yubico.com>  Mon, 26 Jan 2015 13:57:25 +0100
