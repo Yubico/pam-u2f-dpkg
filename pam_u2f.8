@@ -2,12 +2,12 @@
 .\"     Title: pam_u2f
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: Version 0.0.0
+.\"      Date: Version 0.0.1
 .\"    Manual: PAM U2F Module Manual
 .\"    Source: pam-u2f
 .\"  Language: English
 .\"
-.TH "PAM_U2F" "8" "Version 0\&.0\&.0" "pam\-u2f" "PAM U2F Module Manual"
+.TH "PAM_U2F" "8" "Version 0\&.0\&.1" "pam\-u2f" "PAM U2F Module Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -54,7 +54,12 @@ Set the application ID for the U2F authentication procedure\&. If no value is sp
 .PP
 \fBauthfile\fR=\fIfile\fR
 .RS 4
-Set the location of the file that holds the mappings of user names to keyHandles and user keys\&. The format is username:number_of_devices:first_keyHandle,first_public_key:second_keyHandle,second_public_key:\&... default location of the file is $HOME/\&.yubico/u2f_keys\&.
+Set the location of the file that holds the mappings of user names to keyHandles and user keys\&. The format is username:first_keyHandle,first_public_key:second_keyHandle,second_public_key:\&... default location of the file is $HOME/\&.yubico/u2f_keys\&.
+.RE
+.PP
+\fBnouserok\fR
+.RS 4
+Set to enable authentication attempts to succeed even if the user trying to authenticate is not found inside authfile\&.
 .RE
 .PP
 \fBalwaysok\fR

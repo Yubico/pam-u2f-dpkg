@@ -25,6 +25,8 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t * cfg)
       sscanf(argv[i], "max_devices=%u", &cfg->max_devs);
     if (strcmp(argv[i], "debug") == 0)
       cfg->debug = 1;
+    if (strcmp(argv[i], "nouserok") == 0)
+      cfg->nouserok = 1;
     if (strcmp(argv[i], "alwaysok") == 0)
       cfg->alwaysok = 1;
     if (strncmp(argv[i], "authfile=", 9) == 0)
@@ -42,6 +44,7 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t * cfg)
       D(("argv[%d]=%s", i, argv[i]));
     D(("max_devices=%d", cfg->max_devs));
     D(("debug=%d", cfg->debug));
+    D(("nouserok=%d", cfg->nouserok));
     D(("alwaysok=%d", cfg->alwaysok));
     D(("authfile=%s", cfg->auth_file ? cfg->auth_file : "(null)"));
     D(("origin=%s", cfg->origin ? cfg->origin : "(null)"));
@@ -170,13 +173,23 @@ int pam_sm_authenticate(pam_handle_t * pamh, int flags, int argc,
     goto done;
   }
 
+  if (n_devices == 0) {
+    if (cfg->nouserok) {
+      DBG(("Found no devices but nouserok specified. Skipping authentication"));
+      retval = PAM_SUCCESS;
+      goto done;
+    }
+    else {
+      DBG(("Found no devices. Aborting."));
+      retval = PAM_AUTHINFO_UNAVAIL;
+      goto done;
+    }
+  }
+
   retval = do_authentication(cfg, devices, n_devices);
   if (retval != 1) {
     DBG(("do_authentication returned %d", retval));
-    if (retval == -2)
-      retval = PAM_IGNORE;
-    else
-      retval = PAM_AUTH_ERR;
+    retval = PAM_AUTH_ERR;
     goto done;
   }
 
@@ -190,9 +203,12 @@ done:
     retval = PAM_SUCCESS;
   }
   DBG(("done. [%s]", pam_strerror(pamh, retval)));
-  pam_set_data(pamh, "yubico_setcred_return", (void *) (intptr_t) retval,
-               NULL);
+
   return retval;
 
+}
 
+PAM_EXTERN int 
+pam_sm_setcred(pam_handle_t *pamh, int flags, int argc, const char **argv){
+  return PAM_SUCCESS;
 }

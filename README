@@ -10,7 +10,7 @@ Introduction
 ------------
 
 This module implements PAM authentication over U2F. Registration should
-be performed using other tools. Multiple devices are supported, for
+be performed using the included tool. Multiple devices are supported, for
 details check the <<devices, Multiple Devices>> section.
 
 For more information visit the project page
@@ -94,7 +94,7 @@ Set the origin for the U2F authentication procedure.
 If no value is specified, the origin "pam://$HOSTNAME" is used.
 
 appid=appid::
-Set the application ID for the U2F authentication procedure.
+Set the https://developers.yubico.com/U2F/App_ID.html[application ID] for the U2F authentication procedure.
 If no value is specified, the same value used for origin is taken
 ("pam://$HOSTNAME" if also origin is not specified).
 
@@ -105,6 +105,10 @@ to keyHandles and user keys.  The format is
 second_keyHandle,second_public_key:...+ the default location of the
 file is $HOME/.yubico/u2f_keys
 (more on <<files,Authorization Mapping Files>>).
+
+nouserok::
+Set to enable authentication attempts to succeed even if the user trying to
+authenticate is not found inside authfile.
 
 alwaysok::
 Set to enable all authentication attempts to succeed (aka presentation mode).
