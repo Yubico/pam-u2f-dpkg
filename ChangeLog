@@ -1,3 +1,39 @@
+2015-01-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS, configure.ac: Bump to version 0.0.1.
+
+2015-01-15  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #4 from bramvd/master added pam_sm_setcred service function
+
+2015-01-14  Bram Vandoren <bram@bram.be>
+
+	* pam-u2f.c: added pam_sm_setcred service function
+
+2015-01-02  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Updated README.
+
+2015-01-02  Alessio Di Mauro <alessio@yubico.com>
+
+	* README, pam_u2f.8.txt: Updated documentation.
+
+2015-01-02  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c, util.h: Added nouserok parameter.
+
+2015-01-02  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c: Always fail after error in authentication.
+
+2014-12-23  Henrik Stråth <minisu@users.noreply.github.com>
+
+	* README: Update README
+
+2014-12-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* Makefile.am, README: Corrected README.
+
 2014-12-16  Alessio Di Mauro <alessio@yubico.com>
 
 	* Makefile.am: More fix to Makefile.am.
