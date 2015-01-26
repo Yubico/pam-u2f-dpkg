@@ -15,7 +15,7 @@ Homepage: https://developers.yubico.com/pam-u2f/
 Vcs-Browser: https://github.com/Yubico/pam-u2f-dpkg
 Vcs-Git: git://github.com/Yubico/pam-u2f-dpkg.git
 
-Package: pam-u2f
+Package: libpam-u2f
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: universal 2nd factor (U2F) PAM module
@@ -35,5 +35,6 @@ Description: universal 2nd factor (U2F) PAM module command-line helper tool
  other authentications, and through this PAM module it can be used to
  require a U2F device in order to authenticate.
  .
- This package contains the command-line tool pamu2fcfg which is used to
- generate the information needed by pam-u2f to perform an U2F authentication.
+ This package contains the command-line tool pamu2fcfg which is used
+ to generate the information needed by libpam-u2f to perform an U2F
+ authentication.
