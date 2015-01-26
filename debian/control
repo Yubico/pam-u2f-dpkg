@@ -1,15 +1,15 @@
 Source: pam-u2f
 Maintainer: Debian Authentication Maintainers <pkg-auth-maintainers@lists.alioth.debian.org>
-Uploaders: Alessio Di Mauro <alessio@yubico.com>
+Uploaders: Alessio Di Mauro <alessio@yubico.com>, Simon Josefsson <simon@josefsson.org>
 Section: admin
 Priority: optional
 Build-Depends: debhelper (>= 9),
-	       autotools-dev,
-	       dh-autoreconf,
-	       pkg-config,
-	       libpam0g-dev,
-         libu2f-host-dev,
-         libu2f-server-dev
+	autotools-dev,
+	dh-autoreconf,
+	pkg-config,
+	libpam0g-dev,
+        libu2f-host-dev,
+        libu2f-server-dev
 Standards-Version: 3.9.6
 Homepage: https://developers.yubico.com/pam-u2f/
 Vcs-Browser: https://github.com/Yubico/pam-u2f-dpkg
@@ -18,14 +18,22 @@ Vcs-Git: git://github.com/Yubico/pam-u2f-dpkg.git
 Package: pam-u2f
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: This module implements PAM authentication over U2F.
- Registration should be performed using the provided tool.
- Multiple devices are supported. For details check the Multiple Devices section.
- For more information visit the project page
- https://developers.yubico.com/pam-u2f/.
+Description: universal 2nd factor (U2F) PAM module
+ Universal 2nd Factor (U2F) is an authentication mechanism that strengthen
+ other authentications, and through this PAM module it can be used to
+ require a U2F device in order to authenticate.
+ .
+ This package contains the PAM module, which performs the U2F
+ Authentication step.  Before this, you need to perform the U2F Registration
+ step which can be completed using the pamu2fcfg package.
 
 Package: pamu2fcfg
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Command line tool to perform U2F registration and produce
- configuration file to be used with pam-u2f.
+Description: universal 2nd factor (U2F) PAM module command-line helper tool
+ Universal 2nd Factor (U2F) is an authentication mechanism that strengthen
+ other authentications, and through this PAM module it can be used to
+ require a U2F device in order to authenticate.
+ .
+ This package contains the command-line tool pamu2fcfg which is used to
+ generate the information needed by pam-u2f to perform an U2F authentication.
