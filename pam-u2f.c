@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Yubico AB - See COPYING
+ *  Copyright (C) 2014-2015 Yubico AB - See COPYING
  */
 
 /* Define which PAM interfaces we provide */
@@ -23,12 +23,18 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t * cfg)
   for (i = 0; i < argc; i++) {
     if (strncmp(argv[i], "max_devices=", 12) == 0)
       sscanf(argv[i], "max_devices=%u", &cfg->max_devs);
+    if (strcmp(argv[i], "manual") == 0)
+      cfg->manual = 1;
     if (strcmp(argv[i], "debug") == 0)
       cfg->debug = 1;
     if (strcmp(argv[i], "nouserok") == 0)
       cfg->nouserok = 1;
     if (strcmp(argv[i], "alwaysok") == 0)
       cfg->alwaysok = 1;
+    if (strcmp(argv[i], "interactive") == 0)
+      cfg->interactive = 1;
+    if (strcmp(argv[i], "cue") == 0)
+      cfg->cue = 1;
     if (strncmp(argv[i], "authfile=", 9) == 0)
       cfg->auth_file = argv[i] + 9;
     if (strncmp(argv[i], "origin=", 7) == 0)
@@ -44,6 +50,9 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t * cfg)
       D(("argv[%d]=%s", i, argv[i]));
     D(("max_devices=%d", cfg->max_devs));
     D(("debug=%d", cfg->debug));
+    D(("interactive=%d", cfg->interactive));
+    D(("cue=%d", cfg->cue));
+    D(("manual=%d", cfg->manual));
     D(("nouserok=%d", cfg->nouserok));
     D(("alwaysok=%d", cfg->alwaysok));
     D(("authfile=%s", cfg->auth_file ? cfg->auth_file : "(null)"));
@@ -64,10 +73,13 @@ int pam_sm_authenticate(pam_handle_t * pamh, int flags, int argc,
 
   struct passwd *pw = NULL, pw_s;
   const char *user = NULL;
+//  const char *p = NULL;
   cfg_t cfg_st;
   cfg_t *cfg = &cfg_st;
   char buffer[BUFSIZE];
   char *buf;
+  char *authfile_dir;
+  int authfile_dir_len;
   int pgu_ret, gpn_ret;
   int retval = PAM_IGNORE;
   device_t *devices = NULL;
@@ -139,17 +151,42 @@ int pam_sm_authenticate(pam_handle_t * pamh, int flags, int argc,
   DBG(("Home directory for %s is %s", user, pw->pw_dir));
 
   if (!cfg->auth_file) {
-    buf =
-        malloc(sizeof(char) *
-               (strlen(pw->pw_dir) + strlen(DEFAULT_AUTHFILE) + 1));
-    if (!buf) {
-      DBG(("Unable to allocate memory"));
-      retval = PAM_IGNORE;
-      goto done;
+    buf = NULL;
+    authfile_dir = getenv(DEFAULT_AUTHFILE_DIR_VAR);
+    if (!authfile_dir) {
+      DBG(("Variable %s is not set. Using default value ($HOME/.config/)",
+           DEFAULT_AUTHFILE_DIR_VAR));
+      authfile_dir_len =
+          strlen(pw->pw_dir) + strlen("/.config") +
+          strlen(DEFAULT_AUTHFILE) + 1;
+      buf = malloc(sizeof(char) * (authfile_dir_len));
+
+      if (!buf) {
+        DBG(("Unable to allocate memory"));
+        retval = PAM_IGNORE;
+        goto done;
+      }
+
+      strcpy(buf, pw->pw_dir);
+      strcat(buf, "/.config");
+      strcat(buf, DEFAULT_AUTHFILE);
+    } else {
+      DBG(("Variable %s set to %s", DEFAULT_AUTHFILE_DIR_VAR,
+           authfile_dir));
+      authfile_dir_len =
+          strlen(authfile_dir) + strlen(DEFAULT_AUTHFILE) + 1;
+      buf = malloc(sizeof(char) * (authfile_dir_len));
+
+      if (!buf) {
+        DBG(("Unable to allocate memory"));
+        retval = PAM_IGNORE;
+        goto done;
+      }
+
+      strcpy(buf, authfile_dir);
+      strcat(buf, DEFAULT_AUTHFILE);
     }
 
-    strcpy(buf, pw->pw_dir);
-    strcat(buf, DEFAULT_AUTHFILE);
     DBG(("Using default authentication file %s", buf));
 
     cfg->auth_file = strdup(buf);
@@ -178,15 +215,24 @@ int pam_sm_authenticate(pam_handle_t * pamh, int flags, int argc,
       DBG(("Found no devices but nouserok specified. Skipping authentication"));
       retval = PAM_SUCCESS;
       goto done;
-    }
-    else {
+    } else {
       DBG(("Found no devices. Aborting."));
       retval = PAM_AUTHINFO_UNAVAIL;
       goto done;
     }
   }
 
-  retval = do_authentication(cfg, devices, n_devices);
+  if (cfg->manual == 0) {
+    if (cfg->interactive) {
+      converse(pamh, PAM_PROMPT_ECHO_ON,
+               "Insert your U2F device, then press ENTER.\n");
+    }
+
+    retval = do_authentication(cfg, devices, n_devices, pamh);
+  } else {
+    retval = do_manual_authentication(cfg, devices, n_devices, pamh);
+  }
+
   if (retval != 1) {
     DBG(("do_authentication returned %d", retval));
     retval = PAM_AUTH_ERR;
@@ -208,7 +254,8 @@ done:
 
 }
 
-PAM_EXTERN int 
-pam_sm_setcred(pam_handle_t *pamh, int flags, int argc, const char **argv){
+PAM_EXTERN int
+pam_sm_setcred(pam_handle_t * pamh, int flags, int argc, const char **argv)
+{
   return PAM_SUCCESS;
 }
