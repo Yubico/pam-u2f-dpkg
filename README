@@ -56,10 +56,10 @@ This will create a directory 'pam-u2f'. Enter the directory:
   $ cd pam-u2f
 -----------
 
-Autoconf, automake and libtool must be installed. AsciiDoc is used to
+Autoconf, automake, libtool, and libpam must be installed. AsciiDoc and xsltproc are used to
 generate the manpages.
 
-  Debian:   apt-get install autoconf automake libtool asciidoc
+  Debian:   apt-get install autoconf automake libtool libpam-dev asciidoc xsltproc libxml2-utils docbook-xml --no-install-recommends
 
 Generate the build system using:
 
@@ -74,7 +74,9 @@ Installation
 
 Once the module is built copy the file +pam_u2f.so+ to the correct
 directory for your system. Typically +/lib/security/+ or
-+/lib/x86_64-linux-gnu/security/+.
++/lib/x86_64-linux-gnu/security/+. This is automated by +make install+
+assuming that the pam directory chosen by +configure+ is correct.
+If that is not the case it can be specified with +./configure --with-pam-dir=+.
 
 Create a file for a new service in +/etc/pam.d/+ or edit an already
 existing one by adding a line similar to this:
@@ -103,7 +105,8 @@ Set the location of the file that holds the mappings of user names
 to keyHandles and user keys.  The format is
 +username:first_keyHandle,first_public_key:
 second_keyHandle,second_public_key:...+ the default location of the
-file is $HOME/.yubico/u2f_keys
+file is $XDG_CONFIG_HOME/Yubico/u2f_keys. If the environment variable
+is not set, $HOME/.config/Yubico/u2f_keys is used.
 (more on <<files,Authorization Mapping Files>>).
 
 nouserok::
@@ -116,6 +119,19 @@ Set to enable all authentication attempts to succeed (aka presentation mode).
 max_devices=n_devices::
 Maximum number of devices allowed per user (default is 24). Devices specified
 in the authentication file that exceed this value will be ignored.
+
+interactive::
+Set to prompt a message and wait before testing the presence of a U2F device.
+Recommended if your device doesn't have a tactile trigger.
+
+manual::
+Set to drop to a manual console where challenges are printed on screen
+and response read from standard input. Useful for debugging and SSH sessions
+without U2F-support from the SSH client/server.
+If enabled, interactive mode becomes redundant and has no effect.
+
+cue::
+Set to prompt a message to remind to touch the device.
 
 [[files]]
 Authorization Mapping Files
@@ -144,7 +160,7 @@ looks like:
  auth sufficient pam_u2f.so authfile=/etc/u2f_mappings
 
 == Individual authorization mapping by user
-Each user creates a `~/.yubico/u2f_keys` file inside of their home
+Each user creates a `~/.config/Yubico/u2f_keys` file inside of their home
 directory and places the mapping in that file, the file must have only one
 line:
 

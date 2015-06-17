@@ -1,3 +1,131 @@
+2015-06-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS, configure.ac: Bump to version 1.0.0.
+
+2015-06-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Update build instructions.
+
+2015-06-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Indent.
+
+2015-04-20  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c, util.c, util.h: Changed cue mode to use converse.
+
+2015-04-20  Alessio Di Mauro <alessio@yubico.com>
+
+	* README, pam_u2f.8.txt: Fixed documentation.
+
+2015-04-20  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #16 from mikejonesey/master cue: a reminder to push the yubikey button
+
+2015-04-17  mikejonesey <michael.jones@linux.com>
+
+	* README, pam-u2f.c, util.c, util.h: Standardisation of code, Rename
+	verbose to cue, Set cue to only print out when a valid device is
+	found, Update the readme.
+
+2015-04-17  sys-mjones <michael.jones@tuispecialist.com>
+
+	* README: update readme for change for button reminder.
+
+2015-04-17  sys-mjones <michael.jones@tuispecialist.com>
+
+	* pam-u2f.c, util.h: I use the yubikey for a few pam configs, most
+	it's intuitive to press the button at the right time, but in configs
+	such as sudo where i've enabled the module in sufficient mode, i
+	needed a prompt to remind me to press the button.
+
+2015-03-25  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Made documentation slightly clearer.
+
+2015-03-20  Alessio Di Mauro <alessio@yubico.com>
+
+	* Makefile.am: Added some cleanup to Makefile.
+
+2015-02-12  Alessio Di Mauro <alessio@yubico.com>
+
+	* README, pam_u2f.8.txt: Fixed docs.
+
+2015-02-12  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c, pamu2fcfg/cmdline.c, pamu2fcfg/cmdline.h, util.c,
+	util.h: Indent.
+
+2015-02-12  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Minor changes.
+
+2015-02-12  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Fixed some warnings.
+
+2015-02-12  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c: Minor fix.
+
+2015-02-12  Alessio Di Mauro <alessio@yubico.com>
+
+	* COPYING, Makefile.am, configure.ac, pam-u2f.c,
+	pamu2fcfg/Makefile.am, pamu2fcfg/cmdline.c, pamu2fcfg/cmdline.ggo,
+	pamu2fcfg/cmdline.h, pamu2fcfg/pamu2fcfg.c, tests/Makefile.am,
+	tests/basic.c, util.c, util.h: Updated copyright years.
+
+2015-02-12  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #13 from phoeagon/manual Manual mode & interactive
+
+2015-02-11  phoeagon <phoeagon@gmail.com>
+
+	* README, pam_u2f.8.txt, util.c: fix README
+
+2015-02-11  phoeagon <phoeagon@gmail.com>
+
+	* pam-u2f.c, util.c, util.h: fix manual mode to work with SSH
+
+2015-02-11  phoeagon <phoeagon@gmail.com>
+
+	* pam-u2f.c, util.c, util.h: Use pam_get_item instead for
+	portability
+
+2015-02-11  phoeagon <phoeagon@gmail.com>
+
+	* pam-u2f.c, util.c, util.h: add manual mode
+
+2015-02-11  phoeagon <phoeagon@gmail.com>
+
+	* pam-u2f.c, util.h: add interactive mode
+
+2015-02-09  Alessio Di Mauro <alessio@yubico.com>
+
+	* README, pam_u2f.8.txt: Updated documentation.
+
+2015-02-09  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c, util.h: Use XDG_CONFIG_HOME as default for authfile.
+
+2015-01-20  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #8 from catskul/patch-1 Add libpam to dependencies in README.
+
+2015-01-19  catskul <andy.somerville@gmail.com>
+
+	* README: Add --no-install-recommends to avoid pulling in 1GB of
+	extra data ascii doc has a recommends which is gigantic this avoids pulling
+	that in.
+
+2015-01-19  catskul <andy.somerville@gmail.com>
+
+	* README: Add libpam to dependencies in readme
+
+2015-01-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS, configure.ac: Bump to 0.0.2 (unreleased).
+
 2015-01-16  Alessio Di Mauro <alessio@yubico.com>
 
 	* NEWS, configure.ac: Bump to version 0.0.1.

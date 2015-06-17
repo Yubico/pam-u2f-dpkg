@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-#  Copyright (C) 2014 Yubico AB - See COPYING
+#  Copyright (C) 2014-2015 Yubico AB - See COPYING
 
 VPATH = @srcdir@
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
@@ -400,7 +400,6 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(WARN_CFLAGS)
 lib_LTLIBRARIES = pam_u2f.la
 pam_u2f_la_SOURCES = pam-u2f.c util.c util.h
-# XXX add -Wl,-x too?  PAM documentation suggests it.
 pam_u2f_la_LIBADD = -lpam $(LIBU2FHOST_LIBS) $(LIBU2FSERVER_LIBS)
 pam_u2f_la_LDFLAGS = -module -avoid-version
 dist_man8_MANS = pam_u2f.8
@@ -930,7 +929,8 @@ install-dvi: install-dvi-recursive
 install-dvi-am:
 
 install-exec-am: install-libLTLIBRARIES
-
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 install-html: install-html-recursive
 
 install-html-am:
@@ -975,7 +975,8 @@ uninstall-am: uninstall-libLTLIBRARIES uninstall-man
 
 uninstall-man: uninstall-man8
 
-.MAKE: $(am__recursive_targets) install-am install-strip
+.MAKE: $(am__recursive_targets) install-am install-exec-am \
+	install-strip
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
 	am--refresh check check-am clean clean-cscope clean-generic \
@@ -986,15 +987,15 @@ uninstall-man: uninstall-man8
 	distclean-tags distcleancheck distdir distuninstallcheck dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-man install-man8 install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-libLTLIBRARIES \
-	uninstall-man uninstall-man8
+	install-exec install-exec-am install-exec-hook install-html \
+	install-html-am install-info install-info-am \
+	install-libLTLIBRARIES install-man install-man8 install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-libLTLIBRARIES uninstall-man uninstall-man8
 
 
 .8.txt.8:
@@ -1002,10 +1003,14 @@ uninstall-man: uninstall-man8
 
 # Release
 
+install-exec-hook:
+	rm -f $(PAMDIR)/pam_u2f.la
+	chmod 644 $(PAMDIR)/pam_u2f.so
+
 indent:
 	indent -kr -nut -i2 *.c *.h pamu2fcfg/*.c pamu2fcfg/*.h
 	indent -kr -nut -i2 *.c *.h pamu2fcfg/*.c pamu2fcfg/*.h
-https://myaccount.google.com/?pli=1
+
 ChangeLog:
 	cd $(srcdir) && git2cl > ChangeLog
 
