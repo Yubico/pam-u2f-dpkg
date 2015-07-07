@@ -1,6 +1,10 @@
 pam-u2f (1.0.1-1) unstable; urgency=medium
 
+  [ Alessio Di Mauro ]
   * New upstream release.
+
+  [ Simon Josefsson ]
+  * Update README.source.
 
  -- Alessio Di Mauro <alessio@yubico.com>  Thu, 18 Jun 2015 10:35:12 +0200
 
