@@ -4,12 +4,13 @@
 
 #include "util.h"
 
-#include <u2f-server/u2f-server.h>
-#include <u2f-host/u2f-host.h>
+#include <u2f-server.h>
+#include <u2f-host.h>
 
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 #include <string.h>
 
@@ -67,6 +68,8 @@ get_devices_from_authfile(const char *authfile, const char *username,
   if (!buf) {
     if (verbose)
       D(("Unable to allocate memory"));
+    fclose(opwfile);
+    close(fd);
     return retval;
   }
 
@@ -99,7 +102,7 @@ get_devices_from_authfile(const char *authfile, const char *username,
           break;
         }
 
-        if (!s_token) {
+        /*if (!s_token) { // Check not needed, s_token can never be NULL
           if (verbose)
             D(("Unable to retrieve keyHandle number %d", i + 1));
           fclose(opwfile);
@@ -107,7 +110,7 @@ get_devices_from_authfile(const char *authfile, const char *username,
           free(buf);
           buf = NULL;
           return retval;
-        }
+          }*/
 
         if (verbose)
           D(("KeyHandle for device number %d: %s", i + 1, s_token));

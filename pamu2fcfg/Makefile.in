@@ -327,9 +327,9 @@ pamu2fcfg_SOURCES = pamu2fcfg.c cmdline.ggo cmdline.c cmdline.h
 pamu2fcfg_LDADD = $(LIBU2FHOST_LIBS) $(LIBU2FSERVER_LIBS)
 BUILT_SOURCES = cmdline.c cmdline.h
 MAINTAINERCLEANFILES = $(BUILT_SOURCES)
-dist_man1_MANS = pamu2fcfg.1
+dist_man1_MANS = $(top_builddir)/man/pamu2fcfg.1
 DISTCLEANFILES = $(dist_man1_MANS)
-MANSOURCES = pamu2fcfg.1.txt
+MANSOURCES = $(top_builddir)/man/pamu2fcfg.1.txt
 EXTRA_DIST = $(MANSOURCES)
 SUFFIXES = .1.txt .1
 all: $(BUILT_SOURCES)
