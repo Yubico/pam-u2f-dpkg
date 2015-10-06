@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <pwd.h>
 #include <string.h>
+#include <errno.h>
 
 #include "util.h"
 
@@ -73,11 +74,11 @@ int pam_sm_authenticate(pam_handle_t * pamh, int flags, int argc,
 
   struct passwd *pw = NULL, pw_s;
   const char *user = NULL;
-//  const char *p = NULL;
+
   cfg_t cfg_st;
   cfg_t *cfg = &cfg_st;
   char buffer[BUFSIZE];
-  char *buf;
+  char *buf = NULL;
   char *authfile_dir;
   int authfile_dir_len;
   int pgu_ret, gpn_ret;
@@ -133,6 +134,8 @@ int pam_sm_authenticate(pam_handle_t * pamh, int flags, int argc,
   pgu_ret = pam_get_user(pamh, &user, NULL);
   if (pgu_ret != PAM_SUCCESS || user == NULL) {
     DBG(("Unable to access user %s", user));
+    free(devices);
+    devices = NULL;
     return PAM_CONV_ERR;
   }
 
@@ -243,6 +246,11 @@ int pam_sm_authenticate(pam_handle_t * pamh, int flags, int argc,
 
 done:
   free_devices(devices, n_devices);
+
+  if (buf) {
+    free(buf);
+    buf = NULL;
+  }
 
   if (cfg->alwaysok && retval != PAM_SUCCESS) {
     DBG(("alwaysok needed (otherwise return with %d)", retval));
