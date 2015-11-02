@@ -1,3 +1,20 @@
+2015-11-01  Alessio Di Mauro <alessio@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c: Check the correct return value in
+	pamu2fcfg.
+
+2015-10-20  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #24 from astronouth7303/patch-1 Properly tag `perror()` call for `getlogin()`.
+
+2015-10-07  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Tie messages to debug flag more.
+
+2015-10-06  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS, configure.ac: Bump versions.
+
 2015-10-06  Alessio Di Mauro <alessio@yubico.com>
 
 	* NEWS: Version 1.0.2.
