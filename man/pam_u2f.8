@@ -2,12 +2,12 @@
 .\"     Title: pam_u2f
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: Version 1.0.3
+.\"      Date: Version 1.0.4
 .\"    Manual: PAM U2F Module Manual
 .\"    Source: pam-u2f
 .\"  Language: English
 .\"
-.TH "PAM_U2F" "8" "Version 1\&.0\&.3" "pam\-u2f" "PAM U2F Module Manual"
+.TH "PAM_U2F" "8" "Version 1\&.0\&.4" "pam\-u2f" "PAM U2F Module Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -91,6 +91,9 @@ Set to prompt a message to remind to touch the device\&.
 auth sufficient pam_u2f\&.so debug origin=pam://$HOSTNAME appid=pam://$HOSTNAME
 .sp
 auth required pam_u2f\&.so origin=http://example\&.com appid=http://example\&.com authfile=/etc/yubikey_mappings
+.SH "CAVEATS"
+.sp
+Using pam\-u2f to secure the login to a computer while storing the mapping file in an encrypted home directory, will result in the impossibility of logging into the system\&. The partition is decrypted after login and the mapping file can not be accessed\&.
 .SH "BUGS"
 .sp
 Report pam\-u2f bugs in the issue tracker: https://github\&.com/Yubico/pam\-u2f/issues

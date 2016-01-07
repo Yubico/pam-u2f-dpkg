@@ -1,3 +1,26 @@
+2015-12-09  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Remove duplicate definition.  Apparently saving files is a good thing...
+
+2015-12-09  Alessio Di Mauro <alessio@yubico.com>
+
+	* configure.ac, pam-u2f.c, util.c: Use secure_getenv where available
+	(still regarding #28).  If we're on a GNU system use secure_getenv to retrieve environment
+	variables. Otherwise implement a stub fallback that returns nothing.
+
+2015-12-07  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Added authfile owner comparison to address #28.
+
+2015-11-03  Alessio Di Mauro <alessio@yubico.com>
+
+	* README, man/pam_u2f.8.txt: Add warning about using mapping files
+	with encrypted home directories.  Closes #27.
+
+2015-11-02  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS, configure.ac: Bump versions.
+
 2015-11-01  Alessio Di Mauro <alessio@yubico.com>
 
 	* pamu2fcfg/pamu2fcfg.c: Check the correct return value in
