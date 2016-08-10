@@ -1,8 +1,30 @@
-pam-u2f (1.0.4-1) unstable; urgency=medium
+pam-u2f (1.0.4-0.3) unstable; urgency=medium
 
-  * New upstream release.
+  * Non-maintainer upload.
+  * Fix the generated binaries on Debian/kFreeBSD
+  * Drop spurious dependency on autotools-dev
 
- -- Alessio Di Mauro <alessio@yubico.com>  Thu, 07 Jan 2016 11:32:33 +0100
+ -- Nicolas Braud-Santoni <nicolas@braud-santoni.eu>  Tue, 02 Aug 2016 15:48:58 +0200
+
+pam-u2f (1.0.4-0.2) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Set Breaks and Replaces for the moved manpage.
+
+ -- Nicolas Braud-Santoni <nicolas@braud-santoni.eu>  Thu, 14 Jul 2016 21:53:52 +0200
+
+pam-u2f (1.0.4-0.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * New upstream version.
+    Fixes possible permission escalation when using XDG_CONFIG_HOME.
+  * Use HTTPS for Vcs-Git.
+  * Use build-time hardening.
+  * Bump Standards-Version to 3.9.8.
+    No change required.
+  * Put the pam_u2f(8) manpage in the libpam_u2f package.
+
+ -- Nicolas Braud-Santoni <nicolas@braud-santoni.eu>  Wed, 06 Jul 2016 13:25:51 +0200
 
 pam-u2f (1.0.3-1) unstable; urgency=medium
 

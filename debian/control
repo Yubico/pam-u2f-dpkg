@@ -4,19 +4,20 @@ Uploaders: Alessio Di Mauro <alessio@yubico.com>, Simon Josefsson <simon@josefss
 Section: admin
 Priority: optional
 Build-Depends: debhelper (>= 9),
-	autotools-dev,
 	dh-autoreconf,
 	pkg-config,
 	libpam0g-dev,
         libu2f-host-dev,
         libu2f-server-dev
-Standards-Version: 3.9.6
+Standards-Version: 3.9.8
 Homepage: https://developers.yubico.com/pam-u2f/
 Vcs-Browser: https://github.com/Yubico/pam-u2f-dpkg
-Vcs-Git: git://github.com/Yubico/pam-u2f-dpkg.git
+Vcs-Git: https://github.com/Yubico/pam-u2f-dpkg.git
 
 Package: libpam-u2f
 Architecture: any
+Breaks: pamu2fcfg (<< 1.0.4-0.2)
+Replaces: pamu2fcfg (<< 1.0.4-0.2)
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: pamu2fcfg
 Description: universal 2nd factor (U2F) PAM module
@@ -30,6 +31,7 @@ Description: universal 2nd factor (U2F) PAM module
 
 Package: pamu2fcfg
 Architecture: any
+Breaks: libpam-u2f (<< 1.0.4-0.2)
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: universal 2nd factor (U2F) PAM module command-line helper tool
  Universal 2nd Factor (U2F) is an authentication mechanism that strengthen
