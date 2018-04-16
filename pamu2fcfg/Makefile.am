@@ -15,6 +15,7 @@ cmdline.c cmdline.h: cmdline.ggo Makefile.am
 BUILT_SOURCES = cmdline.c cmdline.h
 MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 
+if ENABLE_MAN
 dist_man1_MANS = $(top_builddir)/man/pamu2fcfg.1
 DISTCLEANFILES = $(dist_man1_MANS)
 
@@ -24,4 +25,5 @@ EXTRA_DIST = $(MANSOURCES)
 SUFFIXES = .1.txt .1
 
 .1.txt.1:
-	$(A2X) --format=manpage -a revdate="Version $(VERSION)" $<
+	$(A2X) --format=manpage -L -a revdate="Version $(VERSION)" $<
+endif

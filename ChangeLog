@@ -1,3 +1,325 @@
+2018-04-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS: Update NEWS file
+
+2018-04-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Fixup style nits
+
+2018-04-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Use BUFSIZE instead of a hard constant
+
+2018-04-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Drop blurb about project being rewritten That seems to have slowed for the time being, reinstating this
+	project.
+
+2018-04-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Fixup README to reflect the manpage
+
+2018-04-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* : Merge PR #84
+
+2018-04-14  CJ Oster <cjo@redhat.com>
+
+	* README, man/pam_u2f.8.txt, pam-u2f.c, util.c, util.h: Adds syslog
+	to debug_file options.
+
+2017-06-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Add message about project rewrite to README
+
+2017-04-04  Alessio Di Mauro <alessio@yubico.com>
+
+	* build-aux/travis-build-osx: brew unlink pkg-config to keep Travis
+	happy
+
+2017-04-04  Alessio Di Mauro <alessio@yubico.com>
+
+	* README, man/pam_u2f.8.txt, pam-u2f.c, util.c, util.h: Add
+	`debug_file` option to log debug to a file rather than to STDOUT
+
+2017-04-04  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Fix formatting in README
+
+2017-03-15  Alessio Di Mauro <alessio@yubico.com>
+
+	* : Merge #70: code cleanup and more warnings
+
+2017-03-14  Simon Ruderich <simon@ruderich.org>
+
+	* util.c: get_devices_from_authfile: fix incorrect cast Shouldn't be an issue but makes -Wconversion happy.
+
+2017-03-14  Simon Ruderich <simon@ruderich.org>
+
+	* pam-u2f.c: pam_sm_authenticate: authfile_dir_len must be size_t
+
+2017-03-14  Simon Ruderich <simon@ruderich.org>
+
+	* util.c: do_manual_authentication: simplify for-loop condition Checking retval in two places is confusing. Use a separate if with
+	break to make the intent more clear.
+
+2017-03-14  Simon Ruderich <simon@ruderich.org>
+
+	* pam-u2f.c: pam_sm_authenticate: use goto done in two more places It's confusing that these are the only places where return is used.  This changes the behavior if alwaysok is true and either malloc() or
+	pam_get_user() fails. Previously it would reject logins, with this
+	change it allows them. However this shouldn't affect many setups as
+	alwaysok is most likely not used.
+
+2017-03-14  Simon Ruderich <simon@ruderich.org>
+
+	* pam-u2f.c: pam_sm_authenticate: auth_file: don't strdup() the
+	allocated buffer
+
+2017-03-14  Simon Ruderich <simon@ruderich.org>
+
+	* pam-u2f.c, util.c: Use snprintf() where possible The code in pam_sm_authenticate() uses proper sizes, but snprintf()
+	is generally a safer approach than strcpy()/strcat().  The first sprintf() in do_manual_authentication() could potentially
+	overflow the buffer if origin is very large.
+
+2017-03-14  Simon Ruderich <simon@ruderich.org>
+
+	* pam-u2f.c: pam_sm_authenticate: move strdup() checks into the
+	surrounding if Makes it more obvious that this is the only code path that can reach
+	the check.
+
+2017-03-14  Simon Ruderich <simon@ruderich.org>
+
+	* pam-u2f.c: pam_sm_authenticate: remove checks for strcpy strcpy(3) never fails.
+
+2017-03-14  Alessio Di Mauro <alessio@yubico.com>
+
+	* : Merge #67, fixes to get_devices_from_authfile
+
+2017-03-07  Simon Ruderich <simon@ruderich.org>
+
+	* util.c: get_devices_from_authfile: remove duplication in error
+	handling Also fix a double-close bug (fclose(opwfile); close(fd)).
+
+2017-03-07  Simon Ruderich <simon@ruderich.org>
+
+	* util.c: get_devices_from_authfile: ensure n_devs is initialized If there's no matching user then n_devs is never initialized but we
+	return 1 to indicate success. A later access to n_devs will result
+	in an undefined read.  Note: This is currently not an issue as the single caller correctly
+	initializes n_devs to 0 but it affected our fuzzing process and it
+	future-proofs possible future callers.
+
+2017-03-07  Simon Ruderich <simon@ruderich.org>
+
+	* util.c: get_devices_from_authfile: check result of sscanf() On failure x might contain uninitialized data which must not be
+	added to the key. Abort instead if this occurs.
+
+2017-03-07  Simon Ruderich <simon@ruderich.org>
+
+	* util.c: get_devices_from_authfile: fix out-of-bounds read Casting a char* into an unsigned int* is undefined behavior and will
+	trigger an out-of-bounds read at the end of the publicKey array.
+
+2017-03-13  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #69 from rudis/openasuser Add openasuser option
+
+2017-03-13  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #68 from rudis/nouserok-simplify Simplify nouserok checks for missing/malformed authfiles
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* build-aux/travis-build-osx: travis: Skip man page build on osx
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* .travis.yml, build-aux/travis, build-aux/travis-build-linux,
+	build-aux/travis-build-osx: travis: Refactor and support osx
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* README: README: Just make for building `check` is rather useless at present, and breaks on macOS.
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* pam-u2f.c, pamu2fcfg/pamu2fcfg.c, util.c: util, pamu2fcfg: Silence
+	warnings and fixup compares.
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* Makefile.am, configure.ac, m4/ax_check_compile_flag.m4,
+	m4/manywarnings.m4, m4/warnings.m4: ac: Small attempt at
+	modernisation.  Biggest change is dropping the warnings/manywarnings and using
+	AX_CHECK_COMPILE_FLAG to check for an ok-ish set all of the time.
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* pam-u2f.c, pamu2fcfg/pamu2fcfg.c, util.c, util.h: indent: Run the
+	entire shebang through clang-format
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* .clang-format, Makefile.am: indent: Use clang-format
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* README: README: Better links to U2F libs
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* README: README: No need for a continuation in example
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* README: README: Mention registration in Auth blurb.  Do so with a link to obtaining key handles blurb.
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* README: README: Collapse the Introduction blurb
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* README: README: Drop License and portability blurbs
+
+2017-02-16  Thordur Bjornsson <thorduri@yubico.com>
+
+	* BLURB: BLURB: Retire it
+
+2017-02-15  Thordur Bjornsson <thorduri@yubico.com>
+
+	* : commit 8d6767b9981336dfa9454be759262ab1fbc70e35 Merge: ddd3462
+	e935c33 Author: Thordur Bjornsson <thorduri@yubico.com> Date:   Wed
+	Feb 15 14:17:06 2017 +0100
+
+2017-02-15  Thordur Bjornsson <thorduri@yubico.com>
+
+	* README, man/pam_u2f.8.txt: docs: prompt man blurb and README
+	fixups
+
+2017-02-15  Thordur Bjornsson <thorduri@yubico.com>
+
+	* pam-u2f.c: pam: Simplify prompt handling The prior (and now DEFAULT_PROMPT) had a newline in it, rather then
+	trying to preserve that behaviour, just omit the newline.  The PRESS
+	ENTER behaviour even makes this look nicer...
+
+2017-01-08  Reiner Keller <Reiner.Keller@gmx.de>
+
+	* README, pam-u2f.c, util.h: setup individual prompt message for
+	interactive mode
+
+2017-02-15  Thordur Bjornsson <thorduri@yubico.com>
+
+	* configure.ac: ac: Better defaults for PAM module install path.  On darwin (osx, macos) default to /usr/lib/pam, on linux to the same
+	default as before and in all other cases to /usr/lib.
+
+2017-02-15  Thordur Bjornsson <thorduri@yubico.com>
+
+	* : commit 5ef53fdc872885f10c93e0e1103f42511f406b03 Author: Thordur
+	Bjornsson <thorduri@yubico.com> Date:   Wed Feb 15 09:08:07 2017
+	+0100
+
+2017-02-01  Thordur Bjornsson <thorduri@yubico.com>
+
+	* : Merge remote-tracking branch 'origin/pr/56'
+
+2017-01-20  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #54 from Yubico/readme-hostname README: Add blurb on appid/origin on dynamic networks
+
+2017-01-17  Thordur Bjornsson <thorduri@yubico.com>
+
+	* README: README: Add blurb on appid/origin on dynamic networks.  Prompted by #42
+
+2017-01-17  Thordur Bjornsson <thorduri@yubico.com>
+
+	* util.c: pam: Fix format specifier
+
+2017-01-17  Thordur Bjornsson <thorduri@yubico.com>
+
+	* pam-u2f.c: pam: Drop _GNU_SOURCE define
+
+2017-01-17  Thordur Bjornsson <thorduri@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c: pamu2fcfg: Errors to stderr Tiny style fixup while here.
+
+2017-01-17  Thordur Bjornsson <thorduri@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c: pamu2fcfg: Correct flag to u2fh_globla_init
+
+2017-01-17  Thordur Bjornsson <thorduri@yubico.com>
+
+	* util.c: pam: Add missing header
+
+2017-01-17  Thordur Bjornsson <thorduri@users.noreply.github.com>
+
+	* : Merge pull request #52 from Yubico/autoconf-janitorial auto: handful of fixups
+
+2017-01-17  Thordur Bjornsson <thorduri@yubico.com>
+
+	* configure.ac: auto: Fix tyop in configure.ac
+
+2017-01-17  Thordur Bjornsson <thorduri@yubico.com>
+
+	* autogen.sh: auto: Introduce autogen.sh
+
+2016-11-29  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* Makefile.am: Skip xmllint on Travis builds
+
+2016-11-29  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* pamu2fcfg/Makefile.am: Skip xmllint on Travis builds
+
+2016-11-29  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* .travis.yml: Fix a2x in Travis builds
+
+2016-11-29  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* .travis.yml: Update .travis.yml to build on Trusty
+
+2016-11-09  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #44 from liamjack/master Replace getlogin with getuid and getpwuid to obtain a username
+
+2016-08-02  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #40 from nbraud/gnu-source pam-u2f.c: Define _GNU_SOURCE to make secure_getenv(3) available
+
+2016-03-14  Alessio Di Mauro <alessio@yubico.com>
+
+	* README, man/pam_u2f.8.txt, pam-u2f.c: Extend behavior of
+	`nouserok` to include missing or malformed authfiles.  Closes #32.
+
+2016-03-14  Alessio Di Mauro <alessio@yubico.com>
+
+	* man/pamu2fcfg.1.txt, pamu2fcfg/pamu2fcfg.c: Make `appid` default
+	to `origin`.  Closes #34.
+
+2016-03-14  Alessio Di Mauro <alessio@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c: Minor fix.
+
+2016-03-14  Alessio Di Mauro <alessio@yubico.com>
+
+	* pamu2fcfg/cmdline.c, pamu2fcfg/cmdline.ggo, pamu2fcfg/cmdline.h,
+	pamu2fcfg/pamu2fcfg.c: Added verbose flag.
+
+2016-03-14  Alessio Di Mauro <alessio@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c: Fix typo.
+
+2016-02-02  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Add pkg-config to the dependencies in README.  Closes #30.
+
+2016-01-07  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS, configure.ac: Bump versions.
+
+2016-01-07  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS: Version 1.0.4.
+
 2015-12-09  Alessio Di Mauro <alessio@yubico.com>
 
 	* util.c: Remove duplicate definition.  Apparently saving files is a good thing...
@@ -85,10 +407,9 @@
 
 2015-06-30  Alessio Di Mauro <alessio@yubico.com>
 
-	* .gitignore, Makefile.am, man/pam_u2f.8.txt, man/pamu2fcfg.1.txt,
-	pam_u2f.8.txt, pamu2fcfg/Makefile.am, pamu2fcfg/cmdline.c,
-	pamu2fcfg/cmdline.h, pamu2fcfg/pamu2fcfg.1.txt: Move manpages to
-	/man.
+	* .gitignore, Makefile.am, pam_u2f.8.txt => man/pam_u2f.8.txt,
+	{pamu2fcfg => man}/pamu2fcfg.1.txt, pamu2fcfg/Makefile.am,
+	pamu2fcfg/cmdline.c, pamu2fcfg/cmdline.h: Move manpages to /man.
 
 2015-06-18  Alessio Di Mauro <alessio@yubico.com>
 
@@ -262,7 +583,7 @@
 
 	* pam-u2f.c: Always fail after error in authentication.
 
-2014-12-23  Henrik StrÃ¥th <minisu@users.noreply.github.com>
+2014-12-23  Henrik Stråth <minisu@users.noreply.github.com>
 
 	* README: Update README
 
