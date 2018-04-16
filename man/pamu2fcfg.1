@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: pamu2fcfg
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
-.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: Version 1.0.3
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: Version 1.0.5
 .\"    Manual: PAM U2F Configuration Tool
 .\"    Source: pamu2fcfg
 .\"  Language: English
 .\"
-.TH "PAMU2FCFG" "1" "Version 1\&.0\&.3" "pamu2fcfg" "PAM U2F Configuration Tool"
+.TH "PAMU2FCFG" "1" "Version 1\&.0\&.5" "pamu2fcfg" "PAM U2F Configuration Tool"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -47,14 +47,15 @@ Print debug information (highly verbose)
 Print help and exit
 .RE
 .PP
-\fB\-i\fR, \fB\-\-appid\fR=\fISTRING\fR
-.RS 4
-Application ID to use during registration\&. Defaults to pam://hostname
-.RE
-.PP
 \fB\-o\fR, \fB\-\-origin\fR=\fISTRING\fR
 .RS 4
 Origin URL to use during registration\&. Defaults to pam://hostname
+.RE
+.PP
+\fB\-i\fR, \fB\-\-appid\fR=\fISTRING\fR
+.RS 4
+Application ID to use during registration\&. Defaults to
+\fBorigin\fR
 .RE
 .sp
 \fB\-V\fR, \fB\-\-version\fR \fBPrint version and exit\fR

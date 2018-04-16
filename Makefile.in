@@ -92,11 +92,10 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
-	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
-	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/m4/manywarnings.m4 $(top_srcdir)/m4/warnings.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
@@ -295,6 +294,8 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CSFLAGS = @CSFLAGS@
+CWFLAGS = @CWFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = -DDEBUG_PAM -DPAM_DEBUG @DEFS@
 DEPDIR = @DEPDIR@
@@ -325,6 +326,8 @@ LIBU2FSERVER_LIBS = @LIBU2FSERVER_LIBS@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
+LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
+MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
@@ -352,7 +355,6 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-WARN_CFLAGS = @WARN_CFLAGS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -397,6 +399,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -407,17 +410,17 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = . pamu2fcfg tests
 ACLOCAL_AMFLAGS = -I m4
-AM_CFLAGS = $(WARN_CFLAGS)
+AM_CFLAGS = $(CWFLAGS)
 AM_CPPFLAGS = -I$(srcdir)/.. -I$(builddir)/.. $(LIBU2FHOST_CFLAGS) $(LIBU2FSERVER_CFLAGS)
 lib_LTLIBRARIES = pam_u2f.la
 pam_u2f_la_SOURCES = pam-u2f.c util.c util.h
 pam_u2f_la_LIBADD = -lpam $(LIBU2FHOST_LIBS) $(LIBU2FSERVER_LIBS)
 pam_u2f_la_LDFLAGS = -module -avoid-version
-dist_man8_MANS = $(top_builddir)/man/pam_u2f.8
-DISTCLEANFILES = $(dist_man8_MANS)
-MANSOURCES = $(top_builddir)/man/pam_u2f.8.txt
-EXTRA_DIST = $(MANSOURCES)
-SUFFIXES = .8.txt .8
+@ENABLE_MAN_TRUE@dist_man8_MANS = $(top_builddir)/man/pam_u2f.8
+@ENABLE_MAN_TRUE@DISTCLEANFILES = $(dist_man8_MANS)
+@ENABLE_MAN_TRUE@MANSOURCES = $(top_builddir)/man/pam_u2f.8.txt
+@ENABLE_MAN_TRUE@EXTRA_DIST = $(MANSOURCES)
+@ENABLE_MAN_TRUE@SUFFIXES = .8.txt .8
 PROJECT = pam-u2f
 all: all-recursive
 
@@ -425,7 +428,7 @@ all: all-recursive
 .SUFFIXES: .8.txt .8 .c .lo .o .obj
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -451,9 +454,9 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
 
-$(top_srcdir)/configure:  $(am__configure_deps)
+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	$(am__cd) $(srcdir) && $(AUTOCONF)
-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
 
@@ -1010,8 +1013,8 @@ uninstall-man: uninstall-man8
 .PRECIOUS: Makefile
 
 
-.8.txt.8:
-	$(A2X) --format=manpage -a revdate="Version $(VERSION)" $<
+@ENABLE_MAN_TRUE@.8.txt.8:
+@ENABLE_MAN_TRUE@	$(A2X) --format=manpage -L -a revdate="Version $(VERSION)" $<
 
 # Release
 
@@ -1020,8 +1023,7 @@ install-exec-hook:
 	chmod -f 644 $(PAMDIR)/pam_u2f.so || true
 
 indent:
-	indent -kr -nut -i2 *.c *.h pamu2fcfg/*.c pamu2fcfg/*.h
-	indent -kr -nut -i2 *.c *.h pamu2fcfg/*.c pamu2fcfg/*.h
+	clang-format -i *.c *.h pamu2fcfg/pamu2fcfg.c
 
 ChangeLog:
 	cd $(srcdir) && git2cl > ChangeLog

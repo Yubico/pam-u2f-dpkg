@@ -4,7 +4,7 @@ SUBDIRS = . pamu2fcfg tests
 
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CFLAGS = $(WARN_CFLAGS)
+AM_CFLAGS = $(CWFLAGS)
 AM_CPPFLAGS = -I$(srcdir)/.. -I$(builddir)/.. $(LIBU2FHOST_CFLAGS) $(LIBU2FSERVER_CFLAGS)
 
 libdir = $(PAMDIR)
@@ -20,6 +20,7 @@ pam_u2f_la_LDFLAGS = -module -avoid-version
 
 DEFS = -DDEBUG_PAM -DPAM_DEBUG @DEFS@
 
+if ENABLE_MAN
 dist_man8_MANS = $(top_builddir)/man/pam_u2f.8
 DISTCLEANFILES = $(dist_man8_MANS)
 
@@ -29,7 +30,8 @@ EXTRA_DIST = $(MANSOURCES)
 SUFFIXES = .8.txt .8
 
 .8.txt.8:
-	$(A2X) --format=manpage -a revdate="Version $(VERSION)" $<
+	$(A2X) --format=manpage -L -a revdate="Version $(VERSION)" $<
+endif
 
 # Release
 
@@ -38,8 +40,7 @@ install-exec-hook:
 	chmod -f 644 $(PAMDIR)/pam_u2f.so || true
 
 indent:
-	indent -kr -nut -i2 *.c *.h pamu2fcfg/*.c pamu2fcfg/*.h
-	indent -kr -nut -i2 *.c *.h pamu2fcfg/*.c pamu2fcfg/*.h
+	clang-format -i *.c *.h pamu2fcfg/pamu2fcfg.c
 
 ChangeLog:
 	cd $(srcdir) && git2cl > ChangeLog

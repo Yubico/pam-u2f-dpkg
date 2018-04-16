@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: pam_u2f
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
-.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: Version 1.0.4
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: Version 1.0.5
 .\"    Manual: PAM U2F Module Manual
 .\"    Source: pam-u2f
 .\"  Language: English
 .\"
-.TH "PAM_U2F" "8" "Version 1\&.0\&.4" "pam\-u2f" "PAM U2F Module Manual"
+.TH "PAM_U2F" "8" "Version 1\&.0\&.5" "pam\-u2f" "PAM U2F Module Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -39,7 +39,12 @@ The module provides U2F authentication against Yubikeys and other compliant auth
 .PP
 \fBdebug\fR
 .RS 4
-Turns on debugging to STDOUT
+Enables debug output
+.RE
+.PP
+\fBdebug_file\fR
+.RS 4
+Filename to write debug to, file must exist and be a regular file, or one of "stdout", "stderr", or "syslog"\&. STDERR is the default\&.
 .RE
 .PP
 \fBorigin\fR=\fIorigin\fR
@@ -59,7 +64,12 @@ Set the location of the file that holds the mappings of user names to keyHandles
 .PP
 \fBnouserok\fR
 .RS 4
-Set to enable authentication attempts to succeed even if the user trying to authenticate is not found inside authfile\&.
+Set to enable authentication attempts to succeed even if the user trying to authenticate is not found inside authfile or if authfile is missing/malformed\&.
+.RE
+.PP
+\fBopenasuser\fR
+.RS 4
+Setuid to the authenticating user when opening the authfile\&. Useful when the user\(cqs home is stored on an NFS volume mounted with the root_squash option (which maps root to nobody which will not be able to read the file)\&.
 .RE
 .PP
 \fBalwaysok\fR
@@ -75,6 +85,11 @@ Maximum number of devices allowed per user (default is 24)\&. Devices specified 
 \fBinteractive\fR
 .RS 4
 Set to prompt a message and wait before testing the presence of a U2F device\&. Recommended if your device doesn\(cqt have tactile trigger\&.
+.RE
+.PP
+[prompt=your prompt here]
+.RS 4
+Set individual prompt message for interactive mode\&. Watch the square brackets around this parameter to get spaces correctly recognized by PAM\&.
 .RE
 .PP
 \fBmanual\fR
