@@ -1,3 +1,32 @@
+2018-04-18  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS: Update NEWS file
+
+2018-04-18  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Indent
+
+2018-04-18  Alessio Di Mauro <alessio@yubico.com>
+
+	* : Merge PR #85
+
+2018-04-18  CJ Oster <cjo@redhat.com>
+
+	* util.c, util.h: Avoids cueing user if no suitable U2F device is
+	available.
+
+2018-04-17  CJ Oster <cjo@redhat.com>
+
+	* util.c: Fixing this bug too.
+
+2018-04-16  CJ Oster <cjo@redhat.com>
+
+	* pam-u2f.c, util.c, util.h: Fixes syslog crash in some applications
+
+2018-04-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS, configure.ac: Bump version
+
 2018-04-16  Alessio Di Mauro <alessio@yubico.com>
 
 	* NEWS: Update NEWS file
