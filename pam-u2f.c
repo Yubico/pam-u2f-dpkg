@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2015 Yubico AB - See COPYING
+ *  Copyright (C) 2014-2018 Yubico AB - See COPYING
  */
 
 /* Define which PAM interfaces we provide */
@@ -9,6 +9,7 @@
 #include <security/pam_appl.h>
 #include <security/pam_modules.h>
 
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -51,8 +52,12 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t *cfg) {
       cfg->interactive = 1;
     if (strcmp(argv[i], "cue") == 0)
       cfg->cue = 1;
+    if (strcmp(argv[i], "nodetect") == 0)
+      cfg->nodetect = 1;
     if (strncmp(argv[i], "authfile=", 9) == 0)
       cfg->auth_file = argv[i] + 9;
+    if (strncmp(argv[i], "authpending_file=", 17) == 0)
+      cfg->authpending_file = argv[i] + 17;
     if (strncmp(argv[i], "origin=", 7) == 0)
       cfg->origin = argv[i] + 7;
     if (strncmp(argv[i], "appid=", 6) == 0)
@@ -95,11 +100,13 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t *cfg) {
     D(cfg->debug_file, "debug=%d", cfg->debug);
     D(cfg->debug_file, "interactive=%d", cfg->interactive);
     D(cfg->debug_file, "cue=%d", cfg->cue);
+    D(cfg->debug_file, "nodetect=%d", cfg->nodetect);
     D(cfg->debug_file, "manual=%d", cfg->manual);
     D(cfg->debug_file, "nouserok=%d", cfg->nouserok);
     D(cfg->debug_file, "openasuser=%d", cfg->openasuser);
     D(cfg->debug_file, "alwaysok=%d", cfg->alwaysok);
     D(cfg->debug_file, "authfile=%s", cfg->auth_file ? cfg->auth_file : "(null)");
+    D(cfg->debug_file, "authpending_file=%s", cfg->authpending_file ? cfg->authpending_file : "(null)");
     D(cfg->debug_file, "origin=%s", cfg->origin ? cfg->origin : "(null)");
     D(cfg->debug_file, "appid=%s", cfg->appid ? cfg->appid : "(null)");
     D(cfg->debug_file, "prompt=%s", cfg->prompt ? cfg->prompt : "(null)");
@@ -132,6 +139,10 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   device_t *devices = NULL;
   unsigned n_devices = 0;
   int openasuser;
+  int should_free_origin = 0;
+  int should_free_appid = 0;
+  int should_free_auth_file = 0;
+  int should_free_authpending_file = 0;
 
   parse_cfg(flags, argc, argv, cfg);
 
@@ -148,6 +159,8 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     if (!cfg->origin) {
       DBG("Unable to allocate memory");
       goto done;
+    } else {
+      should_free_origin = 1;
     }
   }
 
@@ -158,6 +171,8 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     if (!cfg->appid) {
       DBG("Unable to allocate memory")
       goto done;
+    } else {
+      should_free_appid = 1;
     }
   }
 
@@ -230,6 +245,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     DBG("Using default authentication file %s", buf);
 
     cfg->auth_file = buf; /* cfg takes ownership */
+    should_free_auth_file = 1;
     buf = NULL;
   } else {
     DBG("Using authentication file %s", cfg->auth_file);
@@ -278,6 +294,36 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     }
   }
 
+  // Determine the full path for authpending_file in order to emit touch request notifications
+  if (!cfg->authpending_file) {
+    int actual_size = snprintf(buffer, BUFSIZE, DEFAULT_AUTHPENDING_FILE_PATH, getuid());
+    if (actual_size >= 0 && actual_size < BUFSIZE) {
+      cfg->authpending_file = strdup(buffer);
+    }
+    if (!cfg->authpending_file) {
+      DBG("Unable to allocate memory for the authpending_file, touch request notifications will not be emitted");
+    } else {
+      should_free_authpending_file = 1;
+    }
+  } else {
+    if (strlen(cfg->authpending_file) == 0) {
+      DBG("authpending_file is set to an empty value, touch request notifications will be disabled");
+      cfg->authpending_file = NULL;
+    }
+  }
+
+  int authpending_file_descriptor = -1;
+  if (cfg->authpending_file) {
+    DBG("Using file '%s' for emitting touch request notifications", cfg->authpending_file);
+
+    // Open (or create) the authpending_file to indicate that we start waiting for a touch
+    authpending_file_descriptor = open(cfg->authpending_file, O_RDONLY | O_CREAT, 0664);
+    if (authpending_file_descriptor < 0) {
+      DBG("Unable to emit 'authentication started' notification by opening the file '%s', (%s)",
+          cfg->authpending_file, strerror(errno));
+    }
+  }
+
   if (cfg->manual == 0) {
     if (cfg->interactive) {
       converse(pamh, PAM_PROMPT_ECHO_ON,
@@ -287,6 +333,14 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     retval = do_authentication(cfg, devices, n_devices, pamh);
   } else {
     retval = do_manual_authentication(cfg, devices, n_devices, pamh);
+  }
+
+  // Close the authpending_file to indicate that we stop waiting for a touch
+  if (authpending_file_descriptor >= 0) {
+    if (close(authpending_file_descriptor) < 0) {
+      DBG("Unable to emit 'authentication stopped' notification by closing the file '%s', (%s)",
+          cfg->authpending_file, strerror(errno));
+    }
   }
 
   if (retval != 1) {
@@ -303,6 +357,26 @@ done:
   if (buf) {
     free(buf);
     buf = NULL;
+  }
+
+  if (should_free_origin) {
+    free((char *) cfg->origin);
+    cfg->origin = NULL;
+  }
+
+  if (should_free_appid) {
+    free((char *) cfg->appid);
+    cfg->appid = NULL;
+  }
+
+  if (should_free_auth_file) {
+    free((char *) cfg->auth_file);
+    cfg->auth_file = NULL;
+  }
+
+  if (should_free_authpending_file) {
+    free((char *) cfg->authpending_file);
+    cfg->authpending_file = NULL;
   }
 
   if (cfg->alwaysok && retval != PAM_SUCCESS) {

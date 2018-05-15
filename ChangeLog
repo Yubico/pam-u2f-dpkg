@@ -1,3 +1,53 @@
+2018-05-15  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* NEWS: Update NEWS file
+
+2018-05-04  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* : Merge PR #92
+
+2018-05-02  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* : Merge PR #91
+
+2018-04-30  CJ Oster <cjo@redhat.com>
+
+	* man/pam_u2f.8.txt, pam-u2f.c, util.c, util.h: Adds "nodetect"
+	option.
+
+2018-04-24  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: fixup some minor memory leaks
+
+2018-04-24  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c, util.c: Make sure to free origin/appid/auth_file if
+	allocated
+
+2018-04-24  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c, util.h: Make authpending_file const and cast it during
+	free
+
+2018-04-24  Alessio Di Mauro <alessio@yubico.com>
+
+	* COPYING, Makefile.am, configure.ac, pam-u2f.c,
+	pamu2fcfg/Makefile.am, pamu2fcfg/cmdline.ggo,
+	pamu2fcfg/pamu2fcfg.c, tests/Makefile.am, tests/basic.c, util.c,
+	util.h: Update copyright
+
+2018-04-24  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c: Default should_free_authpending_file to 0
+
+2018-04-24  Alessio Di Mauro <alessio@yubico.com>
+
+	* : Merge PR #89
+
+2018-04-18  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS, configure.ac: Bump version
+
 2018-04-18  Alessio Di Mauro <alessio@yubico.com>
 
 	* NEWS: Update NEWS file
