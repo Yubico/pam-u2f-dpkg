@@ -13,16 +13,19 @@ Building
 --------
 
 This project uses 'autoconf', 'automake', 'pkg-config' and 'libtool'
-to achieve portability and ease of use. If you downloaded a tarball,
-build it as follows.
+to achieve portability and ease of use. 
+
+In addition, both the Yubico U2F https://developers.yubico.com/libu2f-host['libu2f-host-dev'] and
+https://developers.yubico.com/libu2f-server['libu2f-server-dev'] libaries are needed.
+
+  Debian:   apt-get install autoconf automake libtool pkg-config libu2f-host-dev libu2f-server-dev --no-install-recommends
+
+If you downloaded a tarball, build it as follows.
 
 -----------
   $ ./configure
   $ make
 -----------
-
-Both the Yubico U2F https://developers.yubico.com/libu2f-host[host] and
-https://developers.yubico.com/libu2f-server[server] libaries are needed.
 
 Building from Git
 -----------------
@@ -39,7 +42,7 @@ This will create a directory 'pam-u2f'. Enter the directory:
   $ cd pam-u2f
 -----------
 
-Autoconf, automake, libtool, and libpam must be installed. AsciiDoc and xsltproc are used to
+'Autoconf', 'automake', 'libtool', and 'libpam' must be installed. 'AsciiDoc' and 'xsltproc' are used to
 generate the manpages.
 
   Debian:   apt-get install autoconf automake libtool libpam-dev asciidoc xsltproc libxml2-utils docbook-xml --no-install-recommends
@@ -95,6 +98,14 @@ file is $XDG_CONFIG_HOME/Yubico/u2f_keys. If the environment variable
 is not set, $HOME/.config/Yubico/u2f_keys is used.
 (more on <<files,Authorization Mapping Files>>).
 
+authpending_file=file::
+Set the location of the file that is used for touch request notifications.
+This file will be opened when pam-u2f starts waiting for a user to touch the device,
+and will be closed when it no longer waits for a touch.
+Use inotify to listen on these events, or a more high-level tool like https://github.com/maximbaz/yubikey-touch-detector[yubikey-touch-detector].
+Set an empty value in order to disable this functionality, like so: `authpending_file=`.
+Default value: /var/run/user/$UID/pam-u2f-authpending
+
 nouserok::
 Set to enable authentication attempts to succeed even if the user trying to
 authenticate is not found inside authfile or if authfile is missing/malformed.
@@ -127,6 +138,17 @@ If enabled, interactive mode becomes redundant and has no effect.
 
 cue::
 Set to prompt a message to remind to touch the device.
+
+nodetect::
+Set to skip detecting if a suitable U2F token is inserted before performing
+the full tactile authentication. This detection was created to avoid
+emitting the "cue" message if no suitable token exists, because doing so
+leaks information about the authentication stack if a token is inserted but
+not configured for the authenticating user. However, it was found that
+versions of libu2f-user 1.1.5 or less has buggy iteration/sleep behavior
+which causes a 1-second delay to occur for this initial detection. For this
+reason, as well as the possibility of hypothetical tokens that do not
+tolerate this double authentication, the "nodetect" option was added.
 
 [[files]]
 Authorization Mapping Files
