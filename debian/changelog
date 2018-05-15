@@ -1,3 +1,9 @@
+pam-u2f (1.0.7-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Alessio Di Mauro <alessio@yubico.com>  Tue, 15 May 2018 10:12:45 +0100
+
 pam-u2f (1.0.6-1) unstable; urgency=medium
 
   * New upstream release.
