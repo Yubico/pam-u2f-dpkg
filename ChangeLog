@@ -1,3 +1,50 @@
+2019-06-04  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* NEWS: Update NEWS file
+
+2019-06-04  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* man/pam_u2f.8.txt: Update manual
+
+2019-06-04  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* : Merge PR #116
+
+2019-06-04  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* Makefile.am, README, configure.ac, drop_privs.c, drop_privs.h,
+	pam-u2f.c: Drop privileges by default when opening user-related
+	files The module is typically executed as root and would sometimes open
+	files or follow symlinks that could be controlled from the outside.  Drop privileges to the target user before opening any files.  Fixes CVE-2019-12209.  Thanks to Matthias Gerstner of the SUSE Security Team for reporting
+	the issue.
+
+2019-06-04  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* pam-u2f.c, util.c, util.h: Do not leak file descriptor when doing
+	exec When opening a custom debug file, the descriptor would stay open
+	when calling exec and leak to the child process.  Make sure all files are opened with close-on-exec.  This fixes CVE-2019-12210.  Thanks to Matthias Gerstner of the SUSE Security Team for reporting
+	the issue.
+
+2019-04-01  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #115 from Yubico/malloc_debug Handle malloc failing when logging
+
+2018-07-23  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Add more explicit dependencies to README Closes #101
+
+2018-05-17  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* man/pam_u2f.8.txt: Fix typo in man page
+
+2018-05-17  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* : Merge  PR 95
+
+2018-05-15  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* NEWS, configure.ac: Bump version
+
 2018-05-15  Alessio Di Mauro <alessio@alessiodimauro.com>
 
 	* NEWS: Update NEWS file

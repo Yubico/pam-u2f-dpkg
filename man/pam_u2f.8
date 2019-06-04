@@ -2,12 +2,12 @@
 .\"     Title: pam_u2f
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: Version 1.0.6
+.\"      Date: Version 1.0.8
 .\"    Manual: PAM U2F Module Manual
 .\"    Source: pam-u2f
 .\"  Language: English
 .\"
-.TH "PAM_U2F" "8" "Version 1\&.0\&.6" "pam\-u2f" "PAM U2F Module Manual"
+.TH "PAM_U2F" "8" "Version 1\&.0\&.8" "pam\-u2f" "PAM U2F Module Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -64,7 +64,7 @@ Set the location of the file that holds the mappings of user names to keyHandles
 .PP
 \fBauthpending_file\fR=\fIfile\fR
 .RS 4
-Set the location of the file that is used for touch request notifications\&. This file will be opened when pam\-u2f starts waiting for a user to touch the device, and will be closed when it no longer waits for a touch\&. Use inotify to listen on these events, or a more high\-level tool like yubikey\-touch\-detector\&. Default value: /var/run/user/$UID/pam\-u2f\-authpending\&. Set an empty value in order to disable this functionality, like so: lockfile=
+Set the location of the file that is used for touch request notifications\&. This file will be opened when pam\-u2f starts waiting for a user to touch the device, and will be closed when it no longer waits for a touch\&. Use inotify to listen on these events, or a more high\-level tool like yubikey\-touch\-detector\&. Default value: /var/run/user/$UID/pam\-u2f\-authpending\&. Set an empty value in order to disable this functionality, like so: "authpending_file="\&.
 .RE
 .PP
 \fBnouserok\fR
@@ -74,7 +74,7 @@ Set to enable authentication attempts to succeed even if the user trying to auth
 .PP
 \fBopenasuser\fR
 .RS 4
-Setuid to the authenticating user when opening the authfile\&. Useful when the user\(cqs home is stored on an NFS volume mounted with the root_squash option (which maps root to nobody which will not be able to read the file)\&.
+Setuid to the authenticating user when opening the authfile\&. Useful when the user\(cqs home is stored on an NFS volume mounted with the root_squash option (which maps root to nobody which will not be able to read the file)\&. Note that after release 1\&.0\&.8 this is done by default when no global authfile or XDG_CONFIG_HOME environment variable has been set\&.
 .RE
 .PP
 \fBalwaysok\fR
@@ -119,6 +119,8 @@ auth sufficient pam_u2f\&.so debug origin=pam://$HOSTNAME appid=pam://$HOSTNAME
 .sp
 auth required pam_u2f\&.so origin=http://example\&.com appid=http://example\&.com authfile=/etc/yubikey_mappings
 .SH "CAVEATS"
+.sp
+By default the mapping file inside a home directory will be opened as the target user, whereas the central file will be opened as root\&. If the XDG_CONFIG_HOME variable is set, privileges will not be dropped unless the openasuser configuration setting is set\&.
 .sp
 Using pam\-u2f to secure the login to a computer while storing the mapping file in an encrypted home directory, will result in the impossibility of logging into the system\&. The partition is decrypted after login and the mapping file can not be accessed\&.
 .SH "NOTES"

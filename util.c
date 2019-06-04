@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2018 Yubico AB - See COPYING
+ * Copyright (C) 2014-2019 Yubico AB - See COPYING
  */
 
 #include "util.h"
@@ -36,7 +36,7 @@ int get_devices_from_authfile(const char *authfile, const char *username,
   /* Ensure we never return uninitialized count. */
   *n_devs = 0;
 
-  fd = open(authfile, O_RDONLY, 0);
+  fd = open(authfile, O_RDONLY | O_CLOEXEC | O_NOCTTY);
   if (fd < 0) {
     if (verbose)
       D(debug_file, "Cannot open file: %s (%s)", authfile, strerror(errno));
@@ -83,6 +83,8 @@ int get_devices_from_authfile(const char *authfile, const char *username,
     if (verbose)
       D(debug_file, "fdopen: %s", strerror(errno));
     goto err;
+  } else {
+    fd = -1; /* fd belongs to opwfile */
   }
 
   buf = malloc(sizeof(char) * (DEVSIZE * max_devs));
@@ -95,8 +97,9 @@ int get_devices_from_authfile(const char *authfile, const char *username,
   retval = -2;
   while (fgets(buf, (int)(DEVSIZE * (max_devs - 1)), opwfile)) {
     char *saveptr = NULL;
-    if (buf[strlen(buf) - 1] == '\n')
-      buf[strlen(buf) - 1] = '\0';
+    size_t len = strlen(buf);
+    if (len > 0 && buf[len - 1] == '\n')
+      buf[len - 1] = '\0';
 
     if (verbose)
       D(debug_file, "Authorization line: %s", buf);
@@ -119,16 +122,16 @@ int get_devices_from_authfile(const char *authfile, const char *username,
 
       i = 0;
       while ((s_token = strtok_r(NULL, ",", &saveptr))) {
-        devices[i].keyHandle = NULL;
-        devices[i].publicKey = NULL;
-
-        if ((*n_devs)++ > MAX_DEVS - 1) {
-          *n_devs = MAX_DEVS;
+        if ((*n_devs)++ > max_devs - 1) {
+          *n_devs = max_devs;
           if (verbose)
             D(debug_file, "Found more than %d devices, ignoring the remaining ones",
-               MAX_DEVS);
+               max_devs);
           break;
         }
+
+        devices[i].keyHandle = NULL;
+        devices[i].publicKey = NULL;
 
         if (verbose)
           D(debug_file, "KeyHandle for device number %d: %s", i + 1, s_token);
@@ -211,8 +214,10 @@ out:
 
   if (opwfile)
     fclose(opwfile);
-  else if (fd >= 0)
+
+  if (fd != -1)
     close(fd);
+
   return retval;
 }
 
@@ -294,6 +299,9 @@ int do_authentication(const cfg_t *cfg, const device_t *devices,
     return retval;
   }
 
+  if (cfg->nodetect && cfg->debug)
+    D(cfg->debug_file, "nodetect option specified, suitable key detection will be skipped");
+
   i = 0;
   while (i < n_devs) {
 
@@ -327,9 +335,6 @@ int do_authentication(const cfg_t *cfg, const device_t *devices,
       D(cfg->debug_file, "Challenge: %s", buf);
 
     if (cfg->nodetect || (h_rc = u2fh_authenticate(devs, buf, cfg->origin, &response, 0)) == U2FH_OK ) {
-
-      if (cfg->nodetect)
-        D(cfg->debug_file, "nodetect option specified, suitable key detection skipped");
 
       if (cfg->manual == 0 && cfg->cue && !cued) {
         cued = 1;
@@ -560,9 +565,15 @@ void _debug(FILE *debug_file, const char *file, int line, const char *func, cons
     out = malloc(size);
   }
 
-  size = (unsigned int)sprintf(out, DEBUG_STR, file, line, func);
-  vsprintf(&out[size], fmt, ap);
-  va_end(ap);
+  if (out) {
+    size = (unsigned int)sprintf(out, DEBUG_STR, file, line, func);
+    vsprintf(&out[size], fmt, ap);
+    va_end(ap);
+  }
+  else {
+    out = buffer;
+    sprintf(out, "debug(pam_u2f): malloc failed when trying to log\n");
+  }
 
   if (debug_file == (FILE *)-1) {
     syslog(LOG_AUTHPRIV | LOG_DEBUG, "%s", out);
