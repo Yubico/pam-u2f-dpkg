@@ -2,12 +2,12 @@
 .\"     Title: pamu2fcfg
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: Version 1.0.8
+.\"      Date: Version 1.1.0
 .\"    Manual: PAM U2F Configuration Tool
 .\"    Source: pamu2fcfg
 .\"  Language: English
 .\"
-.TH "PAMU2FCFG" "1" "Version 1\&.0\&.8" "pamu2fcfg" "PAM U2F Configuration Tool"
+.TH "PAMU2FCFG" "1" "Version 1\&.1\&.0" "pamu2fcfg" "PAM U2F Configuration Tool"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -57,8 +57,33 @@ Origin URL to use during registration\&. Defaults to pam://hostname
 Application ID to use during registration\&. Defaults to
 \fBorigin\fR
 .RE
+.PP
+\fB\-r\fR, \fB\-\-resident\fR
+.RS 4
+Generate a resident credential\&. Defaults to off\&.
+.RE
+.PP
+\fB\-t\fR, \fB\-\-type\fR=\fISTRING\fR
+.RS 4
+COSE type to use during registration (ES256 or RS256)\&. Defaults to ES256\&.
+.RE
+.PP
+\fB\-P\fR, \fB\-\-no\-user\-presence\fR
+.RS 4
+Allow using the credential without ensuring the user\(cqs presence\&. Defaults to off\&.
+.RE
+.PP
+\fB\-N\fR, \fB\-\-pin\-verification\fR
+.RS 4
+Require PIN verification during authentication\&. Defaults to off\&.
+.RE
+.PP
+\fB\-V\fR, \fB\-\-user\-verification\fR
+.RS 4
+Require user verification during authentication\&. Defaults to off\&.
+.RE
 .sp
-\fB\-V\fR, \fB\-\-version\fR \fBPrint version and exit\fR
+\fB\-\-version\fR: \fBPrint version and exit\fR
 .sp
 Group: user (mutually exclusive)
 .PP
@@ -80,4 +105,4 @@ Report pamu2fcfg bugs in the issue tracker: https://github\&.com/Yubico/pam\-u2f
 .sp
 The pam\-u2f home page: https://developers\&.yubico\&.com/pam\-u2f/
 .sp
-YubiKeys can be obtained from Yubico: http://www\&.yubico\&.com/
+YubiKeys can be obtained from Yubico: https://www\&.yubico\&.com/

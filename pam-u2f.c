@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <syslog.h>
 #include <pwd.h>
@@ -26,7 +27,7 @@
 #ifndef HAVE_SECURE_GETENV
 char *secure_getenv(const char *);
 char *secure_getenv(const char *name) {
-  (void)name;
+  (void) name;
   return NULL;
 }
 #endif
@@ -39,6 +40,9 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t *cfg) {
 
   memset(cfg, 0, sizeof(cfg_t));
   cfg->debug_file = stderr;
+  cfg->userpresence = -1;
+  cfg->userverification = -1;
+  cfg->pinverification = -1;
 
   for (i = 0; i < argc; i++) {
     if (strncmp(argv[i], "max_devices=", 12) == 0)
@@ -59,8 +63,16 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t *cfg) {
       cfg->cue = 1;
     if (strcmp(argv[i], "nodetect") == 0)
       cfg->nodetect = 1;
+    if (strncmp(argv[i], "userpresence=", 13) == 0)
+      sscanf(argv[i], "userpresence=%d", &cfg->userpresence);
+    if (strncmp(argv[i], "userverification=", 17) == 0)
+      sscanf(argv[i], "userverification=%d", &cfg->userverification);
+    if (strncmp(argv[i], "pinverification=", 16) == 0)
+      sscanf(argv[i], "pinverification=%d", &cfg->pinverification);
     if (strncmp(argv[i], "authfile=", 9) == 0)
       cfg->auth_file = argv[i] + 9;
+    if (strncmp(argv[i], "sshformat", 9) == 0)
+      cfg->sshformat = 1;
     if (strncmp(argv[i], "authpending_file=", 17) == 0)
       cfg->authpending_file = argv[i] + 17;
     if (strncmp(argv[i], "origin=", 7) == 0)
@@ -69,22 +81,22 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t *cfg) {
       cfg->appid = argv[i] + 6;
     if (strncmp(argv[i], "prompt=", 7) == 0)
       cfg->prompt = argv[i] + 7;
-    if (strncmp (argv[i], "debug_file=", 11) == 0) {
+    if (strncmp(argv[i], "cue_prompt=", 11) == 0)
+      cfg->cue_prompt = argv[i] + 11;
+    if (strncmp(argv[i], "debug_file=", 11) == 0) {
       const char *filename = argv[i] + 11;
-      if(strncmp (filename, "stdout", 6) == 0) {
+      if (strncmp(filename, "stdout", 6) == 0) {
         cfg->debug_file = stdout;
-      }
-      else if(strncmp (filename, "stderr", 6) == 0) {
+      } else if (strncmp(filename, "stderr", 6) == 0) {
         cfg->debug_file = stderr;
-      }
-      else if( strncmp (filename, "syslog", 6) == 0) {
-        cfg->debug_file = (FILE *)-1;
-      }
-      else {
-        fd = open(filename, O_WRONLY | O_APPEND | O_CLOEXEC | O_NOFOLLOW | O_NOCTTY);
+      } else if (strncmp(filename, "syslog", 6) == 0) {
+        cfg->debug_file = (FILE *) -1;
+      } else {
+        fd = open(filename,
+                  O_WRONLY | O_APPEND | O_CLOEXEC | O_NOFOLLOW | O_NOCTTY);
         if (fd >= 0 && (fstat(fd, &st) == 0) && S_ISREG(st.st_mode)) {
           file = fdopen(fd, "a");
-          if(file != NULL) {
+          if (file != NULL) {
             cfg->debug_file = file;
             cfg->is_custom_debug_file = 1;
             file = NULL;
@@ -106,12 +118,18 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t *cfg) {
     D(cfg->debug_file, "interactive=%d", cfg->interactive);
     D(cfg->debug_file, "cue=%d", cfg->cue);
     D(cfg->debug_file, "nodetect=%d", cfg->nodetect);
+    D(cfg->debug_file, "userpresence=%d", cfg->userpresence);
+    D(cfg->debug_file, "userverification=%d", cfg->userverification);
+    D(cfg->debug_file, "pinverification=%d", cfg->pinverification);
     D(cfg->debug_file, "manual=%d", cfg->manual);
     D(cfg->debug_file, "nouserok=%d", cfg->nouserok);
     D(cfg->debug_file, "openasuser=%d", cfg->openasuser);
     D(cfg->debug_file, "alwaysok=%d", cfg->alwaysok);
-    D(cfg->debug_file, "authfile=%s", cfg->auth_file ? cfg->auth_file : "(null)");
-    D(cfg->debug_file, "authpending_file=%s", cfg->authpending_file ? cfg->authpending_file : "(null)");
+    D(cfg->debug_file, "sshformat=%d", cfg->sshformat);
+    D(cfg->debug_file, "authfile=%s",
+      cfg->auth_file ? cfg->auth_file : "(null)");
+    D(cfg->debug_file, "authpending_file=%s",
+      cfg->authpending_file ? cfg->authpending_file : "(null)");
     D(cfg->debug_file, "origin=%s", cfg->origin ? cfg->origin : "(null)");
     D(cfg->debug_file, "appid=%s", cfg->appid ? cfg->appid : "(null)");
     D(cfg->debug_file, "prompt=%s", cfg->prompt ? cfg->prompt : "(null)");
@@ -127,9 +145,9 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t *cfg) {
 #ifdef DBG
 #undef DBG
 #endif
-#define DBG(...)                                                                 \
+#define DBG(...)                                                               \
   if (cfg->debug) {                                                            \
-    D(cfg->debug_file, __VA_ARGS__);                                                           \
+    D(cfg->debug_file, __VA_ARGS__);                                           \
   }
 
 /* PAM entry point for authentication verification */
@@ -145,6 +163,8 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   char *buf = NULL;
   char *authfile_dir;
   size_t authfile_dir_len;
+  char *default_authfile;
+  char *default_authfile_dir;
   int pgu_ret, gpn_ret;
   int retval = PAM_IGNORE;
   device_t *devices = NULL;
@@ -154,17 +174,22 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   int should_free_appid = 0;
   int should_free_auth_file = 0;
   int should_free_authpending_file = 0;
-  PAM_MODUTIL_DEF_PRIVS(privs);
 
   parse_cfg(flags, argc, argv, cfg);
 
-  if (!cfg->origin) {
-    strcpy(buffer, DEFAULT_ORIGIN_PREFIX);
+  PAM_MODUTIL_DEF_PRIVS(privs);
 
-    if (gethostname(buffer + strlen(DEFAULT_ORIGIN_PREFIX),
-                    BUFSIZE - strlen(DEFAULT_ORIGIN_PREFIX)) == -1) {
-      DBG("Unable to get host name");
-      goto done;
+  if (!cfg->origin) {
+    if (!cfg->sshformat) {
+      strcpy(buffer, DEFAULT_ORIGIN_PREFIX);
+
+      if (gethostname(buffer + strlen(DEFAULT_ORIGIN_PREFIX),
+                      BUFSIZE - strlen(DEFAULT_ORIGIN_PREFIX)) == -1) {
+        DBG("Unable to get host name");
+        goto done;
+      }
+    } else {
+      strcpy(buffer, SSH_ORIGIN);
     }
     DBG("Origin not specified, using \"%s\"", buffer);
     cfg->origin = strdup(buffer);
@@ -178,7 +203,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
 
   if (!cfg->appid) {
     DBG("Appid not specified, using the same value of origin (%s)",
-         cfg->origin);
+        cfg->origin);
     cfg->appid = strdup(cfg->origin);
     if (!cfg->appid) {
       DBG("Unable to allocate memory")
@@ -193,7 +218,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     cfg->max_devs = MAX_DEVS;
   }
 
-  devices = malloc(sizeof(device_t) * cfg->max_devs);
+  devices = calloc(cfg->max_devs, sizeof(device_t));
   if (!devices) {
     DBG("Unable to allocate memory");
     retval = PAM_IGNORE;
@@ -213,7 +238,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   if (gpn_ret != 0 || pw == NULL || pw->pw_dir == NULL ||
       pw->pw_dir[0] != '/') {
     DBG("Unable to retrieve credentials for user %s, (%s)", user,
-         strerror(errno));
+        strerror(errno));
     retval = PAM_USER_UNKNOWN;
     goto done;
   }
@@ -221,14 +246,22 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   DBG("Found user %s", user);
   DBG("Home directory for %s is %s", user, pw->pw_dir);
 
+  if (!cfg->sshformat) {
+    default_authfile = DEFAULT_AUTHFILE;
+    default_authfile_dir = DEFAULT_AUTHFILE_DIR;
+  } else {
+    default_authfile = DEFAULT_AUTHFILE_SSH;
+    default_authfile_dir = DEFAULT_AUTHFILE_DIR_SSH;
+  }
+
   if (!cfg->auth_file) {
     buf = NULL;
     authfile_dir = secure_getenv(DEFAULT_AUTHFILE_DIR_VAR);
     if (!authfile_dir) {
-      DBG("Variable %s is not set. Using default value ($HOME/.config/)",
-           DEFAULT_AUTHFILE_DIR_VAR);
-      authfile_dir_len =
-        strlen(pw->pw_dir) + strlen("/.config") + strlen(DEFAULT_AUTHFILE) + 1;
+      DBG("Variable %s is not set. Using default value ($HOME%s/)",
+          DEFAULT_AUTHFILE_DIR_VAR, default_authfile_dir);
+      authfile_dir_len = strlen(pw->pw_dir) + strlen(default_authfile_dir) +
+                         strlen(default_authfile) + 1;
       buf = malloc(sizeof(char) * (authfile_dir_len));
 
       if (!buf) {
@@ -240,11 +273,11 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
       /* Opening a file in a users $HOME, need to drop privs for security */
       openasuser = geteuid() == 0 ? 1 : 0;
 
-      snprintf(buf, authfile_dir_len,
-               "%s/.config%s", pw->pw_dir, DEFAULT_AUTHFILE);
+      snprintf(buf, authfile_dir_len, "%s%s%s", pw->pw_dir,
+               default_authfile_dir, default_authfile);
     } else {
       DBG("Variable %s set to %s", DEFAULT_AUTHFILE_DIR_VAR, authfile_dir);
-      authfile_dir_len = strlen(authfile_dir) + strlen(DEFAULT_AUTHFILE) + 1;
+      authfile_dir_len = strlen(authfile_dir) + strlen(default_authfile) + 1;
       buf = malloc(sizeof(char) * (authfile_dir_len));
 
       if (!buf) {
@@ -253,12 +286,12 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
         goto done;
       }
 
-      snprintf(buf, authfile_dir_len,
-               "%s%s", authfile_dir, DEFAULT_AUTHFILE);
+      snprintf(buf, authfile_dir_len, "%s%s", authfile_dir, default_authfile);
 
-      if (!openasuser) {
-	DBG("WARNING: not dropping privileges when reading %s, please "
-	    "consider setting openasuser=1 in the module configuration", buf);
+      if (!cfg->openasuser) {
+        DBG("WARNING: not dropping privileges when reading %s, please "
+            "consider setting openasuser=1 in the module configuration",
+            buf);
       }
     }
 
@@ -268,6 +301,28 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     should_free_auth_file = 1;
     buf = NULL;
   } else {
+    if (cfg->auth_file[0] != '/') {
+      /* Individual authorization mapping by user: auth_file is not
+          absolute path, so prepend user home dir. */
+      openasuser = geteuid() == 0 ? 1 : 0;
+
+      authfile_dir_len =
+        strlen(pw->pw_dir) + strlen("/") + strlen(cfg->auth_file) + 1;
+      buf = malloc(sizeof(char) * (authfile_dir_len));
+
+      if (!buf) {
+        DBG("Unable to allocate memory");
+        retval = PAM_IGNORE;
+        goto done;
+      }
+
+      snprintf(buf, authfile_dir_len, "%s/%s", pw->pw_dir, cfg->auth_file);
+
+      cfg->auth_file = buf; /* update cfg */
+      should_free_auth_file = 1;
+      buf = NULL;
+    }
+
     DBG("Using authentication file %s", cfg->auth_file);
   }
 
@@ -283,9 +338,8 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     }
     DBG("Switched to uid %i", pw->pw_uid);
   }
-  retval = get_devices_from_authfile(cfg->auth_file, user, cfg->max_devs,
-                                     cfg->debug, cfg->debug_file,
-                                     devices, &n_devices);
+  retval = get_devices_from_authfile(cfg, user, devices, &n_devices);
+
   if (openasuser) {
     if (pam_modutil_regain_priv(pamh, &privs)) {
       DBG("could not restore privileges");
@@ -317,33 +371,41 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     }
   }
 
-  // Determine the full path for authpending_file in order to emit touch request notifications
+  // Determine the full path for authpending_file in order to emit touch request
+  // notifications
   if (!cfg->authpending_file) {
-    int actual_size = snprintf(buffer, BUFSIZE, DEFAULT_AUTHPENDING_FILE_PATH, getuid());
+    int actual_size =
+      snprintf(buffer, BUFSIZE, DEFAULT_AUTHPENDING_FILE_PATH, getuid());
     if (actual_size >= 0 && actual_size < BUFSIZE) {
       cfg->authpending_file = strdup(buffer);
     }
     if (!cfg->authpending_file) {
-      DBG("Unable to allocate memory for the authpending_file, touch request notifications will not be emitted");
+      DBG("Unable to allocate memory for the authpending_file, touch request "
+          "notifications will not be emitted");
     } else {
       should_free_authpending_file = 1;
     }
   } else {
     if (strlen(cfg->authpending_file) == 0) {
-      DBG("authpending_file is set to an empty value, touch request notifications will be disabled");
+      DBG("authpending_file is set to an empty value, touch request "
+          "notifications will be disabled");
       cfg->authpending_file = NULL;
     }
   }
 
   int authpending_file_descriptor = -1;
   if (cfg->authpending_file) {
-    DBG("Using file '%s' for emitting touch request notifications", cfg->authpending_file);
+    DBG("Using file '%s' for emitting touch request notifications",
+        cfg->authpending_file);
 
-    // Open (or create) the authpending_file to indicate that we start waiting for a touch
+    // Open (or create) the authpending_file to indicate that we start waiting
+    // for a touch
     authpending_file_descriptor =
-      open(cfg->authpending_file, O_RDONLY | O_CREAT | O_CLOEXEC | O_NOFOLLOW | O_NOCTTY, 0664);
+      open(cfg->authpending_file,
+           O_RDONLY | O_CREAT | O_CLOEXEC | O_NOFOLLOW | O_NOCTTY, 0664);
     if (authpending_file_descriptor < 0) {
-      DBG("Unable to emit 'authentication started' notification by opening the file '%s', (%s)",
+      DBG("Unable to emit 'authentication started' notification by opening the "
+          "file '%s', (%s)",
           cfg->authpending_file, strerror(errno));
     }
   }
@@ -362,7 +424,8 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   // Close the authpending_file to indicate that we stop waiting for a touch
   if (authpending_file_descriptor >= 0) {
     if (close(authpending_file_descriptor) < 0) {
-      DBG("Unable to emit 'authentication stopped' notification by closing the file '%s', (%s)",
+      DBG("Unable to emit 'authentication stopped' notification by closing the "
+          "file '%s', (%s)",
           cfg->authpending_file, strerror(errno));
     }
   }
@@ -382,24 +445,24 @@ done:
     free(buf);
     buf = NULL;
   }
-
+#define free_const(a) free((void *) (uintptr_t)(a))
   if (should_free_origin) {
-    free((char *) cfg->origin);
+    free_const(cfg->origin);
     cfg->origin = NULL;
   }
 
   if (should_free_appid) {
-    free((char *) cfg->appid);
+    free_const(cfg->appid);
     cfg->appid = NULL;
   }
 
   if (should_free_auth_file) {
-    free((char *) cfg->auth_file);
+    free_const(cfg->auth_file);
     cfg->auth_file = NULL;
   }
 
   if (should_free_authpending_file) {
-    free((char *) cfg->authpending_file);
+    free_const(cfg->authpending_file);
     cfg->authpending_file = NULL;
   }
 
@@ -418,10 +481,14 @@ done:
 
 PAM_EXTERN int pam_sm_setcred(pam_handle_t *pamh, int flags, int argc,
                               const char **argv) {
-  (void)pamh;
-  (void)flags;
-  (void)argc;
-  (void)argv;
+  (void) pamh;
+  (void) flags;
+  (void) argc;
+  (void) argv;
 
   return PAM_SUCCESS;
 }
+
+#ifdef PAM_MODULE_ENTRY
+PAM_MODULE_ENTRY("pam_u2f");
+#endif

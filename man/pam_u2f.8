@@ -2,12 +2,12 @@
 .\"     Title: pam_u2f
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: Version 1.0.8
+.\"      Date: Version 1.1.0
 .\"    Manual: PAM U2F Module Manual
 .\"    Source: pam-u2f
 .\"  Language: English
 .\"
-.TH "PAM_U2F" "8" "Version 1\&.0\&.8" "pam\-u2f" "PAM U2F Module Manual"
+.TH "PAM_U2F" "8" "Version 1\&.1\&.0" "pam\-u2f" "PAM U2F Module Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -44,12 +44,17 @@ Enables debug output
 .PP
 \fBdebug_file\fR
 .RS 4
-Filename to write debug to, file must exist and be a regular file, or one of "stdout", "stderr", or "syslog"\&. STDERR is the default\&.
+Filename to write debugging messages to\&.
+\fBIf this file is missing, nothing will be logged\fR\&. This regular file
+\fBhas to be created by the user\fR
+or
+\fBmust exist and be a regular file\fR
+for anything getting logged to it\&. It is not created by pam\-u2f on purpose (for security considerations)\&. This filename may be alternatively set to "stderr" (default), "stdout", or "syslog"\&.
 .RE
 .PP
 \fBorigin\fR=\fIorigin\fR
 .RS 4
-Set the origin for the U2F authentication procedure\&. If no value is specified, the origin "pam://$HOSTNAME" is used\&.
+Set the origin for the FIDO authentication procedure\&. If no value is specified, the origin "pam://$HOSTNAME" is used\&.
 .RE
 .PP
 \fBappid\fR=\fIappid\fR
@@ -59,7 +64,7 @@ Set the application ID for the U2F authentication procedure\&. If no value is sp
 .PP
 \fBauthfile\fR=\fIfile\fR
 .RS 4
-Set the location of the file that holds the mappings of user names to keyHandles and user keys\&. The format is username:keyHandle1,public_key1:keyHandle2,public_key2:\&... the default location of the file is $XDG_CONFIG_HOME/Yubico/u2f_keys\&. If the environment variable is not set, $HOME/\&.config/Yubico/u2f_keys is used\&.
+Set the location of the file that holds the mappings of user names to keyHandles and user keys\&. The format is username:keyHandle1,public_key1:keyHandle2,public_key2:\&... the default location of the file is $XDG_CONFIG_HOME/Yubico/u2f_keys\&. If the environment variable is not set, $HOME/\&.config/Yubico/u2f_keys is used\&. An individual (per user) file may be configured relative to the users\*(Aq home dirs, i\&.e\&. "\&.ssh/u2f_keys"\&.
 .RE
 .PP
 \fBauthpending_file\fR=\fIfile\fR
@@ -92,7 +97,7 @@ Maximum number of devices allowed per user (default is 24)\&. Devices specified 
 Set to prompt a message and wait before testing the presence of a U2F device\&. Recommended if your device doesn\(cqt have tactile trigger\&.
 .RE
 .PP
-[prompt=your prompt here]
+\fB[prompt=your prompt here]\fR
 .RS 4
 Set individual prompt message for interactive mode\&. Watch the square brackets around this parameter to get spaces correctly recognized by PAM\&.
 .RE
@@ -107,11 +112,36 @@ Set to drop to a manual console where challenges are printed on screen and respo
 Set to prompt a message to remind to touch the device\&.
 .RE
 .PP
+\fB[cue_prompt=your prompt here]\fR
+.RS 4
+Set individual prompt message for the cue option\&. Watch the square brackets around this parameter to get spaces correctly recognized by PAM\&.
+.RE
+.PP
 \fBnodetect\fR
 .RS 4
 Skip detecting if a suitable key is inserted before performing a full authentication\&. See
 \fBNOTES\fR
 below\&.
+.RE
+.PP
+\fBuserpresence\fR=\fIint\fR
+.RS 4
+If 1, require user presence during authentication\&. If 0, do not request user presence during authentication\&. Otherwise, fallback to the authenticator\(cqs default behaviour\&.
+.RE
+.PP
+\fBuserverification\fR=\fIint\fR
+.RS 4
+If 1, require user verification during authentication\&. If 0, do not request user verification during authentication\&. Otherwise, fallback to the authenticator\(cqs default behaviour\&.
+.RE
+.PP
+\fBpinverification\fR=\fIint\fR
+.RS 4
+If 1, require PIN verification during authentication\&. If 0, do not request PIN verification during authentication\&. Otherwise, fallback to the authenticator\(cqs default behaviour\&.
+.RE
+.PP
+\fBsshformat\fR
+.RS 4
+Use credentials produced by versions of OpenSSH that have support for FIDO devices\&. It is not possible to mix native credentials and SSH credentials\&. Once this option is enabled all credentials will be parsed as SSH\&.
 .RE
 .SH "EXAMPLES"
 .sp
@@ -120,7 +150,7 @@ auth sufficient pam_u2f\&.so debug origin=pam://$HOSTNAME appid=pam://$HOSTNAME
 auth required pam_u2f\&.so origin=http://example\&.com appid=http://example\&.com authfile=/etc/yubikey_mappings
 .SH "CAVEATS"
 .sp
-By default the mapping file inside a home directory will be opened as the target user, whereas the central file will be opened as root\&. If the XDG_CONFIG_HOME variable is set, privileges will not be dropped unless the openasuser configuration setting is set\&.
+By default the mapping file inside a home directory will be opened as the target user, whereas the central file will be opened as "root"\&. If the "XDG_CONFIG_HOME" variable is set, privileges will not be dropped unless the "openasuser" configuration setting is set\&.
 .sp
 Using pam\-u2f to secure the login to a computer while storing the mapping file in an encrypted home directory, will result in the impossibility of logging into the system\&. The partition is decrypted after login and the mapping file can not be accessed\&.
 .SH "NOTES"
