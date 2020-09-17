@@ -105,7 +105,10 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_pamu2fcfg_OBJECTS = pamu2fcfg.$(OBJEXT) cmdline.$(OBJEXT)
+am__dirstamp = $(am__leading_dot)dirstamp
+am_pamu2fcfg_OBJECTS = pamu2fcfg.$(OBJEXT) cmdline.$(OBJEXT) \
+	readpassphrase.$(OBJEXT) ../util.$(OBJEXT) ../b64.$(OBJEXT) \
+	../explicit_bzero.$(OBJEXT)
 pamu2fcfg_OBJECTS = $(am_pamu2fcfg_OBJECTS)
 am__DEPENDENCIES_1 =
 pamu2fcfg_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
@@ -128,7 +131,10 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/cmdline.Po ./$(DEPDIR)/pamu2fcfg.Po
+am__depfiles_remade = ../$(DEPDIR)/b64.Po \
+	../$(DEPDIR)/explicit_bzero.Po ../$(DEPDIR)/util.Po \
+	./$(DEPDIR)/cmdline.Po ./$(DEPDIR)/pamu2fcfg.Po \
+	./$(DEPDIR)/readpassphrase.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -244,13 +250,13 @@ INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
+LIBCRYPTO_CFLAGS = @LIBCRYPTO_CFLAGS@
+LIBCRYPTO_LIBS = @LIBCRYPTO_LIBS@
+LIBFIDO2_CFLAGS = @LIBFIDO2_CFLAGS@
+LIBFIDO2_LIBS = @LIBFIDO2_LIBS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
-LIBU2FHOST_CFLAGS = @LIBU2FHOST_CFLAGS@
-LIBU2FHOST_LIBS = @LIBU2FHOST_LIBS@
-LIBU2FSERVER_CFLAGS = @LIBU2FSERVER_CFLAGS@
-LIBU2FSERVER_LIBS = @LIBU2FSERVER_LIBS@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
@@ -282,6 +288,7 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+USERNAME = @USERNAME@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -337,9 +344,11 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = $(WARN_CFLAGS)
-AM_CPPFLAGS = -I$(srcdir)/.. -I$(builddir)/.. $(LIBU2FHOST_CFLAGS) $(LIBU2FSERVER_CFLAGS)
-pamu2fcfg_SOURCES = pamu2fcfg.c cmdline.ggo cmdline.c cmdline.h
-pamu2fcfg_LDADD = $(LIBU2FHOST_LIBS) $(LIBU2FSERVER_LIBS)
+AM_CPPFLAGS = -I$(srcdir)/.. -I$(builddir)/.. $(LIBFIDO2_CFLAGS)
+pamu2fcfg_SOURCES = pamu2fcfg.c cmdline.ggo cmdline.c cmdline.h \
+	readpassphrase.c _readpassphrase.h ../util.c ../b64.c \
+	../explicit_bzero.c
+pamu2fcfg_LDADD = $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS)
 BUILT_SOURCES = cmdline.c cmdline.h
 MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 @ENABLE_MAN_TRUE@dist_man1_MANS = $(top_builddir)/man/pamu2fcfg.1
@@ -430,6 +439,16 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+../$(am__dirstamp):
+	@$(MKDIR_P) ..
+	@: > ../$(am__dirstamp)
+../$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ../$(DEPDIR)
+	@: > ../$(DEPDIR)/$(am__dirstamp)
+../util.$(OBJEXT): ../$(am__dirstamp) ../$(DEPDIR)/$(am__dirstamp)
+../b64.$(OBJEXT): ../$(am__dirstamp) ../$(DEPDIR)/$(am__dirstamp)
+../explicit_bzero.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
 
 pamu2fcfg$(EXEEXT): $(pamu2fcfg_OBJECTS) $(pamu2fcfg_DEPENDENCIES) $(EXTRA_pamu2fcfg_DEPENDENCIES) 
 	@rm -f pamu2fcfg$(EXEEXT)
@@ -437,12 +456,17 @@ pamu2fcfg$(EXEEXT): $(pamu2fcfg_OBJECTS) $(pamu2fcfg_DEPENDENCIES) $(EXTRA_pamu2
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f ../*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/b64.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/explicit_bzero.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/util.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmdline.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pamu2fcfg.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readpassphrase.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -451,22 +475,25 @@ $(am__depfiles_remade):
 am--depfiles: $(am__depfiles_remade)
 
 .c.o:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
@@ -638,6 +665,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f ../$(DEPDIR)/$(am__dirstamp)
+	-rm -f ../$(am__dirstamp)
 	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
@@ -650,8 +679,12 @@ clean: clean-am
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/cmdline.Po
+		-rm -f ../$(DEPDIR)/b64.Po
+	-rm -f ../$(DEPDIR)/explicit_bzero.Po
+	-rm -f ../$(DEPDIR)/util.Po
+	-rm -f ./$(DEPDIR)/cmdline.Po
 	-rm -f ./$(DEPDIR)/pamu2fcfg.Po
+	-rm -f ./$(DEPDIR)/readpassphrase.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -697,8 +730,12 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/cmdline.Po
+		-rm -f ../$(DEPDIR)/b64.Po
+	-rm -f ../$(DEPDIR)/explicit_bzero.Po
+	-rm -f ../$(DEPDIR)/util.Po
+	-rm -f ./$(DEPDIR)/cmdline.Po
 	-rm -f ./$(DEPDIR)/pamu2fcfg.Po
+	-rm -f ./$(DEPDIR)/readpassphrase.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

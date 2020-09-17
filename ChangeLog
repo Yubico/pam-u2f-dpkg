@@ -1,3 +1,692 @@
+2020-09-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS: Update NEWS file
+
+2020-09-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS, configure.ac: Update version number to reflect changes
+
+2020-09-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* configure.ac, tests/Makefile.am,
+	tests/credentials/new_-N.cred.in, tests/credentials/new_-N.templ,
+	tests/credentials/new_-P-N.cred.in,
+	tests/credentials/new_-P-N.templ,
+	tests/credentials/new_-P-V-N.cred.in,
+	tests/credentials/new_-P-V-N.templ,
+	tests/credentials/new_-P-V.cred.in,
+	tests/credentials/new_-P-V.templ, tests/credentials/new_-P.cred.in,
+	tests/credentials/new_-P.templ, tests/credentials/new_-V-N.cred.in,
+	tests/credentials/new_-V-N.templ, tests/credentials/new_-V.cred.in,
+	tests/credentials/new_-V.templ, tests/credentials/new_-r-N.cred.in,
+	tests/credentials/new_-r-N.templ,
+	tests/credentials/new_-r-P-N.cred.in,
+	tests/credentials/new_-r-P-N.templ,
+	tests/credentials/new_-r-P-V-N.cred.in,
+	tests/credentials/new_-r-P-V-N.templ,
+	tests/credentials/new_-r-P-V.cred.in,
+	tests/credentials/new_-r-P-V.templ,
+	tests/credentials/new_-r-P.cred.in,
+	tests/credentials/new_-r-P.templ,
+	tests/credentials/new_-r-V-N.cred.in,
+	tests/credentials/new_-r-V-N.templ,
+	tests/credentials/new_-r-V.cred.in,
+	tests/credentials/new_-r-V.templ, tests/credentials/new_-r.cred.in,
+	tests/credentials/new_-r.templ, tests/credentials/new_.cred.in,
+	tests/credentials/new_.templ,
+	tests/credentials/new_double_-N.cred.in,
+	tests/credentials/new_double_-N.templ,
+	tests/credentials/new_double_-P-N.cred.in,
+	tests/credentials/new_double_-P-N.templ,
+	tests/credentials/new_double_-P-V-N.cred.in,
+	tests/credentials/new_double_-P-V-N.templ,
+	tests/credentials/new_double_-P-V.cred.in,
+	tests/credentials/new_double_-P-V.templ,
+	tests/credentials/new_double_-P.cred.in,
+	tests/credentials/new_double_-P.templ,
+	tests/credentials/new_double_-V-N.cred.in,
+	tests/credentials/new_double_-V-N.templ,
+	tests/credentials/new_double_-V.cred.in,
+	tests/credentials/new_double_-V.templ,
+	tests/credentials/new_double_-r-N.cred.in,
+	tests/credentials/new_double_-r-N.templ,
+	tests/credentials/new_double_-r-P-N.cred.in,
+	tests/credentials/new_double_-r-P-N.templ,
+	tests/credentials/new_double_-r-P-V-N.cred.in,
+	tests/credentials/new_double_-r-P-V-N.templ,
+	tests/credentials/new_double_-r-P-V.cred.in,
+	tests/credentials/new_double_-r-P-V.templ,
+	tests/credentials/new_double_-r-P.cred.in,
+	tests/credentials/new_double_-r-P.templ,
+	tests/credentials/new_double_-r-V-N.cred.in,
+	tests/credentials/new_double_-r-V-N.templ,
+	tests/credentials/new_double_-r-V.cred.in,
+	tests/credentials/new_double_-r-V.templ,
+	tests/credentials/new_double_-r.cred.in,
+	tests/credentials/new_double_-r.templ,
+	tests/credentials/new_double_.cred.in,
+	tests/credentials/new_double_.templ,
+	tests/credentials/new_mixed_-P1-P2.cred.in,
+	tests/credentials/new_mixed_-P1-P2.templ,
+	tests/credentials/new_mixed_-P12.cred.in,
+	tests/credentials/new_mixed_-P12.templ,
+	tests/credentials/new_mixed_1-P2.cred.in,
+	tests/credentials/new_mixed_1-P2.templ,
+	tests/credentials/new_mixed_12.cred.in,
+	tests/credentials/new_mixed_12.templ,
+	tests/credentials/old_credential.cred.in,
+	tests/credentials/old_credential.templ,
+	tests/credentials/{ssh_credential.templ => ssh_credential.cred.in},
+	tests/regenerate_credentials.py: User autoconf instead of make to
+	generate test input files
+
+2020-09-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* pamu2fcfg/Makefile.am: Use correct filename in Makefile.am
+
+2020-09-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* README, man/pam_u2f.8.txt: Fix typo
+
+2020-09-03  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Replace Debian with Ubuntu in the documentation
+
+2020-09-03  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Mention minimum libfido2 version required
+
+2020-09-03  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Fix dependency name
+
+2020-08-27  Alessio Di Mauro <alessio@yubico.com>
+
+	* README: Fix code block formatting
+
+2020-08-26  Alessio Di Mauro <alessio@yubico.com>
+
+	* README, man/pam_u2f.8.txt, man/pamu2fcfg.1.txt: Update
+	documentation Reflect the changes for the transition from libu2f to libfido2.  Add
+	some text on the SSH format.  Update manpages.  Relates to #140
+
+2020-08-14  Alessio Di Mauro <alessio@yubico.com>
+
+	* tests/get_devices.c: Indent
+
+2020-08-14  Alessio Di Mauro <alessio@yubico.com>
+
+	* build-aux/ci/build-linux.sh: Update Travis build to not do chown
+
+2020-08-14  Alessio Di Mauro <alessio@yubico.com>
+
+	* .gitignore, tests/Makefile.am, tests/credentials/new_,
+	tests/credentials/new_-N, tests/credentials/new_-N.templ,
+	tests/credentials/new_-P, tests/credentials/new_-P-N,
+	tests/credentials/new_-P-N.templ, tests/credentials/new_-P-V,
+	tests/credentials/new_-P-V-N, tests/credentials/new_-P-V-N.templ,
+	tests/credentials/new_-P-V.templ, tests/credentials/new_-P.templ,
+	tests/credentials/new_-V, tests/credentials/new_-V-N,
+	tests/credentials/new_-V-N.templ, tests/credentials/new_-V.templ,
+	tests/credentials/new_-r, tests/credentials/new_-r-N,
+	tests/credentials/new_-r-N.templ, tests/credentials/new_-r-P,
+	tests/credentials/new_-r-P-N, tests/credentials/new_-r-P-N.templ,
+	tests/credentials/new_-r-P-V, tests/credentials/new_-r-P-V-N,
+	tests/credentials/new_-r-P-V-N.templ,
+	tests/credentials/new_-r-P-V.templ,
+	tests/credentials/new_-r-P.templ, tests/credentials/new_-r-V,
+	tests/credentials/new_-r-V-N, tests/credentials/new_-r-V-N.templ,
+	tests/credentials/new_-r-V.templ, tests/credentials/new_-r.templ,
+	tests/credentials/new_.templ, tests/credentials/new_double_,
+	tests/credentials/new_double_-N,
+	tests/credentials/new_double_-N.templ,
+	tests/credentials/new_double_-P, tests/credentials/new_double_-P-N,
+	tests/credentials/new_double_-P-N.templ,
+	tests/credentials/new_double_-P-V,
+	tests/credentials/new_double_-P-V-N,
+	tests/credentials/new_double_-P-V-N.templ,
+	tests/credentials/new_double_-P-V.templ,
+	tests/credentials/new_double_-P.templ,
+	tests/credentials/new_double_-V, tests/credentials/new_double_-V-N,
+	tests/credentials/new_double_-V-N.templ,
+	tests/credentials/new_double_-V.templ,
+	tests/credentials/new_double_-r, tests/credentials/new_double_-r-N,
+	tests/credentials/new_double_-r-N.templ,
+	tests/credentials/new_double_-r-P,
+	tests/credentials/new_double_-r-P-N,
+	tests/credentials/new_double_-r-P-N.templ,
+	tests/credentials/new_double_-r-P-V,
+	tests/credentials/new_double_-r-P-V-N,
+	tests/credentials/new_double_-r-P-V-N.templ,
+	tests/credentials/new_double_-r-P-V.templ,
+	tests/credentials/new_double_-r-P.templ,
+	tests/credentials/new_double_-r-V,
+	tests/credentials/new_double_-r-V-N,
+	tests/credentials/new_double_-r-V-N.templ,
+	tests/credentials/new_double_-r-V.templ,
+	tests/credentials/new_double_-r.templ,
+	tests/credentials/new_double_.templ,
+	tests/credentials/new_mixed_-P1-P2,
+	tests/credentials/new_mixed_-P1-P2.templ,
+	tests/credentials/new_mixed_-P12,
+	tests/credentials/new_mixed_-P12.templ,
+	tests/credentials/new_mixed_1-P2,
+	tests/credentials/new_mixed_1-P2.templ,
+	tests/credentials/new_mixed_12,
+	tests/credentials/new_mixed_12.templ,
+	tests/credentials/old_credential,
+	tests/credentials/old_credential.templ,
+	tests/credentials/{ssh_credential => ssh_credential.templ},
+	tests/get_devices.c, tests/regenerate_credentials.py: Fix
+	permissions on tests This change adds a new custom suffix to automake and treats
+	credentials as templates. Upon running the tests actual credential
+	files (.cred) will be generated with the current user name.  Similarly the tests will read the user name from the environment and
+	use that value.
+
+2020-07-24  Alessio Di Mauro <alessio@yubico.com>
+
+	* tests/get_devices.c, util.c: Appease clang-format
+
+2020-07-24  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Rework the logic to parse authentication files Make sure that each credential is always parsed correctly including
+	attributes and lack thereof (for the old format).
+
+2020-07-24  Alessio Di Mauro <alessio@yubico.com>
+
+	* tests/credentials/new_, tests/credentials/new_-N,
+	tests/credentials/new_-P, tests/credentials/new_-P-N,
+	tests/credentials/new_-P-V, tests/credentials/new_-P-V-N,
+	tests/credentials/new_-V, tests/credentials/new_-V-N,
+	tests/credentials/new_-r, tests/credentials/new_-r-N,
+	tests/credentials/new_-r-P, tests/credentials/new_-r-P-N,
+	tests/credentials/new_-r-P-V, tests/credentials/new_-r-P-V-N,
+	tests/credentials/new_-r-V, tests/credentials/new_-r-V-N,
+	tests/credentials/new_credential, tests/credentials/new_double_,
+	tests/credentials/new_double_-N, tests/credentials/new_double_-P,
+	tests/credentials/new_double_-P-N,
+	tests/credentials/new_double_-P-V,
+	tests/credentials/new_double_-P-V-N,
+	tests/credentials/new_double_-V, tests/credentials/new_double_-V-N,
+	tests/credentials/new_double_-r, tests/credentials/new_double_-r-N,
+	tests/credentials/new_double_-r-P,
+	tests/credentials/new_double_-r-P-N,
+	tests/credentials/new_double_-r-P-V,
+	tests/credentials/new_double_-r-P-V-N,
+	tests/credentials/new_double_-r-V,
+	tests/credentials/new_double_-r-V-N,
+	tests/credentials/new_mixed_-P1-P2,
+	tests/credentials/new_mixed_-P12, tests/credentials/new_mixed_1-P2,
+	tests/credentials/new_mixed_12, tests/get_devices.c: Add a whole
+	bunch of test cases Parsing combination of single and multiple devices in one file with
+	different sets of attributes
+
+2020-07-24  Alessio Di Mauro <alessio@yubico.com>
+
+	* tests/regenerate_credentials.py: Add a script to generate test
+	cases
+
+2020-01-08  Alessio Di Mauro <alessio@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c, util.c: Indent
+
+2020-01-08  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Check against "+attribute" rather "attribute"
+
+2020-01-08  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Don't set uv when setting PIN
+
+2020-01-08  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Use fido_opt_t in do_manual_authentication
+
+2020-01-08  Alessio Di Mauro <alessio@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c: Use a fido_opt_t in pamu2fcfg
+
+2020-01-07  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Update SSH flags to latest version and attributes
+	management
+
+2020-01-07  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Fix print formatting on decoded application field
+
+2019-12-20  Alessio Di Mauro <alessio@yubico.com>
+
+	* tests/get_devices.c: Indent
+
+2019-12-20  Alessio Di Mauro <alessio@yubico.com>
+
+	* build-aux/ci/build-linux.sh: Change ownership of the test
+	credential files
+
+2019-12-19  Alessio Di Mauro <alessio@yubico.com>
+
+	* tests/Makefile.am: Change tests harness to run serial tests This helps when printing results in the CI
+
+2019-12-19  Alessio Di Mauro <alessio@yubico.com>
+
+	* tests/basic.c, tests/get_devices.c: Indent tests
+
+2019-12-19  Alessio Di Mauro <alessio@yubico.com>
+
+	* tests/Makefile.am, tests/credentials/new_credential,
+	tests/credentials/old_credential, tests/credentials/ssh_credential,
+	tests/get_devices.c: Add a test for parsing credential files
+
+2019-12-19  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Fixup old format compatibility
+
+2019-12-19  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Fix padding check for SSH format
+
+2019-12-18  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c: Indent
+
+2019-12-18  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c, util.h: Add default authfile for sshformat
+
+2019-12-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Initialize decoded_initial to NULL
+
+2019-12-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Make sure to save one \0 byte in buf
+
+2019-12-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Drop unnecessary sizeof(char)
+
+2019-12-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Indent
+
+2019-12-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Use a define for user presence
+
+2019-12-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Check strdup return value when allocation attributes
+
+2019-12-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Check buf length in parse_ssh_format more thoroughly
+
+2019-12-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Use calloc to allocate buf
+
+2019-12-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Indent
+
+2019-12-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c, util.c, util.h: Add initial support for SSH format
+
+2019-12-04  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c, util.c, util.h: Split parsing of native format to a
+	function and add basics for ssh format
+
+2020-08-06  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #153 from herrjemand/patch-1 Added mention of FIDO2 support
+
+2020-07-28  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #151 from Yubico/update-fqdn Update scan action with correct image fqdn
+
+2020-06-23  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* : Merge pull request #148 from Yubico/scan Github Actions: do not run scan if missing credentials
+
+2020-03-05  Alessio Di Mauro <alessio@yubico.com>
+
+	* : Merge PR #142
+
+2020-03-04  Christos Zoulas <christos@zoulas.com>
+
+	* pam-u2f.c: Include <stdint.h> for intptr_t on linux
+
+2020-03-03  Christos Zoulas <christos@zoulas.com>
+
+	* util.c: - explicitly check against NULL to avoid some compiler warnings - fix const cast-away.  - Since we include <syslog.h> unconditionally allow syslog use on
+	  other unixes, not just linux. We check that we provide a LOG_DEBUG
+	macro instead.
+
+2020-03-03  Christos Zoulas <christos@zoulas.com>
+
+	* util.h: Provide an empty statement for non-debugging code.
+
+2020-03-03  Christos Zoulas <christos@zoulas.com>
+
+	* pam-u2f.c: - move PAM_MODUTIL_DEF_PRIVS below parse_cfg, so that
+	  cfg->debug_file gets initialized first (this is c99, statement
+	before decl).  - introduce free_const() macro to avoid const cast-away warnings.  - Add PAM_MODULE_ENTRY() macro used by OpenPAM.
+
+2020-03-03  Christos Zoulas <christos@zoulas.com>
+
+	* drop_privs.h: - cast -1 to the appropriate types - split lines
+
+2020-03-03  Christos Zoulas <christos@zoulas.com>
+
+	* b64.c: Avoid const cast-away
+
+2020-03-02  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #141 from Yubico/boolornot Check explicitly for FIDO_OPT_TRUE
+
+2020-01-17  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* : Merge pull request #139 from Yubico/scan Re-schedule scans every week
+
+2019-12-28  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* : Merge pull request #136 from Yubico/scan Adding a static code analysis github workflow
+
+2019-12-09  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #133 from Yubico/fix_booleans Fix and clarify the behavior of UV, UP and PIN
+
+2019-12-05  pedro martelletto <pedro@yubico.com>
+
+	* README, man/pam_u2f.8.txt, man/pamu2fcfg.1.txt: documentation bits
+	for userpresence, userverification, and pinverification.
+
+2019-12-04  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Fix formatting
+
+2019-12-04  Alessio Di Mauro <alessio@yubico.com>
+
+	* pam-u2f.c, util.c: Map fido_opt_t to tristate values in the
+	configuration
+
+2019-12-04  Alessio Di Mauro <alessio@yubico.com>
+
+	* build-aux/ci/build-bionic-gcc7.sh: Remove "set -x" before calling
+	clang_format It makes the otput more readable if there are formatting errors
+
+2019-12-03  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #132 from Yubico/update_libfido2 Update libfido2
+
+2019-12-03  Alessio Di Mauro <alessio@yubico.com>
+
+	* .travis.yml: Name the individual Travis builds
+
+2019-12-02  Alessio Di Mauro <alessio@yubico.com>
+
+	* build-aux/ci/build-linux.sh, build-aux/ci/build-osx.sh: Don't use
+	`&&` together with `set -e` in the CI scripts
+
+2019-12-02  Alessio Di Mauro <alessio@yubico.com>
+
+	* configure.ac, pamu2fcfg/pamu2fcfg.c, util.c: Update to libfido2 >=
+	1.2.0 Update dependencies Fix deprecated functions
+
+2019-12-02  Alessio Di Mauro <alessio@yubico.com>
+
+	* pamu2fcfg/Makefile.am: Add libcrypto dependency to pamu2fcfg
+
+2019-10-10  Alessio Di Mauro <alessio@yubico.com>
+
+	* man/pam_u2f.8.txt: man: drop backticks
+
+2019-10-10  Alessio Di Mauro <alessio@yubico.com>
+
+	* : Merge PR #127
+
+2019-10-09  Alessio Di Mauro <alessio@yubico.com>
+
+	* build-aux/ci/format-code.sh: build: correctly escape grep pattern
+
+2019-10-09  Alessio Di Mauro <alessio@yubico.com>
+
+	* : Merge PR #126
+
+2019-10-09  corbolais <corbolais@gmail.com>
+
+	* README, man/pam_u2f.8.txt: Clarify usage of individual user
+	mapping file.  Signed-off-by: corbolais <corbolais@gmail.com>
+
+2019-10-09  corbolais <corbolais@gmail.com>
+
+	* README, man/pam_u2f.8.txt: Add accidently removed sentence back
+	in, update man page.  Signed-off-by: corbolais <corbolais@gmail.com>
+
+2019-10-09  Alessio Di Mauro <alessio@yubico.com>
+
+	* : Merge PR #125
+
+2019-10-08  corbolais <corbolais@gmail.com>
+
+	* pam-u2f.c: appease clang_format, again Signed-off-by: corbolais <corbolais@gmail.com>
+
+2019-10-08  corbolais <corbolais@gmail.com>
+
+	* pam-u2f.c: avoid call to strncmp Signed-off-by: corbolais <corbolais@gmail.com>
+
+2019-10-07  corbolais <corbolais@gmail.com>
+
+	* pam-u2f.c: cherry-pick de9731c7423554bcb2749242c384c6764992db8c,
+	undo ce3df86046d111174c46da6f6a81e321553faa5b, formatting changes to
+	please clang format.  Signed-off-by: corbolais <corbolais@gmail.com>
+
+2019-10-05  corbolais <corbolais@gmail.com>
+
+	* README, pam-u2f.c: A different per user file may be specified.
+	Doc: state that the path must be relative to $HOME/. Implicitely set
+	openasuser.  Signed-off-by: corbolais <corbolais@gmail.com>
+
+2019-08-23  Alessio Di Mauro <alessio@yubico.com>
+
+	* build-aux/ci/build-bionic-gcc7.sh: Set commit range for new
+	branches
+
+2019-08-23  Alessio Di Mauro <alessio@yubico.com>
+
+	* build-aux/ci/format-code.sh: Drop slashes and change exit to
+	return
+
+2019-08-22  Alessio Di Mauro <alessio@yubico.com>
+
+	* build-aux/ci/format-code.sh: Use grep -e to keep Travis happy
+
+2019-08-22  Alessio Di Mauro <alessio@yubico.com>
+
+	* build-aux/ci/format-code.sh: Fix format-code.sh
+
+2019-08-22  Alessio Di Mauro <alessio@yubico.com>
+
+	* .travis.yml, build-aux/ci/build-bionic-gcc7.sh,
+	build-aux/ci/build-linux.sh, build-aux/ci/build-osx.sh: Run
+	format-code.sh only on a single Travis build
+
+2019-08-22  Alessio Di Mauro <alessio@yubico.com>
+
+	* .travis.yml: Update dist in .travis-ci.yml
+
+2019-08-22  Alessio Di Mauro <alessio@yubico.com>
+
+	* b64.c, drop_privs.c, drop_privs.h, explicit_bzero.c, pam-u2f.c,
+	pamu2fcfg/pamu2fcfg.c, util.c, util.h: Apply clang-format
+
+2019-08-22  Alessio Di Mauro <alessio@yubico.com>
+
+	* build-aux/ci/format-code.sh: Add format-code.sh
+
+2019-08-22  Alessio Di Mauro <alessio@yubico.com>
+
+	* build-aux/ci/build-linux.sh, build-aux/ci/build-osx.sh: Check code
+	format during a Travis build
+
+2019-08-22  Alessio Di Mauro <alessio@yubico.com>
+
+	* .clang-format, Makefile.am: Update clang-format
+
+2019-08-13  Alessio Di Mauro <alessio@yubico.com>
+
+	* .travis.yml, build-aux/ci/build-bionic-clang7.sh,
+	build-aux/ci/build-bionic-clang8.sh,
+	build-aux/ci/build-bionic-gcc7.sh,
+	build-aux/ci/build-bionic-gcc8.sh,
+	build-aux/ci/build-bionic-gcc9.sh, build-aux/ci/build-linux.sh,
+	build-aux/ci/build-osx.sh, build-aux/ci/build-osx11-clang.sh,
+	build-aux/ci/build-osx9.4-clang.sh,
+	build-aux/ci/build-xenial-clang7.sh,
+	build-aux/ci/build-xenial-clang8.sh,
+	build-aux/ci/build-xenial-gcc7.sh,
+	build-aux/ci/build-xenial-gcc8.sh,
+	build-aux/ci/build-xenial-gcc9.sh, build-aux/travis,
+	build-aux/travis-build-linux, build-aux/travis-build-osx,
+	explicit_bzero.c, pamu2fcfg/{readpassphrase.h =>
+	_readpassphrase.h}, pamu2fcfg/pamu2fcfg.c,
+	pamu2fcfg/readpassphrase.c: Update .travis.yml to build using
+	libfido2
+
+2019-07-31  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge #121 Switch to using vsyslog/vfprintf in the linux case as well
+
+2019-07-22  pedro martelletto <pedro@yubico.com>
+
+	* Makefile.am: AM_CPPFLAGS: don't pull ../ when building from the
+	top dir
+
+2019-07-05  Alessio Di Mauro <alessio@yubico.com>
+
+	* : Merge PR #119
+
+2019-07-04  Michael Beaumont <mjboamail@gmail.com>
+
+	* pam-u2f.c, util.c, util.h: Add "cue_prompt" option to set text
+	shown with cue
+
+2019-06-18  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* pam-u2f.c: Check the correct variable, openasuser has not been set
+	here yet
+
+2019-06-12  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* : Merge PR #98
+
+2019-03-28  pedro martelletto <pedro@yubico.com>
+
+	* tests/bionic/Dockerfile: Dockerfile: adapt to life w/o hidapi;
+	install gengetopt
+
+2019-01-19  Francois Gervais <francoisgervais@gmail.com>
+
+	* util.c: Ask for user presence based on PAM module flag Ignore per-key presence configuration
+
+2019-01-19  Francois Gervais <francoisgervais@gmail.com>
+
+	* pam-u2f.c, util.h: Add 'userpresence' PAM module flag
+
+2018-06-15  pedro martelletto <pedro@yubico.com>
+
+	* util.c: Have do_manual_authentication() work with fido2-assert.
+
+2018-06-07  pedro martelletto <pedro@yubico.com>
+
+	* util.c: Reflect changes in libfido2's API
+
+2018-05-17  pedro martelletto <pedro@yubico.com>
+
+	* tests/bionic/Dockerfile, tests/bionic/README, tests/bionic/run.sh: 
+	Add a set of core containerized tests
+
+2018-05-16  pedro martelletto <pedro@yubico.com>
+
+	* Makefile.am, util.c, util.h: Add backwards-compatibility with
+	pre-FIDO2 authorization files.
+
+2018-05-15  pedro martelletto <pedro@yubico.com>
+
+	* util.c: Handle resident keys, user verification and COSE RS256 in
+	do_manual_authentication().
+
+2018-05-15  pedro martelletto <pedro@yubico.com>
+
+	* util.c: Handle resident keys, user verification and COSE RS256 in
+	do_authentication().
+
+2018-05-15  pedro martelletto <pedro@yubico.com>
+
+	* pam-u2f.c: Zero the devices array on allocation.
+
+2018-05-15  pedro martelletto <pedro@yubico.com>
+
+	* util.c, util.h: Change get_devices_from_authfile() to parse the
+	new format generated by pamu2fcfg.  This new format includes two extra fields: one denoting a
+	credential's COSE type, and a second representing a credential's
+	attributes (only '+' or '-' to enable/disable user verification for
+	now). The meaning of the key handle field has also been extended:
+	'*' can now be used to tell pam-u2f that a given credential is
+	resident.
+
+2018-05-15  pedro martelletto <pedro@yubico.com>
+
+	* .gitignore, pamu2fcfg/cmdline.c, pamu2fcfg/cmdline.h: Zap
+	autogenerated files.
+
+2018-05-15  pedro martelletto <pedro@yubico.com>
+
+	* pamu2fcfg/cmdline.ggo, pamu2fcfg/pamu2fcfg.c: Add -t, -r and -N
+	options to pamu2fcfg.  - option t allows the COSE type of a credential to be specified; - option r allows a resident credential to be created; - option N enables verification without the user's presence.
+
+2018-05-08  pedro martelletto <pedro@yubico.com>
+
+	* util.c: Convert do_manual_authentication() to libfido2.
+
+2018-05-08  pedro martelletto <pedro@yubico.com>
+
+	* util.c: Convert do_authentication() to libfido2.  Introduce an auxiliary find_authenticator() function to iterate over
+	authenticator devices configured on the system and find the one
+	containing the credential being authenticated.
+
+2018-05-08  pedro martelletto <pedro@yubico.com>
+
+	* Makefile.am, util.c, util.h: Convert get_devices_from_authfile()
+	to libfido2.
+
+2018-05-08  pedro martelletto <pedro@yubico.com>
+
+	* pamu2fcfg/Makefile.am, pamu2fcfg/pamu2fcfg.c: Convert pamu2fcfg to
+	libfido2.
+
+2018-05-08  pedro martelletto <pedro@yubico.com>
+
+	* util.c, util.h: Define random_bytes().  random_bytes() is an auxiliary function to read an arbitrary number
+	of bytes from a system's PRNG, to be used in upcoming commits.
+
+2018-05-08  pedro martelletto <pedro@yubico.com>
+
+	* configure.ac: Detect libfido2 and enable subdir-objects.
+
+2018-05-08  pedro martelletto <pedro@yubico.com>
+
+	* Makefile.am, b64.c, b64.h, configure.ac: Add base64
+	encoding/decoding functions.  To be used in the representation of key handles and public keys in
+	upcoming commits.
+
+2019-06-04  Alessio Di Mauro <alessio@alessiodimauro.com>
+
+	* NEWS, configure.ac: Bump version
+
 2019-06-04  Alessio Di Mauro <alessio@alessiodimauro.com>
 
 	* NEWS: Update NEWS file

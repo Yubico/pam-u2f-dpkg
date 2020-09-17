@@ -103,7 +103,41 @@ DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = tests/credentials/new_double_-N.cred \
+	tests/credentials/new_double_-P-N.cred \
+	tests/credentials/new_double_-P.cred \
+	tests/credentials/new_double_-P-V-N.cred \
+	tests/credentials/new_double_-P-V.cred \
+	tests/credentials/new_double_-r-N.cred \
+	tests/credentials/new_double_-r-P-N.cred \
+	tests/credentials/new_double_-r-P.cred \
+	tests/credentials/new_double_-r-P-V-N.cred \
+	tests/credentials/new_double_-r-P-V.cred \
+	tests/credentials/new_double_-r.cred \
+	tests/credentials/new_double_-r-V-N.cred \
+	tests/credentials/new_double_-r-V.cred \
+	tests/credentials/new_double_.cred \
+	tests/credentials/new_double_-V-N.cred \
+	tests/credentials/new_double_-V.cred \
+	tests/credentials/new_mixed_12.cred \
+	tests/credentials/new_mixed_1-P2.cred \
+	tests/credentials/new_mixed_-P12.cred \
+	tests/credentials/new_mixed_-P1-P2.cred \
+	tests/credentials/new_-N.cred tests/credentials/new_-P-N.cred \
+	tests/credentials/new_-P.cred \
+	tests/credentials/new_-P-V-N.cred \
+	tests/credentials/new_-P-V.cred \
+	tests/credentials/new_-r-N.cred \
+	tests/credentials/new_-r-P-N.cred \
+	tests/credentials/new_-r-P.cred \
+	tests/credentials/new_-r-P-V-N.cred \
+	tests/credentials/new_-r-P-V.cred \
+	tests/credentials/new_-r.cred \
+	tests/credentials/new_-r-V-N.cred \
+	tests/credentials/new_-r-V.cred tests/credentials/new_.cred \
+	tests/credentials/new_-V-N.cred tests/credentials/new_-V.cred \
+	tests/credentials/old_credential.cred \
+	tests/credentials/ssh_credential.cred
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -136,7 +170,8 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(man8dir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 pam_u2f_la_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_pam_u2f_la_OBJECTS = pam-u2f.lo util.lo drop_privs.lo
+am_pam_u2f_la_OBJECTS = pam-u2f.lo util.lo drop_privs.lo b64.lo \
+	explicit_bzero.lo
 pam_u2f_la_OBJECTS = $(am_pam_u2f_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -160,8 +195,9 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/drop_privs.Plo \
-	./$(DEPDIR)/pam-u2f.Plo ./$(DEPDIR)/util.Plo
+am__depfiles_remade = ./$(DEPDIR)/b64.Plo ./$(DEPDIR)/drop_privs.Plo \
+	./$(DEPDIR)/explicit_bzero.Plo ./$(DEPDIR)/pam-u2f.Plo \
+	./$(DEPDIR)/util.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -235,10 +271,49 @@ am__DIST_COMMON = $(dist_man8_MANS) $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/build-aux/install-sh \
 	$(top_srcdir)/build-aux/ltmain.sh \
-	$(top_srcdir)/build-aux/missing AUTHORS COPYING ChangeLog NEWS \
-	README build-aux/ar-lib build-aux/compile \
-	build-aux/config.guess build-aux/config.sub build-aux/depcomp \
-	build-aux/install-sh build-aux/ltmain.sh build-aux/missing
+	$(top_srcdir)/build-aux/missing \
+	$(top_srcdir)/tests/credentials/new_-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_-P-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_-P-V-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_-P-V.cred.in \
+	$(top_srcdir)/tests/credentials/new_-P.cred.in \
+	$(top_srcdir)/tests/credentials/new_-V-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_-V.cred.in \
+	$(top_srcdir)/tests/credentials/new_-r-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_-r-P-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_-r-P-V-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_-r-P-V.cred.in \
+	$(top_srcdir)/tests/credentials/new_-r-P.cred.in \
+	$(top_srcdir)/tests/credentials/new_-r-V-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_-r-V.cred.in \
+	$(top_srcdir)/tests/credentials/new_-r.cred.in \
+	$(top_srcdir)/tests/credentials/new_.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-P-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-P-V-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-P-V.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-P.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-V-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-V.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-r-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-r-P-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-r-P-V-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-r-P-V.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-r-P.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-r-V-N.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-r-V.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_-r.cred.in \
+	$(top_srcdir)/tests/credentials/new_double_.cred.in \
+	$(top_srcdir)/tests/credentials/new_mixed_-P1-P2.cred.in \
+	$(top_srcdir)/tests/credentials/new_mixed_-P12.cred.in \
+	$(top_srcdir)/tests/credentials/new_mixed_1-P2.cred.in \
+	$(top_srcdir)/tests/credentials/new_mixed_12.cred.in \
+	$(top_srcdir)/tests/credentials/old_credential.cred.in \
+	$(top_srcdir)/tests/credentials/ssh_credential.cred.in AUTHORS \
+	COPYING ChangeLog NEWS README build-aux/ar-lib \
+	build-aux/compile build-aux/config.guess build-aux/config.sub \
+	build-aux/depcomp build-aux/install-sh build-aux/ltmain.sh \
+	build-aux/missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -318,13 +393,13 @@ INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
+LIBCRYPTO_CFLAGS = @LIBCRYPTO_CFLAGS@
+LIBCRYPTO_LIBS = @LIBCRYPTO_LIBS@
+LIBFIDO2_CFLAGS = @LIBFIDO2_CFLAGS@
+LIBFIDO2_LIBS = @LIBFIDO2_LIBS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
-LIBU2FHOST_CFLAGS = @LIBU2FHOST_CFLAGS@
-LIBU2FHOST_LIBS = @LIBU2FHOST_LIBS@
-LIBU2FSERVER_CFLAGS = @LIBU2FSERVER_CFLAGS@
-LIBU2FSERVER_LIBS = @LIBU2FSERVER_LIBS@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
@@ -356,6 +431,7 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+USERNAME = @USERNAME@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -413,10 +489,11 @@ top_srcdir = @top_srcdir@
 SUBDIRS = . pamu2fcfg tests
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(CWFLAGS)
-AM_CPPFLAGS = -I$(srcdir)/.. -I$(builddir)/.. $(LIBU2FHOST_CFLAGS) $(LIBU2FSERVER_CFLAGS)
+AM_CPPFLAGS = $(LIBFIDO2_CFLAGS) $(LIBCRYPTO_CFLAGS)
 lib_LTLIBRARIES = pam_u2f.la
-pam_u2f_la_SOURCES = pam-u2f.c util.c util.h drop_privs.h drop_privs.c
-pam_u2f_la_LIBADD = -lpam $(LIBU2FHOST_LIBS) $(LIBU2FSERVER_LIBS)
+pam_u2f_la_SOURCES = pam-u2f.c util.c util.h drop_privs.h drop_privs.c \
+	b64.c b64.h explicit_bzero.c
+pam_u2f_la_LIBADD = -lpam $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS)
 pam_u2f_la_LDFLAGS = -module -avoid-version
 @ENABLE_MAN_TRUE@dist_man8_MANS = $(top_builddir)/man/pam_u2f.8
 @ENABLE_MAN_TRUE@DISTCLEANFILES = $(dist_man8_MANS)
@@ -461,6 +538,82 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
+tests/credentials/new_double_-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-P-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-P-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-P.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-P.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-P-V-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-P-V-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-P-V.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-P-V.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-r-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-r-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-r-P-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-r-P-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-r-P.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-r-P.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-r-P-V-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-r-P-V-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-r-P-V.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-r-P-V.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-r.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-r.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-r-V-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-r-V-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-r-V.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-r-V.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-V-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-V-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_double_-V.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_double_-V.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_mixed_12.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_mixed_12.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_mixed_1-P2.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_mixed_1-P2.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_mixed_-P12.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_mixed_-P12.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_mixed_-P1-P2.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_mixed_-P1-P2.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-P-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-P-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-P.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-P.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-P-V-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-P-V-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-P-V.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-P-V.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-r-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-r-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-r-P-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-r-P-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-r-P.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-r-P.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-r-P-V-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-r-P-V-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-r-P-V.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-r-P-V.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-r.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-r.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-r-V-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-r-V-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-r-V.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-r-V.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-V-N.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-V-N.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_-V.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_-V.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/old_credential.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/old_credential.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/ssh_credential.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/ssh_credential.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
@@ -506,7 +659,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/b64.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drop_privs.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/explicit_bzero.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pam-u2f.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Plo@am__quote@ # am--include-marker
 
@@ -517,22 +672,25 @@ $(am__depfiles_remade):
 am--depfiles: $(am__depfiles_remade)
 
 .c.o:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
@@ -930,7 +1088,9 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-		-rm -f ./$(DEPDIR)/drop_privs.Plo
+		-rm -f ./$(DEPDIR)/b64.Plo
+	-rm -f ./$(DEPDIR)/drop_privs.Plo
+	-rm -f ./$(DEPDIR)/explicit_bzero.Plo
 	-rm -f ./$(DEPDIR)/pam-u2f.Plo
 	-rm -f ./$(DEPDIR)/util.Plo
 	-rm -f Makefile
@@ -981,7 +1141,9 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-		-rm -f ./$(DEPDIR)/drop_privs.Plo
+		-rm -f ./$(DEPDIR)/b64.Plo
+	-rm -f ./$(DEPDIR)/drop_privs.Plo
+	-rm -f ./$(DEPDIR)/explicit_bzero.Plo
 	-rm -f ./$(DEPDIR)/pam-u2f.Plo
 	-rm -f ./$(DEPDIR)/util.Plo
 	-rm -f Makefile
@@ -1039,7 +1201,7 @@ install-exec-hook:
 	chmod -f 644 $(PAMDIR)/pam_u2f.so || true
 
 indent:
-	clang-format -i *.c *.h pamu2fcfg/pamu2fcfg.c
+	clang-format -i *.c *.h pamu2fcfg/*.c pamu2fcfg/*.h
 
 ChangeLog:
 	cd $(srcdir) && git2cl > ChangeLog

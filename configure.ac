@@ -1,13 +1,14 @@
-#  Copyright (C) 2014-2018 Yubico AB
+#  Copyright (C) 2014-2019 Yubico AB
 AC_PREREQ([2.65])
-AC_INIT([pam_u2f], [1.0.8], [https://github.com/Yubico/pam-u2f/issues],
+AC_INIT([pam_u2f], [1.1.0], [https://github.com/Yubico/pam-u2f/issues],
   [pam_u2f], [https://developers.yubico.com/pam-u2f/])
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE([1.11 foreign])
+AM_INIT_AUTOMAKE([1.11 foreign subdir-objects])
+
 AM_SILENT_RULES([yes])
 AM_MAINTAINER_MODE
 
@@ -17,7 +18,7 @@ AM_PROG_AR
 AC_LIBTOOL_WIN32_DLL
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
-
+AC_PROG_CC_STDC
 
 AC_ARG_ENABLE([man],
   [AS_HELP_STRING([--disable-man], [Disable man page generation])],
@@ -55,16 +56,16 @@ AC_ARG_WITH(pam-dir,
 AC_SUBST(PAMDIR, "$PAMDIR")
 
 
-PKG_CHECK_MODULES([LIBU2FHOST], [u2f-host], [], [])
-PKG_CHECK_MODULES([LIBU2FSERVER], [u2f-server], [], [])
+PKG_CHECK_MODULES([LIBCRYPTO], [libcrypto], [], [])
+PKG_CHECK_MODULES([LIBFIDO2], [libfido2 >= 1.2.0], [], [])
 
 
-# Check for secure_getenv
+# Check for secure_getenv, readpassphrase, explicit_bzero, and memset_s
 am_save_CFLAGS="$CFLAGS"
 am_save_LIBS="$LIBS"
 CFLAGS="$CFLAGS"
 LIBS="$LIBS"
-AC_CHECK_FUNCS([secure_getenv])
+AC_CHECK_FUNCS([secure_getenv readpassphrase explicit_bzero memset_s])
 CFLAGS=$am_save_CFLAGS
 LIBS=$am_save_LIBS
 
@@ -92,6 +93,48 @@ AC_CONFIG_FILES([
   pamu2fcfg/Makefile
   tests/Makefile
 ])
+
+creduser=$(whoami)
+AC_SUBST(USERNAME, $creduser)
+AC_CONFIG_FILES([tests/credentials/new_double_-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-P-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-P.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-P-V-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-P-V.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-r-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-r-P-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-r-P.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-r-P-V-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-r-P-V.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-r.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-r-V-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-r-V.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-V-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_double_-V.cred])
+AC_CONFIG_FILES([tests/credentials/new_mixed_12.cred])
+AC_CONFIG_FILES([tests/credentials/new_mixed_1-P2.cred])
+AC_CONFIG_FILES([tests/credentials/new_mixed_-P12.cred])
+AC_CONFIG_FILES([tests/credentials/new_mixed_-P1-P2.cred])
+AC_CONFIG_FILES([tests/credentials/new_-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_-P-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_-P.cred])
+AC_CONFIG_FILES([tests/credentials/new_-P-V-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_-P-V.cred])
+AC_CONFIG_FILES([tests/credentials/new_-r-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_-r-P-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_-r-P.cred])
+AC_CONFIG_FILES([tests/credentials/new_-r-P-V-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_-r-P-V.cred])
+AC_CONFIG_FILES([tests/credentials/new_-r.cred])
+AC_CONFIG_FILES([tests/credentials/new_-r-V-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_-r-V.cred])
+AC_CONFIG_FILES([tests/credentials/new_.cred])
+AC_CONFIG_FILES([tests/credentials/new_-V-N.cred])
+AC_CONFIG_FILES([tests/credentials/new_-V.cred])
+AC_CONFIG_FILES([tests/credentials/old_credential.cred])
+AC_CONFIG_FILES([tests/credentials/ssh_credential.cred])
+
 AC_OUTPUT
 
 
@@ -105,9 +148,9 @@ AC_MSG_NOTICE([Summary of build options:
   CWFLAGS:             ${CWFLAGS}
   CSFLAGS:             ${CSFLAGS}
   Library types:       Shared=${enable_shared}, Static=${enable_static}
-  LIBU2FHOST CFLAGS:   $LIBU2FHOST_CFLAGS
-  LIBU2FHOST LIBS:     $LIBU2FHOST_LIBS
-  LIBU2FSERVER CFLAGS: $LIBU2FSERVER_CFLAGS
-  LIBU2FSERVER LIBS:   $LIBU2FSERVER_LIBS
+  LIBFIDO2 CFLAGS:     $LIBFIDO2_CFLAGS
+  LIBFIDO2 LIBS:       $LIBFIDO2_LIBS
+  LIBCRYPTO CFLAGS:    $LIBCRYPTO_CFLAGS
+  LIBCRYPTO LIBS:      $LIBCRYPTO_LIBS
   PAMDIR:              $PAMDIR
 ])
