@@ -9,6 +9,7 @@
 #include <openssl/ec.h>
 #include <openssl/obj_mac.h>
 
+#include <limits.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -202,6 +203,14 @@ static int parse_native_format(const cfg_t *cfg, const char *username,
         devices[i].old_format = 0;
 
         s_token = strtok_r(s_credential, ",", &credsaveptr);
+
+        if (!s_token) {
+          if (cfg->debug) {
+            D(cfg->debug_file,
+              "Unable to retrieve keyHandle for device %d", i + 1);
+          }
+          return retval;
+        }
 
         if (cfg->debug) {
           D(cfg->debug_file, "KeyHandle for device number %d: %s", i + 1,
@@ -1114,7 +1123,7 @@ static int get_authenticators(const cfg_t *cfg, const fido_dev_info_t *devlist,
     }
   }
 
-  if (kh == NULL && j != 0)
+  if (j != 0)
     return (1);
   else {
     if (cfg->debug)
@@ -1370,8 +1379,13 @@ int do_authentication(const cfg_t *cfg, const device_t *devices,
           goto out;
         }
 
-        if (pin_verification == FIDO_OPT_TRUE)
+        if (pin_verification == FIDO_OPT_TRUE) {
           pin = converse(pamh, PAM_PROMPT_ECHO_OFF, "Please enter the PIN: ");
+          if (pin == NULL) {
+            D(cfg->debug_file, "converse() returned NULL");
+            goto out;
+          }
+        }
         if (user_presence == FIDO_OPT_TRUE ||
             user_verification == FIDO_OPT_TRUE) {
           if (cfg->manual == 0 && cfg->cue && !cued) {
@@ -1387,6 +1401,14 @@ int do_authentication(const cfg_t *cfg, const device_t *devices,
           pin = NULL;
         }
         if (r == FIDO_OK) {
+          if (pin_verification == FIDO_OPT_TRUE ||
+              user_verification == FIDO_OPT_TRUE) {
+            r = fido_assert_set_uv(assert, FIDO_OPT_TRUE);
+            if (r != FIDO_OK) {
+              D(cfg->debug_file, "Failed to set UV");
+              goto out;
+            }
+          }
           r = fido_assert_verify(assert, 0, cose_type,
                                  cose_type == COSE_ES256
                                    ? (const void *) es256_pk

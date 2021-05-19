@@ -1,6 +1,6 @@
 #  Copyright (C) 2014-2019 Yubico AB
 AC_PREREQ([2.65])
-AC_INIT([pam_u2f], [1.1.0], [https://github.com/Yubico/pam-u2f/issues],
+AC_INIT([pam_u2f], [1.1.1], [https://github.com/Yubico/pam-u2f/issues],
   [pam_u2f], [https://developers.yubico.com/pam-u2f/])
 
 AC_CONFIG_AUX_DIR([build-aux])
@@ -30,6 +30,20 @@ AS_IF([test "$enable_man" = "yes"],
 )
 AM_CONDITIONAL([ENABLE_MAN], [test "$enable_man" = "yes"])
 
+AC_CACHE_CHECK([for clang],
+        _cv_clang,[
+        AC_TRY_COMPILE([], [
+                #ifdef __clang__
+                #else
+                #error "NOT CLANG"
+                #endif
+                return 0;
+        ],
+        [_cv_clang=yes],
+        [_cv_clang=no],
+        [])
+])
+AM_CONDITIONAL([COMPILER_CLANG], [test "$_cv_clang" = yes])
 
 AC_CHECK_HEADERS([security/pam_appl.h], [],
   [AC_MSG_ERROR([[PAM header files not found, install libpam-dev.]])])
@@ -57,7 +71,7 @@ AC_SUBST(PAMDIR, "$PAMDIR")
 
 
 PKG_CHECK_MODULES([LIBCRYPTO], [libcrypto], [], [])
-PKG_CHECK_MODULES([LIBFIDO2], [libfido2 >= 1.2.0], [], [])
+PKG_CHECK_MODULES([LIBFIDO2], [libfido2 >= 1.3.0], [], [])
 
 
 # Check for secure_getenv, readpassphrase, explicit_bzero, and memset_s
@@ -92,6 +106,7 @@ AC_CONFIG_FILES([
   Makefile
   pamu2fcfg/Makefile
   tests/Makefile
+  fuzz/Makefile
 ])
 
 creduser=$(whoami)
@@ -134,7 +149,6 @@ AC_CONFIG_FILES([tests/credentials/new_-V-N.cred])
 AC_CONFIG_FILES([tests/credentials/new_-V.cred])
 AC_CONFIG_FILES([tests/credentials/old_credential.cred])
 AC_CONFIG_FILES([tests/credentials/ssh_credential.cred])
-
 AC_OUTPUT
 
 
