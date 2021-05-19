@@ -2,12 +2,12 @@
 .\"     Title: pam_u2f
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: Version 1.1.0
+.\"      Date: Version 1.1.1
 .\"    Manual: PAM U2F Module Manual
 .\"    Source: pam-u2f
 .\"  Language: English
 .\"
-.TH "PAM_U2F" "8" "Version 1\&.1\&.0" "pam\-u2f" "PAM U2F Module Manual"
+.TH "PAM_U2F" "8" "Version 1\&.1\&.1" "pam\-u2f" "PAM U2F Module Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -155,11 +155,35 @@ By default the mapping file inside a home directory will be opened as the target
 Using pam\-u2f to secure the login to a computer while storing the mapping file in an encrypted home directory, will result in the impossibility of logging into the system\&. The partition is decrypted after login and the mapping file can not be accessed\&.
 .SH "NOTES"
 .sp
+\fBNodetect\fR
+.sp
 The "nodetect" option should be used with caution\&. pam_u2f checks that a key configured for the user is inserted before performing the full tactile authentication\&. This detection is done by sending a "check\-only" authentication request to all inserted tokens to so see if at least one of them responds affirmatively to one or more of the keyhandles configured for the user\&. By doing this, pam_u2f can avoid emitting the "cue" prompt (if configured), which can cause some confusing UI issues if the cue is emitted followed by the underlying library immediately failing the tactile authentication\&. This option is also useful to avoid an unintended 1\-second delay prior to the tactile authentication caused by versions of libu2f\-host <= 1\&.1\&.5\&.
 .sp
 If pam_u2f is configured to "cue" and "nodetect", an attacker can determine that pam_u2f is part of the authentication stack by inserting any random U2F token and performing an authentication attempt\&. In this scenario, the attacker would see the cue message followed by an immediate failure, whereas with detection enabled, the U2F authentication will fail silently\&. Understand that an attacker could choose a U2F token that alerts him or her in some way to the "check\-only" authentication attempt, so this precaution only pushes the issue back a step\&.
 .sp
 In summary, the detection feature was added to avoid confusing UI issues and to prevent leaking information about the authentication stack in very specific scenario when "cue" is configured\&. The "nodetect" option was added to avoid buggy sleep behavior in older versions of libu2f\-host and for hypothetical tokens that do not tolerate the double authentication\&. Detection is performed, and likewise "nodetect" honored, regardless of whether "cue" is also specified\&.
+.sp
+\fBSELinux\fR
+.sp
+Due to an issue with Fedora Linux, and possibly with other distributions that use SELinux, a system configured with pam\-u2f may end up in a situation where access to the credentials file is denied\&. If the nouserok option is also set, this will result in a successful authentication within the module, without using the FIDO authenticator\&.
+.sp
+In order to correctly update the security context the command \fBfixfiles onboot\fR should be used on existing installations
+.sp
+Moreover, to allow read access to an authfile or directory placed in a non\-standard location, the command
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# chcon \-R \-t auth_home_t /path/to/authfile
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+should be used\&.
+.sp
+For more information see https://access\&.redhat\&.com/security/cve/CVE\-2020\-24612\&.
 .SH "BUGS"
 .sp
 Report pam\-u2f bugs in the issue tracker: https://github\&.com/Yubico/pam\-u2f/issues

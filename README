@@ -16,10 +16,15 @@ This project uses 'autoconf', 'automake', 'pkg-config' and 'libtool'
 to achieve portability and ease of use.
 
 In addition, https://developers.yubico.com/libfido2['libfido2'] (>=
-1.2.0) is needed. Versions of this project up to 1.0.8 used
-`libu2f-host` and libu2f-server`.
+1.3.0) is needed. Versions of this project up to 1.0.8 used
+`libu2f-host` and `libu2f-server`. On Ubuntu, the necessary dependencies can be
+installed using
 
-  Ubuntu:  apt install autoconf automake libtool pkg-config libfido2-dev --no-install-recommends
+[source]
+----
+# apt install --no-install-recommends autoconf automake libtool pkg-config \
+    libfido2-dev libpam-dev libssl-dev
+----
 
 If you downloaded a tarball, build it as follows.
 
@@ -46,10 +51,16 @@ This will create a directory 'pam-u2f'. Enter the directory:
 $ cd pam-u2f
 ----
 
-`autoconf`, `automake`, `libtool`, and `libpam` must be installed.
-`AsciiDoc` and `xsltproc` are used to generate the manpages.
+`autoconf`, `automake`, `gengetopt`, `libtool`, and `libpam` must be installed.
+`AsciiDoc` and `xsltproc` are used to generate the manpages. On Ubuntu, the
+necessary dependencies can be installed using
 
-  Ubuntu:  apt install autoconf automake libtool libpam-dev libfido2-dev asciidoc xsltproc libxml2-utils docbook-xml --no-install-recommends
+[source]
+----
+# apt install --no-install-recommends autoconf automake libtool gengetopt \
+    pkg-config libfido2-dev libpam-dev libssl-dev asciidoc xsltproc \
+    libxml2-utils docbook-xml
+----
 
 Generate the build system using:
 
@@ -108,7 +119,7 @@ keyHandles and user keys. The format is
 second_keyHandle,second_public_key:...` the default location of the
 file is $XDG_CONFIG_HOME/Yubico/u2f_keys. If the environment variable
 is not set, $HOME/.config/Yubico/u2f_keys is used. (more on
-<<files,Authorization Mapping Files>>). An individual (per user) file
+<<authMappingFiles,Authorization Mapping Files>>). An individual (per user) file
 may be configured, see <<individualAuth>>.
 
 authpending_file=file::
@@ -200,7 +211,7 @@ FIDO devices. It is not possible to mix native credentials and SSH
 credentials. Once this option is enabled all credentials will be parsed
 as SSH.
 
-[[files]]
+[[authMappingFiles]]
 Authorization Mapping Files
 ---------------------------
 
@@ -323,3 +334,29 @@ authentication against them is attempted sequentially as they are defined
 in the configuration file of the module. If during an authentication
 attempt a connected device is removed or a new device is plugged in,
 the authentication restarts from the top of the list.
+
+SELinux Note
+------------
+
+Due to an issue with Fedora Linux, and possibly with other
+distributions that use SELinux, a system configured with pam-u2f may
+end up in a situation where access to the credentials file is denied.
+If the `nouserok` option is also set, this will result in a successful
+authentication within the module, without using the FIDO
+authenticator.
+
+In order to correctly update the security context the command
+`fixfiles onboot` should be used on existing installations
+
+Moreover, to allow read access to an authfile or directory placed in a
+non-standard location, the command
+
+[source, bash]
+----
+# chcon -R -t auth_home_t /path/to/target
+----
+
+should be used.
+
+For more information see
+https://access.redhat.com/security/cve/CVE-2020-24612[HERE].

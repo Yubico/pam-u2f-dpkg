@@ -1,3 +1,117 @@
+2021-05-19  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* NEWS: Update NEWS file
+
+2021-05-19  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* fuzz/Makefile.am: fuzz: also include helper scripts in tarball
+
+2021-05-19  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* Makefile.am, configure.ac: fuzz: use COMPILER_CLANG conditional to
+	add subdir Otherwise, the fuzz subdirectory is not included in the tarball
+	created by `make dist`. If one then tries to build from the tarball
+	with CC=clang, then `./configure` fails fails with     config.status: error: cannot find input file: `fuzz/Makefile.in'
+
+2021-05-19  pedro martelletto <pedro@yubico.com>
+
+	* util.c: Verify that the UV bit is set If PIN or other forms of user verification are required, check that
+	the corresponding User Verification (UV) bit is set in the signed
+	payload obtained from the authenticator.
+
+2021-05-19  pedro martelletto <pedro@yubico.com>
+
+	* util.c: Handle converse() returning NULL If a PIN is required and converse() returns NULL, abort the
+	authentication flow instead of reverting to FIDO2 without PIN.
+	Fixes #175.
+
+2021-03-16  Ludvig Michaelsson <4864502+LDVG@users.noreply.github.com>
+
+	* : Merge pull request #174 from Yubico/readme misc: update README, gitignore
+
+2021-03-11  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README: README: update dependency installation instructions
+
+2021-01-11  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #169 from syscll/syscll-patch-1 README: update Authorization Mapping Files link
+
+2020-12-09  Alessio Di Mauro <alessio@yubico.com>
+
+	* README, configure.ac: Bump minimum required version of libfido2 PR #168 added support for self-attestation in pamu2fcfg which was
+	introduced in libfido2 v1.3.0.
+
+2020-12-09  Alessio Di Mauro <alessio@yubico.com>
+
+	* : Merge PR #168
+
+2020-12-01  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* .github/workflows/codeql-analysis.yml: actions: apt update
+
+2020-10-16  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* .github/workflows/scan.yml: actions: add xsltproc as dependency
+
+2020-10-16  Alessio Di Mauro <alessio@yubico.com>
+
+	* : Merge PR #165
+
+2020-06-15  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* .github/workflows/codeql-analysis.yml: actions: CodeQL scanning
+
+2020-09-29  Alessio Di Mauro <alessio@yubico.com>
+
+	* README, man/pam_u2f.8.txt: Clarify text around SELinux Relates to #152.
+
+2020-09-28  Alessio Di Mauro <alessio@yubico.com>
+
+	* README, man/pam_u2f.8.txt: Add a note regarding SELinux on man and
+	README Relates to #152.
+
+2020-09-22  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* : Merge pull request #160 from Yubico/fuzz Add fuzzing harness for fuzzing native and ssh formats
+
+2020-09-22  Alessio Di Mauro <alessio@yubico.com>
+
+	* util.c: Do not error out when nodetect is set and devices are
+	found
+
+2020-09-17  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* .github/workflows/linux_fuzz.yml, .gitignore,
+	build-aux/ci/fuzz-linux-asan.sh, configure.ac, fuzz/Makefile.am,
+	fuzz/coverage.sh, fuzz/fuzz_format_parsers.c, fuzz/make_seed.py: 
+	fuzz: add fuzzing harness for the native and ssh formats o builds and fuzzes in a github action flow.
+
+2020-09-17  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* : Merge pull request #159 from Yubico/ga Github Actions: build and run tests on linux
+
+2020-09-17  Alessio Di Mauro <a-dma@users.noreply.github.com>
+
+	* : Merge pull request #158 from Yubico/docs docs: cosmetics
+
+2020-09-17  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* README: docs: cosmetics
+
+2020-09-17  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* util.c: Check that strtok_s succeeded before continuing Avoids a potential segfault found by fuzzing
+
+2020-09-17  Gabriel Kihlman <g.kihlman@yubico.com>
+
+	* tests/get_devices.c: tests: also free alloced memory before
+	exiting This makes LeakSanitizer happy
+
+2020-09-17  Alessio Di Mauro <alessio@yubico.com>
+
+	* NEWS, configure.ac: Bump version
+
 2020-09-16  Alessio Di Mauro <alessio@yubico.com>
 
 	* NEWS: Update NEWS file
