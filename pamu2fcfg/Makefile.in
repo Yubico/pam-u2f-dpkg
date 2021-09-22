@@ -107,8 +107,8 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_pamu2fcfg_OBJECTS = pamu2fcfg.$(OBJEXT) cmdline.$(OBJEXT) \
-	readpassphrase.$(OBJEXT) ../util.$(OBJEXT) ../b64.$(OBJEXT) \
-	../explicit_bzero.$(OBJEXT)
+	readpassphrase.$(OBJEXT) strlcpy.$(OBJEXT) ../util.$(OBJEXT) \
+	../b64.$(OBJEXT) ../explicit_bzero.$(OBJEXT)
 pamu2fcfg_OBJECTS = $(am_pamu2fcfg_OBJECTS)
 am__DEPENDENCIES_1 =
 pamu2fcfg_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
@@ -134,7 +134,7 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ../$(DEPDIR)/b64.Po \
 	../$(DEPDIR)/explicit_bzero.Po ../$(DEPDIR)/util.Po \
 	./$(DEPDIR)/cmdline.Po ./$(DEPDIR)/pamu2fcfg.Po \
-	./$(DEPDIR)/readpassphrase.Po
+	./$(DEPDIR)/readpassphrase.Po ./$(DEPDIR)/strlcpy.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -343,11 +343,11 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CFLAGS = $(WARN_CFLAGS)
+AM_CFLAGS = $(CWFLAGS) $(CSFLAGS)
 AM_CPPFLAGS = -I$(srcdir)/.. -I$(builddir)/.. $(LIBFIDO2_CFLAGS)
 pamu2fcfg_SOURCES = pamu2fcfg.c cmdline.ggo cmdline.c cmdline.h \
-	readpassphrase.c _readpassphrase.h ../util.c ../b64.c \
-	../explicit_bzero.c
+	readpassphrase.c _readpassphrase.h strlcpy.c openbsd-compat.h \
+	../util.c ../b64.c ../explicit_bzero.c
 pamu2fcfg_LDADD = $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS)
 BUILT_SOURCES = cmdline.c cmdline.h
 MAINTAINERCLEANFILES = $(BUILT_SOURCES)
@@ -467,6 +467,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmdline.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pamu2fcfg.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readpassphrase.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strlcpy.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -685,6 +686,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/cmdline.Po
 	-rm -f ./$(DEPDIR)/pamu2fcfg.Po
 	-rm -f ./$(DEPDIR)/readpassphrase.Po
+	-rm -f ./$(DEPDIR)/strlcpy.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -736,6 +738,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/cmdline.Po
 	-rm -f ./$(DEPDIR)/pamu2fcfg.Po
 	-rm -f ./$(DEPDIR)/readpassphrase.Po
+	-rm -f ./$(DEPDIR)/strlcpy.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

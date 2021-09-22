@@ -90,7 +90,28 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@COMPILER_CLANG_TRUE@am__append_1 = fuzz
+@ENABLE_FUZZING_TRUE@am__append_1 = fuzz
+@ENABLE_FUZZING_TRUE@am__append_2 = -fsanitize=fuzzer-no-link
+@ENABLE_FUZZING_TRUE@am__append_3 = fuzz/wrap.c
+@ENABLE_FUZZING_TRUE@am__append_4 = -Wl,--wrap=strdup \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=calloc -Wl,--wrap=malloc \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=open -Wl,--wrap=close \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=fdopen -Wl,--wrap=fstat \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=read -Wl,--wrap=gethostname \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=getpwnam_r \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=getpwuid_r -Wl,--wrap=geteuid \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=secure_getenv \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=pam_get_user \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=pam_get_item \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=pam_modutil_drop_priv \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=pam_modutil_regain_priv \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=BIO_new -Wl,--wrap=BIO_write \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=BIO_read -Wl,--wrap=BIO_ctrl \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=BIO_new_mem_buf \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=EC_KEY_new_by_curve_name \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=EC_KEY_get0_group \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=fido_dev_open \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=fido_dev_info_manifest
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
@@ -167,12 +188,17 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(man8dir)"
-LTLIBRARIES = $(lib_LTLIBRARIES)
+am__installdirs = "$(DESTDIR)$(pampluginexecdir)" \
+	"$(DESTDIR)$(man8dir)"
+LTLIBRARIES = $(pampluginexec_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 pam_u2f_la_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_pam_u2f_la_OBJECTS = pam-u2f.lo util.lo drop_privs.lo b64.lo \
-	explicit_bzero.lo
+am__pam_u2f_la_SOURCES_DIST = pam-u2f.c util.c util.h drop_privs.h \
+	b64.c b64.h explicit_bzero.c fuzz/wrap.c
+am__dirstamp = $(am__leading_dot)dirstamp
+@ENABLE_FUZZING_TRUE@am__objects_1 = fuzz/wrap.lo
+am_pam_u2f_la_OBJECTS = pam-u2f.lo util.lo b64.lo explicit_bzero.lo \
+	$(am__objects_1)
 pam_u2f_la_OBJECTS = $(am_pam_u2f_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -196,9 +222,9 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/b64.Plo ./$(DEPDIR)/drop_privs.Plo \
+am__depfiles_remade = ./$(DEPDIR)/b64.Plo \
 	./$(DEPDIR)/explicit_bzero.Plo ./$(DEPDIR)/pam-u2f.Plo \
-	./$(DEPDIR)/util.Plo
+	./$(DEPDIR)/util.Plo fuzz/$(DEPDIR)/wrap.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -219,7 +245,7 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(pam_u2f_la_SOURCES)
-DIST_SOURCES = $(pam_u2f_la_SOURCES)
+DIST_SOURCES = $(am__pam_u2f_la_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -467,7 +493,7 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
-libdir = $(PAMDIR)
+libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
@@ -489,18 +515,24 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = . pamu2fcfg tests $(am__append_1)
 ACLOCAL_AMFLAGS = -I m4
-AM_CFLAGS = $(CWFLAGS)
-AM_CPPFLAGS = $(LIBFIDO2_CFLAGS) $(LIBCRYPTO_CFLAGS)
-lib_LTLIBRARIES = pam_u2f.la
-pam_u2f_la_SOURCES = pam-u2f.c util.c util.h drop_privs.h drop_privs.c \
-	b64.c b64.h explicit_bzero.c
+AM_CFLAGS = $(CWFLAGS) $(CSFLAGS)
+AM_CPPFLAGS = $(LIBFIDO2_CFLAGS) $(LIBCRYPTO_CFLAGS) $(am__append_2)
+pampluginexecdir = $(PAMDIR)
+pampluginexec_LTLIBRARIES = pam_u2f.la
+pam_u2f_la_SOURCES = pam-u2f.c util.c util.h drop_privs.h b64.c b64.h \
+	explicit_bzero.c $(am__append_3)
 pam_u2f_la_LIBADD = -lpam $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS)
-pam_u2f_la_LDFLAGS = -module -avoid-version
+pam_u2f_la_LDFLAGS = -module -avoid-version $(am__append_4)
 @ENABLE_MAN_TRUE@dist_man8_MANS = $(top_builddir)/man/pam_u2f.8
 @ENABLE_MAN_TRUE@DISTCLEANFILES = $(dist_man8_MANS)
 @ENABLE_MAN_TRUE@MANSOURCES = $(top_builddir)/man/pam_u2f.8.txt
 @ENABLE_MAN_TRUE@EXTRA_DIST = $(MANSOURCES)
 @ENABLE_MAN_TRUE@SUFFIXES = .8.txt .8
+
+# Release
+
+# XXX: make distcheck happy with install location of pam_u2f.so
+AM_DISTCHECK_CONFIGURE_FLAGS = --with-pam-dir='/$$(prefix)/$(PAMDIR)'
 PROJECT = pam-u2f
 all: all-recursive
 
@@ -616,33 +648,33 @@ tests/credentials/old_credential.cred: $(top_builddir)/config.status $(top_srcdi
 tests/credentials/ssh_credential.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/ssh_credential.cred.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
-install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+install-pampluginexecLTLIBRARIES: $(pampluginexec_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
-	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
+	@list='$(pampluginexec_LTLIBRARIES)'; test -n "$(pampluginexecdir)" || list=; \
 	list2=; for p in $$list; do \
 	  if test -f $$p; then \
 	    list2="$$list2 $$p"; \
 	  else :; fi; \
 	done; \
 	test -z "$$list2" || { \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(libdir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(libdir)" || exit 1; \
-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libdir)'"; \
-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libdir)"; \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(pampluginexecdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(pampluginexecdir)" || exit 1; \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(pampluginexecdir)'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(pampluginexecdir)"; \
 	}
 
-uninstall-libLTLIBRARIES:
+uninstall-pampluginexecLTLIBRARIES:
 	@$(NORMAL_UNINSTALL)
-	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
+	@list='$(pampluginexec_LTLIBRARIES)'; test -n "$(pampluginexecdir)" || list=; \
 	for p in $$list; do \
 	  $(am__strip_dir) \
-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$f'"; \
-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$f"; \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(pampluginexecdir)/$$f'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(pampluginexecdir)/$$f"; \
 	done
 
-clean-libLTLIBRARIES:
-	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
-	@list='$(lib_LTLIBRARIES)'; \
+clean-pampluginexecLTLIBRARIES:
+	-test -z "$(pampluginexec_LTLIBRARIES)" || rm -f $(pampluginexec_LTLIBRARIES)
+	@list='$(pampluginexec_LTLIBRARIES)'; \
 	locs=`for p in $$list; do echo $$p; done | \
 	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
 	      sort -u`; \
@@ -650,21 +682,30 @@ clean-libLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
+fuzz/$(am__dirstamp):
+	@$(MKDIR_P) fuzz
+	@: > fuzz/$(am__dirstamp)
+fuzz/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) fuzz/$(DEPDIR)
+	@: > fuzz/$(DEPDIR)/$(am__dirstamp)
+fuzz/wrap.lo: fuzz/$(am__dirstamp) fuzz/$(DEPDIR)/$(am__dirstamp)
 
 pam_u2f.la: $(pam_u2f_la_OBJECTS) $(pam_u2f_la_DEPENDENCIES) $(EXTRA_pam_u2f_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(pam_u2f_la_LINK) -rpath $(libdir) $(pam_u2f_la_OBJECTS) $(pam_u2f_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(pam_u2f_la_LINK) -rpath $(pampluginexecdir) $(pam_u2f_la_OBJECTS) $(pam_u2f_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f fuzz/*.$(OBJEXT)
+	-rm -f fuzz/*.lo
 
 distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/b64.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drop_privs.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/explicit_bzero.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pam-u2f.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@fuzz/$(DEPDIR)/wrap.Plo@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -701,6 +742,7 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+	-rm -rf fuzz/.libs fuzz/_libs
 
 distclean-libtool:
 	-rm -f libtool config.lt
@@ -1048,7 +1090,7 @@ check: check-recursive
 all-am: Makefile $(LTLIBRARIES) $(MANS)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(man8dir)"; do \
+	for dir in "$(DESTDIR)$(pampluginexecdir)" "$(DESTDIR)$(man8dir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -1077,6 +1119,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f fuzz/$(DEPDIR)/$(am__dirstamp)
+	-rm -f fuzz/$(am__dirstamp)
 	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
@@ -1084,16 +1128,16 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
+clean-am: clean-generic clean-libtool clean-pampluginexecLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 		-rm -f ./$(DEPDIR)/b64.Plo
-	-rm -f ./$(DEPDIR)/drop_privs.Plo
 	-rm -f ./$(DEPDIR)/explicit_bzero.Plo
 	-rm -f ./$(DEPDIR)/pam-u2f.Plo
 	-rm -f ./$(DEPDIR)/util.Plo
+	-rm -f fuzz/$(DEPDIR)/wrap.Plo
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-libtool distclean-tags
@@ -1116,7 +1160,7 @@ install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am: install-pampluginexecLTLIBRARIES
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 install-html: install-html-recursive
@@ -1143,10 +1187,10 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
 		-rm -f ./$(DEPDIR)/b64.Plo
-	-rm -f ./$(DEPDIR)/drop_privs.Plo
 	-rm -f ./$(DEPDIR)/explicit_bzero.Plo
 	-rm -f ./$(DEPDIR)/pam-u2f.Plo
 	-rm -f ./$(DEPDIR)/util.Plo
+	-rm -f fuzz/$(DEPDIR)/wrap.Plo
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -1163,17 +1207,18 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-libLTLIBRARIES uninstall-man
-
+uninstall-am: uninstall-man uninstall-pampluginexecLTLIBRARIES
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) uninstall-hook
 uninstall-man: uninstall-man8
 
 .MAKE: $(am__recursive_targets) install-am install-exec-am \
-	install-strip
+	install-strip uninstall-am
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
 	am--depfiles am--refresh check check-am clean clean-cscope \
-	clean-generic clean-libLTLIBRARIES clean-libtool cscope \
-	cscopelist-am ctags ctags-am dist dist-all dist-bzip2 \
+	clean-generic clean-libtool clean-pampluginexecLTLIBRARIES \
+	cscope cscopelist-am ctags ctags-am dist dist-all dist-bzip2 \
 	dist-gzip dist-lzip dist-shar dist-tarZ dist-xz dist-zip \
 	distcheck distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distcleancheck distdir \
@@ -1181,13 +1226,14 @@ uninstall-man: uninstall-man8
 	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-exec-hook \
 	install-html install-html-am install-info install-info-am \
-	install-libLTLIBRARIES install-man install-man8 install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags tags-am uninstall uninstall-am \
-	uninstall-libLTLIBRARIES uninstall-man uninstall-man8
+	install-man install-man8 install-pampluginexecLTLIBRARIES \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am uninstall-hook uninstall-man uninstall-man8 \
+	uninstall-pampluginexecLTLIBRARIES
 
 .PRECIOUS: Makefile
 
@@ -1195,11 +1241,12 @@ uninstall-man: uninstall-man8
 @ENABLE_MAN_TRUE@.8.txt.8:
 @ENABLE_MAN_TRUE@	$(A2X) --format=manpage -L -a revdate="Version $(VERSION)" $<
 
-# Release
-
 install-exec-hook:
-	rm -f $(PAMDIR)/pam_u2f.la
-	chmod -f 644 $(PAMDIR)/pam_u2f.so || true
+	rm -f $(DESTDIR)$(pampluginexecdir)/pam_u2f.la
+	chmod -f 644 $(DESTDIR)$(pampluginexecdir)/pam_u2f.so || true
+
+uninstall-hook:
+	rm -f $(DESTDIR)$(pampluginexecdir)/pam_u2f.so
 
 indent:
 	clang-format -i *.c *.h pamu2fcfg/*.c pamu2fcfg/*.h
@@ -1224,7 +1271,7 @@ release:
 		grep -q "Version $(VERSION) .released `date -I`" || \
 		(echo 'error: Update date/version in $(srcdir)/NEWS.'; exit 1)
 	rm -f $(srcdir)/ChangeLog
-	sudo make ChangeLog distcheck
+	make ChangeLog distcheck
 	gpg --detach-sign --default-key $(KEYID) $(PACKAGE)-$(VERSION).tar.gz
 	gpg --verify $(PACKAGE)-$(VERSION).tar.gz.sig
 	cd $(srcdir) && git push

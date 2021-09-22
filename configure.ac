@@ -1,6 +1,6 @@
 #  Copyright (C) 2014-2019 Yubico AB
 AC_PREREQ([2.65])
-AC_INIT([pam_u2f], [1.1.1], [https://github.com/Yubico/pam-u2f/issues],
+AC_INIT([pam_u2f], [1.2.0], [https://github.com/Yubico/pam-u2f/issues],
   [pam_u2f], [https://developers.yubico.com/pam-u2f/])
 
 AC_CONFIG_AUX_DIR([build-aux])
@@ -30,29 +30,21 @@ AS_IF([test "$enable_man" = "yes"],
 )
 AM_CONDITIONAL([ENABLE_MAN], [test "$enable_man" = "yes"])
 
-AC_CACHE_CHECK([for clang],
-        _cv_clang,[
-        AC_TRY_COMPILE([], [
-                #ifdef __clang__
-                #else
-                #error "NOT CLANG"
-                #endif
-                return 0;
-        ],
-        [_cv_clang=yes],
-        [_cv_clang=no],
-        [])
+AC_ARG_ENABLE([fuzzing],
+  [AS_HELP_STRING([--enable-fuzzing], [Enable fuzzing targets])]
+)
+AS_IF([test "$enable_fuzzing" = "yes"],[
+  AC_DEFINE([WITH_FUZZING])
 ])
-AM_CONDITIONAL([COMPILER_CLANG], [test "$_cv_clang" = yes])
+AM_CONDITIONAL([ENABLE_FUZZING], [test "$enable_fuzzing" = "yes"])
 
 AC_CHECK_HEADERS([security/pam_appl.h], [],
   [AC_MSG_ERROR([[PAM header files not found, install libpam-dev.]])])
-AC_CHECK_HEADERS([security/pam_modules.h security/_pam_macros.h security/pam_modutil.h], [], [],
+AC_CHECK_HEADERS([security/pam_modules.h security/_pam_macros.h security/pam_modutil.h security/openpam.h], [], [],
   [#include <sys/types.h>
    #include <security/pam_appl.h>])
 AC_CHECK_LIB([pam], [pam_start])
-
-AC_SEARCH_LIBS([pam_modutil_drop_priv], ["pam"], [AC_DEFINE([HAVE_PAM_MODUTIL_DROP_PRIV], [1])])
+AC_CHECK_FUNCS([pam_modutil_drop_priv openpam_borrow_cred])
 
 case "$host" in
      *darwin*)  PAMDIR="/usr/lib/pam";;
@@ -74,33 +66,36 @@ PKG_CHECK_MODULES([LIBCRYPTO], [libcrypto], [], [])
 PKG_CHECK_MODULES([LIBFIDO2], [libfido2 >= 1.3.0], [], [])
 
 
-# Check for secure_getenv, readpassphrase, explicit_bzero, and memset_s
+# Check for secure_getenv, strlcpy, readpassphrase, explicit_bzero, and memset_s
 am_save_CFLAGS="$CFLAGS"
 am_save_LIBS="$LIBS"
 CFLAGS="$CFLAGS"
 LIBS="$LIBS"
-AC_CHECK_FUNCS([secure_getenv readpassphrase explicit_bzero memset_s])
+AC_CHECK_FUNCS([secure_getenv strlcpy readpassphrase explicit_bzero memset_s])
 CFLAGS=$am_save_CFLAGS
 LIBS=$am_save_LIBS
 
+# Make clang emit errors for unknown warnings to make the AX_CHECK_COMPILE_FLAG
+# macro behave as intended, excluding unsupported flags.
+AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option], [check_extra_flags="-Werror=unknown-warning-option"])
 
 AC_ARG_VAR([CWFLAGS], [Warning flags])
-AX_CHECK_COMPILE_FLAG([-Wall], [CWFLAGS="-Wall"])
-AX_CHECK_COMPILE_FLAG([-Wextra], [CWFLAGS="$CWFLAGS -Wextra"])
-AX_CHECK_COMPILE_FLAG([-Wconversion], [CWFLAGS="$CWFLAGS -Wconversion"])
+AX_CHECK_COMPILE_FLAG([-Wall], [CWFLAGS="-Wall"], [], [$check_extra_flags])
+AX_CHECK_COMPILE_FLAG([-Wextra], [CWFLAGS="$CWFLAGS -Wextra"], [], [$check_extra_flags])
+AX_CHECK_COMPILE_FLAG([-Wconversion], [CWFLAGS="$CWFLAGS -Wconversion"], [], [$check_extra_flags])
 # Because pam headers are doing sign-conversion, see PAM_MODUTIL_DEF_PRIVS in pam_modutil.h
-AX_CHECK_COMPILE_FLAG([-Wconversion], [CWFLAGS="$CWFLAGS -Wno-sign-conversion"])
-AX_CHECK_COMPILE_FLAG([-Wpedantic], [CWFLAGS="$CWFLAGS -Wpedantic"])
-AX_CHECK_COMPILE_FLAG([-Wformat=2], [CWFLAGS="$CWFLAGS -Wformat=2"])
-AX_CHECK_COMPILE_FLAG([-Wstrict-prototypes], [CWFLAGS="$CWFLAGS -Wstrict-prototypes"])
-AX_CHECK_COMPILE_FLAG([-Wmissing-declarations], [CWFLAGS="$CWFLAGS -Wmissing-declarations"])
-AX_CHECK_COMPILE_FLAG([-Wmissing-prototypes], [CWFLAGS="$CWFLAGS -Wmissing-prototypes"])
-AX_CHECK_COMPILE_FLAG([-Wnull-dereference], [CWFLAGS="$CWFLAGS -Wnull-dereference"])
-AX_CHECK_COMPILE_FLAG([-Wshadow], [CWFLAGS="$CWFLAGS -Wshadow"])
-AX_CHECK_COMPILE_FLAG([-Wpointer-arith], [CWFLAGS="$CWFLAGS -Wpointer-arith"])
+AX_CHECK_COMPILE_FLAG([-Wconversion], [CWFLAGS="$CWFLAGS -Wno-sign-conversion"], [], [$check_extra_flags])
+AX_CHECK_COMPILE_FLAG([-Wpedantic], [CWFLAGS="$CWFLAGS -Wpedantic"], [], [$check_extra_flags])
+AX_CHECK_COMPILE_FLAG([-Wformat=2], [CWFLAGS="$CWFLAGS -Wformat=2"], [], [$check_extra_flags])
+AX_CHECK_COMPILE_FLAG([-Wstrict-prototypes], [CWFLAGS="$CWFLAGS -Wstrict-prototypes"], [], [$check_extra_flags])
+AX_CHECK_COMPILE_FLAG([-Wmissing-declarations], [CWFLAGS="$CWFLAGS -Wmissing-declarations"], [], [$check_extra_flags])
+AX_CHECK_COMPILE_FLAG([-Wmissing-prototypes], [CWFLAGS="$CWFLAGS -Wmissing-prototypes"], [], [$check_extra_flags])
+AX_CHECK_COMPILE_FLAG([-Wnull-dereference], [CWFLAGS="$CWFLAGS -Wnull-dereference"], [], [$check_extra_flags])
+AX_CHECK_COMPILE_FLAG([-Wshadow], [CWFLAGS="$CWFLAGS -Wshadow"], [], [$check_extra_flags])
+AX_CHECK_COMPILE_FLAG([-Wpointer-arith], [CWFLAGS="$CWFLAGS -Wpointer-arith"], [], [$check_extra_flags])
 
 AC_ARG_VAR([CSFLAGS], [Warning suppression flags])
-AX_CHECK_COMPILE_FLAG([-Wno-unused-but-set-variable], [CSFLAGS="-Wno-unused-but-set-variable"])
+AX_CHECK_COMPILE_FLAG([-Wno-unused-but-set-variable], [CSFLAGS="-Wno-unused-but-set-variable"], [], [$check_extra_flags])
 
 AC_CONFIG_FILES([
   Makefile
