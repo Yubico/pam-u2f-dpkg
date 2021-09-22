@@ -1,3 +1,9 @@
+pam-u2f (1.2.0-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Ludvig Michaelsson <ludvig.michaelsson@yubico.com>  Wed, 22 Sep 2021 10:02:50 +0200
+
 pam-u2f (1.1.1-1) unstable; urgency=medium
 
   * New upstream release.
