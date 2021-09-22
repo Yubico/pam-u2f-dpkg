@@ -43,15 +43,15 @@ struct gengetopt_args_info
 {
   const char *help_help; /**< @brief Print help and exit help description.  */
   const char *version_help; /**< @brief Print version and exit help description.  */
-  char * origin_arg;	/**< @brief Origin URL to use during registration. Defaults to pam://hostname.  */
-  char * origin_orig;	/**< @brief Origin URL to use during registration. Defaults to pam://hostname original value given at command line.  */
-  const char *origin_help; /**< @brief Origin URL to use during registration. Defaults to pam://hostname help description.  */
-  char * appid_arg;	/**< @brief Application ID to use during registration. Defaults to pam://hostname.  */
-  char * appid_orig;	/**< @brief Application ID to use during registration. Defaults to pam://hostname original value given at command line.  */
-  const char *appid_help; /**< @brief Application ID to use during registration. Defaults to pam://hostname help description.  */
-  char * type_arg;	/**< @brief COSE type to use during registration (ES256 or RS256). Defaults to ES256..  */
-  char * type_orig;	/**< @brief COSE type to use during registration (ES256 or RS256). Defaults to ES256. original value given at command line.  */
-  const char *type_help; /**< @brief COSE type to use during registration (ES256 or RS256). Defaults to ES256. help description.  */
+  char * origin_arg;	/**< @brief Relying party ID to use during registration. Defaults to pam://hostname.  */
+  char * origin_orig;	/**< @brief Relying party ID to use during registration. Defaults to pam://hostname original value given at command line.  */
+  const char *origin_help; /**< @brief Relying party ID to use during registration. Defaults to pam://hostname help description.  */
+  char * appid_arg;	/**< @brief Relying party name to use during registration. Defaults to the value of origin.  */
+  char * appid_orig;	/**< @brief Relying party name to use during registration. Defaults to the value of origin original value given at command line.  */
+  const char *appid_help; /**< @brief Relying party name to use during registration. Defaults to the value of origin help description.  */
+  char * type_arg;	/**< @brief COSE type to use during registration (ES256, EDDSA, or RS256). Defaults to ES256..  */
+  char * type_orig;	/**< @brief COSE type to use during registration (ES256, EDDSA, or RS256). Defaults to ES256. original value given at command line.  */
+  const char *type_help; /**< @brief COSE type to use during registration (ES256, EDDSA, or RS256). Defaults to ES256. help description.  */
   int resident_flag;	/**< @brief Generate a resident credential (default=off).  */
   const char *resident_help; /**< @brief Generate a resident credential help description.  */
   int no_user_presence_flag;	/**< @brief Allow the credential to be used without ensuring the user's presence (default=off).  */

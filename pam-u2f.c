@@ -33,7 +33,9 @@ char *secure_getenv(const char *name) {
 #endif
 
 static void parse_cfg(int flags, int argc, const char **argv, cfg_t *cfg) {
+#ifndef WITH_FUZZING
   struct stat st;
+#endif
   FILE *file = NULL;
   int fd = -1;
   int i;
@@ -84,6 +86,10 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t *cfg) {
     if (strncmp(argv[i], "cue_prompt=", 11) == 0)
       cfg->cue_prompt = argv[i] + 11;
     if (strncmp(argv[i], "debug_file=", 11) == 0) {
+      if (cfg->is_custom_debug_file)
+        fclose(cfg->debug_file);
+      cfg->debug_file = stderr;
+      cfg->is_custom_debug_file = 0;
       const char *filename = argv[i] + 11;
       if (strncmp(filename, "stdout", 6) == 0) {
         cfg->debug_file = stdout;
@@ -94,7 +100,11 @@ static void parse_cfg(int flags, int argc, const char **argv, cfg_t *cfg) {
       } else {
         fd = open(filename,
                   O_WRONLY | O_APPEND | O_CLOEXEC | O_NOFOLLOW | O_NOCTTY);
+#ifndef WITH_FUZZING
         if (fd >= 0 && (fstat(fd, &st) == 0) && S_ISREG(st.st_mode)) {
+#else
+        if (fd >= 0) {
+#endif
           file = fdopen(fd, "a");
           if (file != NULL) {
             cfg->debug_file = file;
@@ -217,6 +227,10 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     DBG("Maximum devices number not set. Using default (%d)", MAX_DEVS);
     cfg->max_devs = MAX_DEVS;
   }
+#if WITH_FUZZING
+  if (cfg->max_devs > 256)
+    cfg->max_devs = 256;
+#endif
 
   devices = calloc(cfg->max_devs, sizeof(device_t));
   if (!devices) {
@@ -412,8 +426,10 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
 
   if (cfg->manual == 0) {
     if (cfg->interactive) {
-      converse(pamh, PAM_PROMPT_ECHO_ON,
-               cfg->prompt != NULL ? cfg->prompt : DEFAULT_PROMPT);
+      buf = converse(pamh, PAM_PROMPT_ECHO_ON,
+                     cfg->prompt != NULL ? cfg->prompt : DEFAULT_PROMPT);
+      free(buf);
+      buf = NULL;
     }
 
     retval = do_authentication(cfg, devices, n_devices, pamh);

@@ -2,12 +2,12 @@
 .\"     Title: pam_u2f
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: Version 1.1.1
+.\"      Date: Version 1.2.0
 .\"    Manual: PAM U2F Module Manual
 .\"    Source: pam-u2f
 .\"  Language: English
 .\"
-.TH "PAM_U2F" "8" "Version 1\&.1\&.1" "pam\-u2f" "PAM U2F Module Manual"
+.TH "PAM_U2F" "8" "Version 1\&.2\&.0" "pam\-u2f" "PAM U2F Module Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -54,17 +54,17 @@ for anything getting logged to it\&. It is not created by pam\-u2f on purpose (f
 .PP
 \fBorigin\fR=\fIorigin\fR
 .RS 4
-Set the origin for the FIDO authentication procedure\&. If no value is specified, the origin "pam://$HOSTNAME" is used\&.
+Set the relying party ID for the FIDO authentication procedure\&. If no value is specified, the identifier "pam://$HOSTNAME" is used\&.
 .RE
 .PP
 \fBappid\fR=\fIappid\fR
 .RS 4
-Set the application ID for the U2F authentication procedure\&. If no value is specified, the same value used for origin is taken ("pam://$HOSTNAME" if also origin is not specified)\&.
+Set the application ID for the U2F authentication procedure\&. If no value is specified, the same value used for origin is taken ("pam://$HOSTNAME" if also origin is not specified)\&. This setting is only applicable for U2F credentials created with pamu2fcfg versions v1\&.0\&.8 or earlier\&. Note that on v1\&.1\&.0 and v1\&.1\&.1 of pam\-u2f, handling of this setting was temporarily broken if the value was not the same as the value of origin\&.
 .RE
 .PP
 \fBauthfile\fR=\fIfile\fR
 .RS 4
-Set the location of the file that holds the mappings of user names to keyHandles and user keys\&. The format is username:keyHandle1,public_key1:keyHandle2,public_key2:\&... the default location of the file is $XDG_CONFIG_HOME/Yubico/u2f_keys\&. If the environment variable is not set, $HOME/\&.config/Yubico/u2f_keys is used\&. An individual (per user) file may be configured relative to the users\*(Aq home dirs, i\&.e\&. "\&.ssh/u2f_keys"\&.
+Set the location of the file that holds the mappings of user names to keyHandles and user keys\&. An individual (per user) file may be configured relative to the users\*(Aq home dirs, e\&.g\&. "\&.ssh/u2f_keys"\&. If not specified, the location defaults to $XDG_CONFIG_HOME/Yubico/u2f_keys\&. If $XDG_CONFIG_HOME is not set, $HOME/\&.config/Yubico/u2f_keys is used\&. The authfile format is <username>:<KeyHandle1>,<UserKey1>,<CoseType1>,<Options1>:<KeyHandle2>,<UserKey2>,<CoseType2>,<Options2>:\&...
 .RE
 .PP
 \fBauthpending_file\fR=\fIfile\fR

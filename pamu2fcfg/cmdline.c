@@ -25,7 +25,7 @@
 
 #include "cmdline.h"
 
-const char *gengetopt_args_info_purpose = "Perform a U2F registration operation and print a configuration line that can be\nused with the pam_u2f module.";
+const char *gengetopt_args_info_purpose = "Perform a FIDO2/U2F registration operation and print a configuration line that\ncan be used with the pam_u2f module.";
 
 const char *gengetopt_args_info_usage = "Usage: " CMDLINE_PARSER_PACKAGE " [OPTION]...";
 
@@ -36,9 +36,9 @@ const char *gengetopt_args_info_description = "";
 const char *gengetopt_args_info_help[] = {
   "  -h, --help               Print help and exit",
   "      --version            Print version and exit",
-  "  -o, --origin=STRING      Origin URL to use during registration. Defaults to\n                             pam://hostname",
-  "  -i, --appid=STRING       Application ID to use during registration. Defaults\n                             to pam://hostname",
-  "  -t, --type=STRING        COSE type to use during registration (ES256 or\n                             RS256). Defaults to ES256.",
+  "  -o, --origin=STRING      Relying party ID to use during registration.\n                             Defaults to pam://hostname",
+  "  -i, --appid=STRING       Relying party name to use during registration.\n                             Defaults to the value of origin",
+  "  -t, --type=STRING        COSE type to use during registration (ES256, EDDSA,\n                             or RS256). Defaults to ES256.",
   "  -r, --resident           Generate a resident credential  (default=off)",
   "  -P, --no-user-presence   Allow the credential to be used without ensuring the\n                             user's presence  (default=off)",
   "  -N, --pin-verification   Require PIN verification during authentication\n                             (default=off)",
@@ -577,7 +577,7 @@ cmdline_parser_internal (
           return 0;
         
           break;
-        case 'o':	/* Origin URL to use during registration. Defaults to pam://hostname.  */
+        case 'o':	/* Relying party ID to use during registration. Defaults to pam://hostname.  */
         
         
           if (update_arg( (void *)&(args_info->origin_arg), 
@@ -589,7 +589,7 @@ cmdline_parser_internal (
             goto failure;
         
           break;
-        case 'i':	/* Application ID to use during registration. Defaults to pam://hostname.  */
+        case 'i':	/* Relying party name to use during registration. Defaults to the value of origin.  */
         
         
           if (update_arg( (void *)&(args_info->appid_arg), 
@@ -601,7 +601,7 @@ cmdline_parser_internal (
             goto failure;
         
           break;
-        case 't':	/* COSE type to use during registration (ES256 or RS256). Defaults to ES256..  */
+        case 't':	/* COSE type to use during registration (ES256, EDDSA, or RS256). Defaults to ES256..  */
         
         
           if (update_arg( (void *)&(args_info->type_arg), 
