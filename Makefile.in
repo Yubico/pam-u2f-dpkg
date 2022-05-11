@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-#  Copyright (C) 2014-2018 Yubico AB - See COPYING
+#  Copyright (C) 2014-2022 Yubico AB - See COPYING
 
 VPATH = @srcdir@
 am__is_gnu_make = { \
@@ -90,15 +90,18 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ENABLE_FUZZING_TRUE@am__append_1 = fuzz
-@ENABLE_FUZZING_TRUE@am__append_2 = -fsanitize=fuzzer-no-link
-@ENABLE_FUZZING_TRUE@am__append_3 = fuzz/wrap.c
-@ENABLE_FUZZING_TRUE@am__append_4 = -Wl,--wrap=strdup \
+@ENABLE_MAN_TRUE@am__append_1 = man
+@ENABLE_FUZZING_TRUE@am__append_2 = fuzz
+@ENABLE_FUZZING_TRUE@am__append_3 = -fsanitize=fuzzer-no-link
+@ENABLE_FUZZING_FALSE@am__append_4 = -export-symbols $(srcdir)/export.sym
+@ENABLE_FUZZING_TRUE@am__append_5 = -export-symbols \
+@ENABLE_FUZZING_TRUE@	$(srcdir)/fuzz/export.sym \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=asprintf -Wl,--wrap=strdup \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=calloc -Wl,--wrap=malloc \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=open -Wl,--wrap=close \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=fdopen -Wl,--wrap=fstat \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=read -Wl,--wrap=gethostname \
-@ENABLE_FUZZING_TRUE@	-Wl,--wrap=getpwnam_r \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=getline -Wl,--wrap=getpwnam_r \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=getpwuid_r -Wl,--wrap=geteuid \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=secure_getenv \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=pam_get_user \
@@ -112,6 +115,7 @@ host_triplet = @host@
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=EC_KEY_get0_group \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=fido_dev_open \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=fido_dev_info_manifest
+@ENABLE_FUZZING_TRUE@am__append_6 = fuzz/wrap.c
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
@@ -159,7 +163,8 @@ CONFIG_CLEAN_FILES = tests/credentials/new_double_-N.cred \
 	tests/credentials/new_-r-V.cred tests/credentials/new_.cred \
 	tests/credentials/new_-V-N.cred tests/credentials/new_-V.cred \
 	tests/credentials/old_credential.cred \
-	tests/credentials/ssh_credential.cred
+	tests/credentials/ssh_credential.cred \
+	tests/credentials/new_limited_count.cred
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -188,22 +193,24 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(pampluginexecdir)" \
-	"$(DESTDIR)$(man8dir)"
-LTLIBRARIES = $(pampluginexec_LTLIBRARIES)
+am__installdirs = "$(DESTDIR)$(pampluginexecdir)"
+LTLIBRARIES = $(noinst_LTLIBRARIES) $(pampluginexec_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-pam_u2f_la_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am__pam_u2f_la_SOURCES_DIST = pam-u2f.c util.c util.h drop_privs.h \
-	b64.c b64.h explicit_bzero.c fuzz/wrap.c
-am__dirstamp = $(am__leading_dot)dirstamp
-@ENABLE_FUZZING_TRUE@am__objects_1 = fuzz/wrap.lo
-am_pam_u2f_la_OBJECTS = pam-u2f.lo util.lo b64.lo explicit_bzero.lo \
-	$(am__objects_1)
-pam_u2f_la_OBJECTS = $(am_pam_u2f_la_OBJECTS)
+libmodule_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+am_libmodule_la_OBJECTS = pam-u2f.lo b64.lo debug.lo explicit_bzero.lo \
+	util.lo
+libmodule_la_OBJECTS = $(am_libmodule_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+pam_u2f_la_DEPENDENCIES = libmodule.la
+am__pam_u2f_la_SOURCES_DIST = fuzz/wrap.c
+am__dirstamp = $(am__leading_dot)dirstamp
+@ENABLE_FUZZING_TRUE@am__objects_1 = fuzz/wrap.lo
+am_pam_u2f_la_OBJECTS = $(am__objects_1)
+pam_u2f_la_OBJECTS = $(am_pam_u2f_la_OBJECTS)
 pam_u2f_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(pam_u2f_la_LDFLAGS) $(LDFLAGS) -o $@
@@ -222,7 +229,7 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/b64.Plo \
+am__depfiles_remade = ./$(DEPDIR)/b64.Plo ./$(DEPDIR)/debug.Plo \
 	./$(DEPDIR)/explicit_bzero.Plo ./$(DEPDIR)/pam-u2f.Plo \
 	./$(DEPDIR)/util.Plo fuzz/$(DEPDIR)/wrap.Plo
 am__mv = mv -f
@@ -244,8 +251,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(pam_u2f_la_SOURCES)
-DIST_SOURCES = $(am__pam_u2f_la_SOURCES_DIST)
+SOURCES = $(libmodule_la_SOURCES) $(pam_u2f_la_SOURCES)
+DIST_SOURCES = $(libmodule_la_SOURCES) $(am__pam_u2f_la_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -259,9 +266,6 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-man8dir = $(mandir)/man8
-NROFF = nroff
-MANS = $(dist_man8_MANS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -290,9 +294,9 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
-DIST_SUBDIRS = . pamu2fcfg tests fuzz
-am__DIST_COMMON = $(dist_man8_MANS) $(srcdir)/Makefile.in \
-	$(top_srcdir)/build-aux/ar-lib $(top_srcdir)/build-aux/compile \
+DIST_SUBDIRS = . pamu2fcfg tests man fuzz
+am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/build-aux/ar-lib \
+	$(top_srcdir)/build-aux/compile \
 	$(top_srcdir)/build-aux/config.guess \
 	$(top_srcdir)/build-aux/config.sub \
 	$(top_srcdir)/build-aux/depcomp \
@@ -331,6 +335,7 @@ am__DIST_COMMON = $(dist_man8_MANS) $(srcdir)/Makefile.in \
 	$(top_srcdir)/tests/credentials/new_double_-r-V.cred.in \
 	$(top_srcdir)/tests/credentials/new_double_-r.cred.in \
 	$(top_srcdir)/tests/credentials/new_double_.cred.in \
+	$(top_srcdir)/tests/credentials/new_limited_count.cred.in \
 	$(top_srcdir)/tests/credentials/new_mixed_-P1-P2.cred.in \
 	$(top_srcdir)/tests/credentials/new_mixed_-P12.cred.in \
 	$(top_srcdir)/tests/credentials/new_mixed_1-P2.cred.in \
@@ -388,7 +393,6 @@ ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
-AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -513,21 +517,21 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = . pamu2fcfg tests $(am__append_1)
+SUBDIRS = . pamu2fcfg tests $(am__append_1) $(am__append_2)
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(CWFLAGS) $(CSFLAGS)
-AM_CPPFLAGS = $(LIBFIDO2_CFLAGS) $(LIBCRYPTO_CFLAGS) $(am__append_2)
+AM_CPPFLAGS = $(LIBFIDO2_CFLAGS) $(LIBCRYPTO_CFLAGS) $(am__append_3)
+noinst_LTLIBRARIES = libmodule.la
+libmodule_la_SOURCES = pam-u2f.c b64.c b64.h debug.c debug.h \
+	drop_privs.h explicit_bzero.c util.c util.h
+libmodule_la_LIBADD = -lpam $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS)
 pampluginexecdir = $(PAMDIR)
 pampluginexec_LTLIBRARIES = pam_u2f.la
-pam_u2f_la_SOURCES = pam-u2f.c util.c util.h drop_privs.h b64.c b64.h \
-	explicit_bzero.c $(am__append_3)
-pam_u2f_la_LIBADD = -lpam $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS)
-pam_u2f_la_LDFLAGS = -module -avoid-version $(am__append_4)
-@ENABLE_MAN_TRUE@dist_man8_MANS = $(top_builddir)/man/pam_u2f.8
-@ENABLE_MAN_TRUE@DISTCLEANFILES = $(dist_man8_MANS)
-@ENABLE_MAN_TRUE@MANSOURCES = $(top_builddir)/man/pam_u2f.8.txt
-@ENABLE_MAN_TRUE@EXTRA_DIST = $(MANSOURCES)
-@ENABLE_MAN_TRUE@SUFFIXES = .8.txt .8
+pam_u2f_la_SOURCES = $(am__append_6)
+pam_u2f_la_LIBADD = libmodule.la
+pam_u2f_la_LDFLAGS = -module -avoid-version $(am__append_4) \
+	$(am__append_5)
+EXTRA_DIST = export.sym
 
 # Release
 
@@ -537,7 +541,7 @@ PROJECT = pam-u2f
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .8.txt .8 .c .lo .o .obj
+.SUFFIXES: .c .lo .o .obj
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -647,6 +651,19 @@ tests/credentials/old_credential.cred: $(top_builddir)/config.status $(top_srcdi
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 tests/credentials/ssh_credential.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/ssh_credential.cred.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/credentials/new_limited_count.cred: $(top_builddir)/config.status $(top_srcdir)/tests/credentials/new_limited_count.cred.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; \
+	locs=`for p in $$list; do echo $$p; done | \
+	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
+	      sort -u`; \
+	test -z "$$locs" || { \
+	  echo rm -f $${locs}; \
+	  rm -f $${locs}; \
+	}
 
 install-pampluginexecLTLIBRARIES: $(pampluginexec_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
@@ -682,6 +699,9 @@ clean-pampluginexecLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
+
+libmodule.la: $(libmodule_la_OBJECTS) $(libmodule_la_DEPENDENCIES) $(EXTRA_libmodule_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK)  $(libmodule_la_OBJECTS) $(libmodule_la_LIBADD) $(LIBS)
 fuzz/$(am__dirstamp):
 	@$(MKDIR_P) fuzz
 	@: > fuzz/$(am__dirstamp)
@@ -702,6 +722,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/b64.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/explicit_bzero.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pam-u2f.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Plo@am__quote@ # am--include-marker
@@ -746,47 +767,6 @@ clean-libtool:
 
 distclean-libtool:
 	-rm -f libtool config.lt
-install-man8: $(dist_man8_MANS)
-	@$(NORMAL_INSTALL)
-	@list1='$(dist_man8_MANS)'; \
-	list2=''; \
-	test -n "$(man8dir)" \
-	  && test -n "`echo $$list1$$list2`" \
-	  || exit 0; \
-	echo " $(MKDIR_P) '$(DESTDIR)$(man8dir)'"; \
-	$(MKDIR_P) "$(DESTDIR)$(man8dir)" || exit 1; \
-	{ for i in $$list1; do echo "$$i"; done;  \
-	if test -n "$$list2"; then \
-	  for i in $$list2; do echo "$$i"; done \
-	    | sed -n '/\.8[a-z]*$$/p'; \
-	fi; \
-	} | while read p; do \
-	  if test -f $$p; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; echo "$$p"; \
-	done | \
-	sed -e 'n;s,.*/,,;p;h;s,.*\.,,;s,^[^8][0-9a-z]*$$,8,;x' \
-	      -e 's,\.[0-9a-z]*$$,,;$(transform);G;s,\n,.,' | \
-	sed 'N;N;s,\n, ,g' | { \
-	list=; while read file base inst; do \
-	  if test "$$base" = "$$inst"; then list="$$list $$file"; else \
-	    echo " $(INSTALL_DATA) '$$file' '$(DESTDIR)$(man8dir)/$$inst'"; \
-	    $(INSTALL_DATA) "$$file" "$(DESTDIR)$(man8dir)/$$inst" || exit $$?; \
-	  fi; \
-	done; \
-	for i in $$list; do echo "$$i"; done | $(am__base_list) | \
-	while read files; do \
-	  test -z "$$files" || { \
-	    echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(man8dir)'"; \
-	    $(INSTALL_DATA) $$files "$(DESTDIR)$(man8dir)" || exit $$?; }; \
-	done; }
-
-uninstall-man8:
-	@$(NORMAL_UNINSTALL)
-	@list='$(dist_man8_MANS)'; test -n "$(man8dir)" || exit 0; \
-	files=`{ for i in $$list; do echo "$$i"; done; \
-	} | sed -e 's,.*/,,;h;s,.*\.,,;s,^[^8][0-9a-z]*$$,8,;x' \
-	      -e 's,\.[0-9a-z]*$$,,;$(transform);G;s,\n,.,'`; \
-	dir='$(DESTDIR)$(man8dir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -1087,10 +1067,10 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LTLIBRARIES) $(MANS)
+all-am: Makefile $(LTLIBRARIES)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(pampluginexecdir)" "$(DESTDIR)$(man8dir)"; do \
+	for dir in "$(DESTDIR)$(pampluginexecdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -1121,19 +1101,19 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f fuzz/$(DEPDIR)/$(am__dirstamp)
 	-rm -f fuzz/$(am__dirstamp)
-	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool clean-pampluginexecLTLIBRARIES \
-	mostlyclean-am
+clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
+	clean-pampluginexecLTLIBRARIES mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 		-rm -f ./$(DEPDIR)/b64.Plo
+	-rm -f ./$(DEPDIR)/debug.Plo
 	-rm -f ./$(DEPDIR)/explicit_bzero.Plo
 	-rm -f ./$(DEPDIR)/pam-u2f.Plo
 	-rm -f ./$(DEPDIR)/util.Plo
@@ -1154,7 +1134,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-man
+install-data-am:
 
 install-dvi: install-dvi-recursive
 
@@ -1171,7 +1151,7 @@ install-info: install-info-recursive
 
 install-info-am:
 
-install-man: install-man8
+install-man:
 
 install-pdf: install-pdf-recursive
 
@@ -1187,6 +1167,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
 		-rm -f ./$(DEPDIR)/b64.Plo
+	-rm -f ./$(DEPDIR)/debug.Plo
 	-rm -f ./$(DEPDIR)/explicit_bzero.Plo
 	-rm -f ./$(DEPDIR)/pam-u2f.Plo
 	-rm -f ./$(DEPDIR)/util.Plo
@@ -1207,39 +1188,34 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-man uninstall-pampluginexecLTLIBRARIES
+uninstall-am: uninstall-pampluginexecLTLIBRARIES
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) uninstall-hook
-uninstall-man: uninstall-man8
-
 .MAKE: $(am__recursive_targets) install-am install-exec-am \
 	install-strip uninstall-am
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
 	am--depfiles am--refresh check check-am clean clean-cscope \
-	clean-generic clean-libtool clean-pampluginexecLTLIBRARIES \
-	cscope cscopelist-am ctags ctags-am dist dist-all dist-bzip2 \
-	dist-gzip dist-lzip dist-shar dist-tarZ dist-xz dist-zip \
-	distcheck distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distcleancheck distdir \
-	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-exec-hook \
-	install-html install-html-am install-info install-info-am \
-	install-man install-man8 install-pampluginexecLTLIBRARIES \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-hook uninstall-man uninstall-man8 \
+	clean-generic clean-libtool clean-noinstLTLIBRARIES \
+	clean-pampluginexecLTLIBRARIES cscope cscopelist-am ctags \
+	ctags-am dist dist-all dist-bzip2 dist-gzip dist-lzip \
+	dist-shar dist-tarZ dist-xz dist-zip distcheck distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distcleancheck distdir distuninstallcheck dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-exec-hook install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pampluginexecLTLIBRARIES install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am uninstall-hook \
 	uninstall-pampluginexecLTLIBRARIES
 
 .PRECIOUS: Makefile
 
-
-@ENABLE_MAN_TRUE@.8.txt.8:
-@ENABLE_MAN_TRUE@	$(A2X) --format=manpage -L -a revdate="Version $(VERSION)" $<
 
 install-exec-hook:
 	rm -f $(DESTDIR)$(pampluginexecdir)/pam_u2f.la

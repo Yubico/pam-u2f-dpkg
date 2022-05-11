@@ -1,3 +1,387 @@
+2022-05-11  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* NEWS: Update NEWS file
+
+2022-05-05  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* man/pamu2fcfg.1.txt: man: sync manpages with pamu2fcfg help text
+
+2022-04-28  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* configure.ac, tests/credentials/new_limited_count.cred.in,
+	tests/get_devices.c: tests: test parsing a limited number of
+	credentials
+
+2022-04-22  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c, util.h: pam: remove unused buffer
+
+2022-04-22  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: pam: mandate a SSH trailer for success
+
+2022-04-22  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: pam: use fixed max size for SSH credential We're always parsing at most one credential. Use a reasonably sized
+	buffer to parse into.
+
+2022-04-22  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: pam: adjust buffer size correctly only decrement size when we copy a character
+
+2022-04-28  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* Makefile.am, fuzz/wrap.c: fuzz: wrap getline
+
+2022-04-22  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: pam: do not truncate credentials ensure an entire line is always read as to not truncate parts of the
+	credential
+
+2022-04-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: pam: ensure reaching native authfile's EOF since we look for the user's last line in the authfile, ensure that
+	all of it was parsed when fgets() or friends returns without data
+
+2022-04-27  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README, man/pam_u2f.8.txt: man: clarify omission of options
+
+2022-04-27  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README, man/pam_u2f.8.txt: man: make note of features that require
+	FIDO2
+
+2022-04-27  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README: man: reword, rewrap previous
+
+2022-04-26  Martin Brugnara <martin.brugnara@gmail.com>
+
+	* README: FAQ: YubiKey 4 does not support asking for pin Explicitly state YubiKey 4 series does not support asking for pin.  __Problem__ * FIDO(1) devices are only partially supported. They can be used as
+	a second authentication factor to the password or as a single factor
+	by themselves, but they cannot be used in conjunction with a `pin`.  * The failure mode consists in silently ignoring the device.  It
+	does not provide any feedback as to why the authentication procedure
+	is failing and it's thus very complicated to debug (see for example
+	#144).  * YubiKey product pages, understandably, do not highlight the
+	differences between FIDO and FIDO2, users may thus not realize at a
+	first glance what their devices do actually support.  __This PR__ Add a paragraph to help users like myself understand why
+	their YubiKeys work only half of the time.  __Next steps__ Modify `pamu2fcfg` to emit a warning when registering
+	devices with unsupported configurations.
+
+2022-04-22  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* configure.ac: make: silence deprecation warnings for OSSL 3.* When we bump up the minimum libfido2 version to 1.9.0 we can switch
+	to using the EVP interface rather than the deprecated EC_KEY
+	interface.  Until then, silence the related deprecation warnings.
+
+2022-04-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: pam: simplify authfile parser cleanup
+
+2022-04-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: pam: simplify ssh authfile parser cleanup
+
+2022-04-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: pam: consolidate authfile parsers' return values other functions in pam-u2f return 1 for success, 0 for error
+
+2022-04-13  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: pam: introduce parse_native_credential() extracts (native) credential components from a comma-delimited list
+
+2022-04-14  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/alpine_builds.yml: ci: fix permissions on alpine
+	workdir
+
+2022-04-06  Alexandru Geana <alex.geana@yubico.com>
+
+	* .github/workflows/scan.yml: tests: remove deprecated scan.yml
+	workflow
+
+2022-03-04  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* fuzz/export.sym, fuzz/fuzz_format_parsers.c: fuzz: export
+	get_devices_from_authfile() Have `fuzz_format_parsers` use this function instead of the two
+	private authfile parsers. This is made possible via the mocking
+	utilities introduced along with `fuzz_auth` and enables us to not
+	have to include the relevant sources directly in the fuzzer harness
+	source.
+
+2022-03-04  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* fuzz/fuzz_auth.c, fuzz/fuzz_format_parsers.c: fuzz: sort headers
+
+2022-03-04  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* configure.ac: configure: remove unused header check
+
+2022-03-04  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* configure.ac: configure: remove redundant variables AC_CHECK_FUNCS does not modify CFLAGS nor LIBS, there's no need to
+	store and reset their value. Remove redundant comment.
+
+2022-03-01  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: pam: remove redundant appid comparison No functional change; it does not matter if we pass `origin` or
+	`appid` to `fido_assert_set_rp()` if they compare equal.
+
+2022-03-01  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c: pam: use strcmp for sshformat flag matching This ensures an exact match of the configuration option. Prefix
+	matching is only useful for matching configuration options with a
+	value.
+
+2022-03-01  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c: pam: skip redundant configuration option comparisons No functional change; each option has a unique name.
+
+2022-02-25  Alexandru Geana <alex.geana@yubico.com>
+
+	* fuzz/wrap.c: fuzz: check prng status before use
+
+2022-02-09  Alexandru Geana <alex.geana@yubico.com>
+
+	* build-aux/ci/fuzz-linux-asan.sh: fuzz: checkout specific libfido2
+	commit for fuzzing builds
+
+2022-02-23  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* tests/get_devices.c, tests/regenerate_credentials.py: tests:
+	clearly label autogenerated test cases Additionally, skip running the formatter on the autogenerated code
+	to make it easier to diff in the future. The two tests that are not
+	automatically generated (SSH, old format) are kept separate.  While here, remove unnecessary includes.
+
+2022-02-23  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* tests/regenerate_credentials.py: tests: only regenerate missing
+	templates While here, remove redundant argument.
+
+2022-02-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* Makefile.am, fuzz/wrap.c: fuzz: wrap asprintf
+
+2022-02-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* fuzz/wrap.c: fuzz: sort includes
+
+2022-02-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c, util.h: pam: reduce `asprintf` repetition While here, ensure that the resolved path is absolute.
+
+2022-02-18  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c: pam: reduce `openasuser` repetition
+
+2022-02-18  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c: pam: remove unnecessary branch Caller guarantees a relative or missing path.
+
+2022-02-18  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c: pam: set asprintf string to NULL on failure
+
+2022-02-14  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* tests/regenerate_credentials.py: tests: flatten
+	regenerate_credentials.py loops
+
+2022-02-14  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* tests/regenerate_credentials.py: tests: modernize
+	regenerate_credentials.py for PY3
+
+2022-02-14  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* tests/regenerate_credentials.py: tests: simplify
+	regenerate_credentials.py Reduce repetition via a helper function to generate and dump
+	credentials to the specified filename.
+
+2022-02-04  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/alpine_builds.yml,
+	.github/workflows/codeql-analysis.yml,
+	.github/workflows/linux_builds.yml,
+	.github/workflows/linux_fuzz.yml,
+	.github/workflows/macos_builds.yml,
+	build-aux/ci/build-linux-clang.sh, tests/bionic/Dockerfile: ci:
+	remove occurrences of `gengetopt`
+
+2022-02-04  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README: doc: remove occurrences of `gengetopt`
+
+2022-02-03  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pamu2fcfg/Makefile.am, pamu2fcfg/cmdline.ggo,
+	pamu2fcfg/pamu2fcfg.c: pamu2fcfg: use bespoke `getopt_long` handler This drops the (maintainer) dependency on `gengetopt`. Moreover, a
+	combination of the `--username` and `--nouser` options is now
+	allowed.  The former sets the username in the credential, while the
+	latter only toggles whether the username is printed to stdout with
+	the rest of the credential.
+
+2022-02-02  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c: pam: remove unused variable
+
+2022-02-01  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* Makefile.am, export.sym, fuzz/Makefile.am, fuzz/export.sym: pam:
+	only export the public service functions For fuzzing, a couple of additional symbols for mocking are
+	exported.
+
+2022-02-01  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* Makefile.am, tests/Makefile.am: tests: use convenience library for
+	unit tests Tests that poke at internal functions can link to this (static)
+	library instead. This is required if we're to restrict the symbols
+	that are exported in our shared module.
+
+2022-02-02  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* tests/Makefile.am, tests/get_devices.c: tests: fixup CFLAGS and
+	related warnings
+
+2022-02-02  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .gitignore, tests/Makefile.am, tests/basic.c, tests/dlsym_check.c: 
+	tests: basic sanity checks of the shared module This checks that the expected public service functions can be loaded
+	using `dlsym`.
+
+2022-01-27  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pamu2fcfg/Makefile.am: pamu2fcfg: prevent parallel generation of
+	cmdline.[ch] Running make in parallel would spawn two instances of gengetopt. To
+	prevent this, use a GNU make pattern rule which is able to express
+	rules with multiple output files. Other make implementations should
+	still be able to build from the tarballs. While here, remove an
+	unnecessary include path.
+
+2022-01-26  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* Makefile.am, configure.ac, man/Makefile.am, pamu2fcfg/Makefile.am: 
+	man: collect man page generation rules `DISTCLEANFILES` is replaced with `MAINTAINERCLEANFILES`, the former
+	is primarily intended for files generated by `configure`. We are
+	distributing the generated man pages as if they were source files.
+
+2022-01-13  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .gitignore: git: simplify .gitignore Remove ignores of specific files that are also ignored by patterns.
+
+2022-01-11  pedro martelletto <pedro@yubico.com>
+
+	* README, build-aux/ci/build-osx.sh,
+	build-aux/ci/fuzz-linux-asan.sh: git -> https the unauthenticated git protocol on port 9418 (git://) is no longer
+	supported by github.
+
+2022-01-05  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* COPYING: COPYING: bump copyright
+
+2022-01-05  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* configure.ac: autoconf: replace obsoleted macros - AC_PROG_CC_STDC was integrated into AC_PROG_CC in autoconf 2.54.  - Replace only remaining occurrence of obsolete AC_HELP_STRING.  - Modern libtool prefers passing options through LT_INIT.
+
+2022-01-05  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* m4/ax_check_compile_flag.m4: m4: update ax_check_compile_flag to
+	latest revision
+
+2022-01-03  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* debug.c: debug: indicate truncated log messages
+
+2021-12-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c, util.c: util: reword potentially long debug messages Move user-controlled data towards the end of the debug string so
+	that relevant information is always visible. Additionally remove a
+	couple of overly verbose debug messages.
+
+2021-12-20  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* debug.c: debug: only print the source file's basename The file path may contain an absolute or relative path to the source
+	directory. Strip any components before the last forward slash.
+
+2021-12-20  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* debug.c: debug: only write to debug file once per call This prevents double syslog entries for each call of
+	`debug_fprintf()` by writing into an internal buffer before passing
+	along the result.  This may truncate long debug messages (>2048
+	octets; the recommended minimum maximum syslog message length),
+	which should be avoided. Note that RFC 5424 §8.3 encourages not
+	logging messages longer than the required minimum maximum size of
+	480 octets.
+
+2021-12-17  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: util: use debug_dbg() in do_manual_authentication()
+
+2021-12-17  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: util: use debug_dbg() in do_authentication()
+
+2021-12-17  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: util: use debug_dbg() while preparing assert
+
+2021-12-17  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: util: use debug_dbg() while probing authenticators
+
+2021-12-17  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: util: use debug_dbg() in SSH authfile parser
+
+2021-12-17  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: util: use debug_dbg() in native authfile parser
+
+2021-12-17  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: util: use debug_dbg() in authfile loader
+
+2021-12-17  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c: pam: replace DBG() calls with debug_dbg()
+
+2021-12-17  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c: pam: replace D() calls in parse_cfg()
+
+2021-12-15  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* Makefile.am, debug.c, debug.h, pam-u2f.c, util.c, util.h: debug:
+	introduce debug.{c,h} Move debug-related functions here and introduce debug_dbg() which
+	can be used to replace if-debug-debug constructs.
+
+2021-12-15  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c, util.h: pam: introduce helpers for managing the
+	`debug_file`
+
+2021-12-15  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c, util.c: util: use NULL to represent syslog While here, bump copyright.
+
+2021-12-15  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: util: assume that syslog is defined Windows is not a target for us, syslog should always be available.
+
+2021-09-30  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c: pam: add helper function to resolve `authfile` path Given a relative or unassigned authfile path, this function
+	allocates and returns the absolute path to the authfile.
+
+2021-09-29  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pam-u2f.c: pam: add helper function for `interactive` prompt Reduces scope of helper variable required to free the user response.
+
+2021-09-22  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* NEWS, configure.ac: Bump version
+
 2021-09-22  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
 
 	* NEWS: Update NEWS file

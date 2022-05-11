@@ -2,12 +2,12 @@
 .\"     Title: pamu2fcfg
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: Version 1.2.0
+.\"      Date: Version 1.2.1
 .\"    Manual: PAM U2F Configuration Tool
 .\"    Source: pamu2fcfg
 .\"  Language: English
 .\"
-.TH "PAMU2FCFG" "1" "Version 1\&.2\&.0" "pamu2fcfg" "PAM U2F Configuration Tool"
+.TH "PAMU2FCFG" "1" "Version 1\&.2\&.1" "pamu2fcfg" "PAM U2F Configuration Tool"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -84,17 +84,15 @@ Require user verification during authentication\&. Defaults to off\&.
 .RE
 .sp
 \fB\-\-version\fR: \fBPrint version and exit\fR
-.sp
-Group: user (mutually exclusive)
 .PP
 \fB\-u\fR, \fB\-\-username\fR=\fISTRING\fR
 .RS 4
-The name of the user registering the device\&. Defaults to the current user name
+The name of the user registering the device\&. Defaults to the current user name\&.
 .RE
 .PP
 \fB\-n\fR, \fB\-\-nouser\fR
 .RS 4
-Print only registration information (keyHandle and public key)\&. Useful for appending
+Print only registration information (key handle, public key, and options)\&. Useful for appending\&.
 .RE
 .SH "BUGS"
 .sp

@@ -185,7 +185,6 @@ ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
-AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -319,7 +318,7 @@ fuzz_format_parsers_SOURCES = fuzz_format_parsers.c
 fuzz_format_parsers_LDADD = -lpam $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS) ../pam_u2f.la
 fuzz_auth_SOURCES = fuzz_auth.c pack.c fuzz.h authfile.h wiredata.h
 fuzz_auth_LDADD = -lpam $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS) ../pam_u2f.la
-EXTRA_DIST = coverage.sh make_seed.py
+EXTRA_DIST = coverage.sh make_seed.py export.sym
 all: all-am
 
 .SUFFIXES:
