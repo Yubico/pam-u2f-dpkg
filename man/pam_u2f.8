@@ -2,12 +2,12 @@
 .\"     Title: pam_u2f
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: Version 1.2.0
+.\"      Date: Version 1.2.1
 .\"    Manual: PAM U2F Module Manual
 .\"    Source: pam-u2f
 .\"  Language: English
 .\"
-.TH "PAM_U2F" "8" "Version 1\&.2\&.0" "pam\-u2f" "PAM U2F Module Manual"
+.TH "PAM_U2F" "8" "Version 1\&.2\&.1" "pam\-u2f" "PAM U2F Module Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -126,17 +126,17 @@ below\&.
 .PP
 \fBuserpresence\fR=\fIint\fR
 .RS 4
-If 1, require user presence during authentication\&. If 0, do not request user presence during authentication\&. Otherwise, fallback to the authenticator\(cqs default behaviour\&.
+If 1, require user presence during authentication\&. If 0, do not request user presence during authentication\&. If omitted, fallback to the authenticator\(cqs default behaviour\&.
 .RE
 .PP
 \fBuserverification\fR=\fIint\fR
 .RS 4
-If 1, require user verification during authentication\&. If 0, do not request user verification during authentication\&. Otherwise, fallback to the authenticator\(cqs default behaviour\&.
+If 1, require user verification during authentication (e\&.g\&. biometrics)\&. If 0, do not request user verification during authentication\&. If omitted, fallback to the authenticator\(cqs default behaviour\&. If enabled, an authenticator with support for FIDO2 user verification is required\&.
 .RE
 .PP
 \fBpinverification\fR=\fIint\fR
 .RS 4
-If 1, require PIN verification during authentication\&. If 0, do not request PIN verification during authentication\&. Otherwise, fallback to the authenticator\(cqs default behaviour\&.
+If 1, require PIN verification during authentication\&. If 0, do not request PIN verification during authentication\&. If omitted, fallback to the authenticator\(cqs default behaviour\&. If enabled, an authenticator with support for a FIDO2 PIN is required\&.
 .RE
 .PP
 \fBsshformat\fR

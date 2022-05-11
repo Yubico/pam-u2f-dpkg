@@ -42,7 +42,7 @@ You may check out the sources using Git with the following command:
 
 [source, console]
 ----
-$ git clone git://github.com/Yubico/pam-u2f.git
+$ git clone https://github.com/Yubico/pam-u2f.git
 ----
 
 This will create a directory 'pam-u2f'. Enter the directory:
@@ -52,13 +52,13 @@ This will create a directory 'pam-u2f'. Enter the directory:
 $ cd pam-u2f
 ----
 
-`autoconf`, `automake`, `gengetopt`, `libtool`, and `libpam` must be installed.
-`AsciiDoc` and `xsltproc` are used to generate the manpages. On Ubuntu, the
-necessary dependencies can be installed using
+`autoconf`, `automake`, `libtool`, and `libpam` must be installed.
+`AsciiDoc` and `xsltproc` are used to generate the manpages. On Ubuntu,
+the necessary dependencies can be installed using
 
 [source, console]
 ----
-# apt install --no-install-recommends autoconf automake libtool gengetopt \
+# apt install --no-install-recommends autoconf automake libtool \
     pkg-config libfido2-dev libpam-dev libssl-dev asciidoc xsltproc \
     libxml2-utils docbook-xml
 ----
@@ -67,7 +67,7 @@ On Fedora, the necessary dependencies can be installed using
 
 [source, console]
 ----
-# dnf -y install autoconf automake libtool gengetopt libfido2-devel pam-devel \
+# dnf -y install autoconf automake libtool libfido2-devel pam-devel \
     openssl-devel asciidoc
 ----
 
@@ -211,18 +211,20 @@ authentication, the "nodetect" option was added.
 
 userpresence=int::
 If 1, request user presence during authentication. If 0, do not
-request user presence during authentication. Otherwise, fallback to
+request user presence during authentication. If omitted, fallback to
 the authenticator's default behaviour.
 
 userverification=int::
-If 1, request user verification during authentication. If 0, do not
-request user verification during authentication. Otherwise, fallback
-to the authenticator's default behaviour.
+If 1, request user verification during authentication (e.g. biometrics).
+If 0, do not request user verification during authentication. If omitted,
+fallback to the authenticator's default behaviour. If enabled, an
+authenticator with support for FIDO2 user verification is required.
 
 pinverification=int::
 If 1, request PIN verification during authentication. If 0, do not
-request PIN verification during authentication. Otherwise, fallback to
-the authenticator's default behaviour.
+request PIN verification during authentication. If omitted, fallback to
+the authenticator's default behaviour. If enabled, an authenticator
+with support for a FIDO2 PIN is required.
 
 sshformat::
 Use credentials produced by versions of OpenSSH that have support for
@@ -380,3 +382,11 @@ should be used.
 
 For more information see
 https://access.redhat.com/security/cve/CVE-2020-24612[HERE].
+
+FIDO U2F vs FIDO2
+-----------------
+Devices that solely support FIDO U2F and not FIDO2, e.g. the YubiKey 4 series,
+can be used only in conjunction with compatible features. Enabling incompatible
+features, such as setting the `+pin` or the `+verification` flags in the
+`authfile` or the corresponding options in the PAM service configuration causes
+the device to be ignored.
