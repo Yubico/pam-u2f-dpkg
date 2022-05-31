@@ -1,0 +1,16 @@
+Template: libpam-u2f/type
+Type: select
+Choices: Primary, Additional
+Default: Primary
+Description: Authentication type:
+ The pam-u2f module can be configured as either a Primary or Additional
+ (second) factor for authentication. As a Primary factor, failure to
+ authenticate may cause PAM to fallback to another lower priority method. As
+ either factor, higher priority modules may preempt pam-u2f altogether.
+
+Template: libpam-u2f/args
+Type: string
+Default: cue
+Description: Module options:
+ The behavior of pam-u2f can be further customized using a space-separated list
+ of options. Available options are described in the pam_u2f(8) manual page.

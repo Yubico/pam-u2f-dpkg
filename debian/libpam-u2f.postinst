@@ -1,0 +1,34 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+db_get libpam-u2f/type
+AUTHTYPE="$RET"
+
+db_get libpam-u2f/args
+ARGS="$RET"
+
+case "${AUTHTYPE}" in
+	Additional)
+		CONTROL="required"
+		;;
+	*)
+		CONTROL="[success=end default=ignore]"
+		;;
+esac
+
+cat << EOF > /usr/share/pam-configs/pam-u2f
+Name: FIDO2/U2F authentication using pam-u2f
+Default: no
+Priority: 384
+Auth-Type: $AUTHTYPE
+Auth:
+	$CONTROL	pam_u2f.so	$ARGS
+Auth-Initial:
+	$CONTROL	pam_u2f.so	$ARGS
+EOF
+
+pam-auth-update --package
+
+#DEBHELPER#

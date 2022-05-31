@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "purge" ] && [ -e /usr/share/debconf/confmodule ]; then
+	. /usr/share/debconf/confmodule
+	db_purge
+fi
+
+if [ "$1" = "remove" ]; then
+	rm -f /usr/share/pam-configs/pam-u2f
+fi
+
+#DEBHELPER#

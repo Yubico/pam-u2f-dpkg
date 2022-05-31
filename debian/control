@@ -18,7 +18,9 @@ Package: libpam-u2f
 Architecture: any
 Breaks: pamu2fcfg (<< 1.0.4-0.2)
 Replaces: pamu2fcfg (<< 1.0.4-0.2)
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: debconf | debconf-2.0,
+	 ${shlibs:Depends},
+	 ${misc:Depends}
 Recommends: pamu2fcfg
 Description: universal 2nd factor (U2F) PAM module
  Universal 2nd Factor (U2F) is an authentication mechanism that strengthen
