@@ -1,3 +1,214 @@
+2023-03-14  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* NEWS: release 1.3.0
+
+2023-03-06  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* NEWS: news: prepare for 1.3.0
+
+2023-03-06  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* NEWS, configure.ac: misc: adjust version to reflect changes Next version introduces new features.
+
+2023-03-03  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* man/pam_u2f.8.txt: man: clarify relative and absolute authfile
+	paths
+
+2023-02-16  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* COPYING: COPYING: bump copyright
+
+2023-03-02  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README, man/pam_u2f.8.txt: man: clarify what a global authfile is
+
+2023-03-02  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README, man/pam_u2f.8.txt: man: document `expand`
+
+2023-02-15  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* Makefile.am, pam-u2f.c, util.h: pam: add opt-in for %u expansion
+	in authfile path
+
+2023-02-15  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* expand.c, tests/Makefile.am, tests/expand.c, util.h: expand:
+	utility for replacing occurrences of %u with username
+
+2022-11-30  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README, man/pamu2fcfg.1.txt: man: add references to fido2-token,
+	yubikey-manager For setting PIN, enrolling fingerprints, and more.
+
+2022-11-30  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c: pamu2fcfg: also check FIDO_ERR_PIN_BLOCKED For CTAP 2.0 authenticators' equivalent of FIDO_ERR_UV_BLOCKED.
+
+2022-11-30  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c: pamu2fcfg: make_cred() exercises UV Attempt using either built-in UV/PIN depending on the user selection
+	of authentication options.  This fixes #278 (more consistent PIN prompts).
+
+2022-11-29  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c: pamu2fcfg: make_cred() for non-PIN
+	authenticators CTAP2.0 with some form of UV configured will require UV for
+	credential creation.  Similarly, CTAP2.1 devices will require some
+	form of UV if the makeCredUvNotRqd option is not enabled.  While here, allow fallback to PIN if built-in UV is blocked.
+
+2022-11-29  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c: pamu2fcfg: basic sanity checking of user
+	options Compare selection of user verification methods to what the
+	authenticator actually supports.  This fixes #278 (ensure that device actually has some form of UV).
+
+2022-11-29  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c: pamu2fcfg: defer prepare_cred()
+
+2022-12-01  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/ISSUE_TEMPLATE/config.yml: github: direct questions to
+	discussions tab
+
+2022-12-01  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/ISSUE_TEMPLATE/feature_request.md: github: feature request
+	template
+
+2022-11-30  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* SECURITY.md: github: add security policy
+
+2022-11-30  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/ISSUE_TEMPLATE/bug_report.md: github: add bug report
+	template
+
+2022-11-30  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/format.yml, build-aux/ci/format-code.sh: ci:
+	update clang-format version
+
+2022-11-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README, man/pam_u2f.8.txt: README: add common example
+	configurations
+
+2022-11-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README, man/pam_u2f.8.txt: README: clarify multiple authenticators While here, remove an unused anchor and refer to the authorization
+	mapping file consistently.
+
+2022-11-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README: README: change heading syntax, add subsections While here, move a notice about origin/appid to a more relevant
+	section.
+
+2022-11-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README: README: yubikey-touch-detector no longer uses
+	authpending_file
+
+2022-11-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README: README: consistent headings
+
+2022-11-01  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/linux_builds.yml: ci: restore install of
+	docbook-xsl
+
+2022-11-01  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/linux_builds.yml: ci: bump gcc to gcc-12
+
+2022-09-05  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/macos_builds.yml: ci: macos 10.15 workflows are
+	deprecated
+
+2022-09-05  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/format.yml, .github/workflows/linux_builds.yml: 
+	ci: ubuntu 18.04 workflows are deprected
+
+2022-06-08  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/alpine_builds.yml,
+	.github/workflows/codeql-analysis.yml,
+	.github/workflows/format.yml, .github/workflows/linux_builds.yml,
+	.github/workflows/linux_fuzz.yml,
+	.github/workflows/macos_builds.yml: ci: bump checkout to v3 While here, use the proposed workaround for ownership problems [1].  [1] https://github.com/actions/checkout/issues/766
+
+2022-07-13  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/format.yml, build-aux/ci/format-code.sh: ci:
+	update base branch name to main
+
+2022-06-23  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/alpine_builds.yml: ci: drop USER environment
+	variable
+
+2022-06-23  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* tests/get_devices.c: tests: prefer getpwuid over getenv `$USER` may not be set, look up the username of the effective user
+	ID from the password database instead. In the long term, consider
+	splitting authfile handling and parsing to simplify testing.  This fixes #270.
+
+2022-06-17  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* build-aux/ci/fuzz-linux-asan.sh: fuzz: bump libcbor to 0.9.0
+
+2022-06-17  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/linux_fuzz.yml, build-aux/ci/fuzz-linux-asan.sh: 
+	fuzz: bump libfido2 to 1.11.0
+
+2022-06-09  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/macos_builds.yml: ci: add macos-11, macos-12
+
+2022-06-07  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/linux_fuzz.yml: ci: bump fuzzer builds to ubuntu
+	22.04/clang-14
+
+2022-06-07  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/linux_builds.yml: ci: add ubuntu 22.04 builds
+
+2022-06-07  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/linux_builds.yml: ci: collapse linux build
+	matrix
+
+2022-06-02  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/codeql-analysis.yml: ci: update codeql to v2
+
+2022-06-02  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/alpine_builds.yml: ci: alpine now packages
+	libfido2-dev
+
+2022-06-02  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/alpine_builds.yml: ci: bump alpine host to
+	ubuntu-22.04
+
+2022-06-02  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* .github/workflows/alpine_builds.yml: ci: explicitly add bash to
+	alpine container
+
+2022-05-11  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* NEWS, configure.ac: Bump version
+
 2022-05-11  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
 
 	* NEWS: Update NEWS file

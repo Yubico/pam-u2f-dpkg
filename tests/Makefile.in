@@ -89,7 +89,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = dlsym_check$(EXEEXT) get_devices$(EXEEXT)
+check_PROGRAMS = dlsym_check$(EXEEXT) get_devices$(EXEEXT) \
+	expand$(EXEEXT)
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
@@ -112,6 +113,9 @@ am__v_lt_1 =
 dlsym_check_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(dlsym_check_LDFLAGS) $(LDFLAGS) -o $@
+expand_SOURCES = expand.c
+expand_OBJECTS = expand.$(OBJEXT)
+expand_DEPENDENCIES = $(top_builddir)/libmodule.la
 get_devices_SOURCES = get_devices.c
 get_devices_OBJECTS = get_devices.$(OBJEXT)
 get_devices_DEPENDENCIES = $(top_builddir)/libmodule.la
@@ -130,7 +134,7 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/dlsym_check.Po \
+am__depfiles_remade = ./$(DEPDIR)/dlsym_check.Po ./$(DEPDIR)/expand.Po \
 	./$(DEPDIR)/get_devices.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -151,8 +155,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = dlsym_check.c get_devices.c
-DIST_SOURCES = dlsym_check.c get_devices.c
+SOURCES = dlsym_check.c expand.c get_devices.c
+DIST_SOURCES = dlsym_check.c expand.c get_devices.c
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -520,6 +524,7 @@ AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = -no-install
 dlsym_check_LDFLAGS = -ldl $(AM_LDFLAGS)
 get_devices_LDADD = $(top_builddir)/libmodule.la
+expand_LDADD = $(top_builddir)/libmodule.la
 TESTS = $(check_PROGRAMS)
 all: all-am
 
@@ -568,6 +573,10 @@ dlsym_check$(EXEEXT): $(dlsym_check_OBJECTS) $(dlsym_check_DEPENDENCIES) $(EXTRA
 	@rm -f dlsym_check$(EXEEXT)
 	$(AM_V_CCLD)$(dlsym_check_LINK) $(dlsym_check_OBJECTS) $(dlsym_check_LDADD) $(LIBS)
 
+expand$(EXEEXT): $(expand_OBJECTS) $(expand_DEPENDENCIES) $(EXTRA_expand_DEPENDENCIES) 
+	@rm -f expand$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(expand_OBJECTS) $(expand_LDADD) $(LIBS)
+
 get_devices$(EXEEXT): $(get_devices_OBJECTS) $(get_devices_DEPENDENCIES) $(EXTRA_get_devices_DEPENDENCIES) 
 	@rm -f get_devices$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(get_devices_OBJECTS) $(get_devices_LDADD) $(LIBS)
@@ -579,6 +588,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlsym_check.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expand.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/get_devices.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
@@ -824,6 +834,13 @@ get_devices.log: get_devices$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+expand.log: expand$(EXEEXT)
+	@p='expand$(EXEEXT)'; \
+	b='expand'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 .test.log:
 	@p='$<'; \
 	$(am__set_b); \
@@ -918,6 +935,7 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/dlsym_check.Po
+	-rm -f ./$(DEPDIR)/expand.Po
 	-rm -f ./$(DEPDIR)/get_devices.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -965,6 +983,7 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/dlsym_check.Po
+	-rm -f ./$(DEPDIR)/expand.Po
 	-rm -f ./$(DEPDIR)/get_devices.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
