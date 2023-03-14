@@ -35,6 +35,7 @@ typedef struct {
   int userverification;
   int pinverification;
   int sshformat;
+  int expand;
   const char *auth_file;
   const char *authpending_file;
   const char *origin;
@@ -64,6 +65,7 @@ char *converse(pam_handle_t *pamh, int echocode, const char *prompt);
 int random_bytes(void *, size_t);
 int cose_type(const char *, int *);
 const char *cose_string(int);
+char *expand_variables(const char *, const char *);
 
 #if !defined(HAVE_EXPLICIT_BZERO)
 void explicit_bzero(void *, size_t);

@@ -198,8 +198,8 @@ LTLIBRARIES = $(noinst_LTLIBRARIES) $(pampluginexec_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 libmodule_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
-am_libmodule_la_OBJECTS = pam-u2f.lo b64.lo debug.lo explicit_bzero.lo \
-	util.lo
+am_libmodule_la_OBJECTS = pam-u2f.lo b64.lo debug.lo expand.lo \
+	explicit_bzero.lo util.lo
 libmodule_la_OBJECTS = $(am_libmodule_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -230,8 +230,9 @@ DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/b64.Plo ./$(DEPDIR)/debug.Plo \
-	./$(DEPDIR)/explicit_bzero.Plo ./$(DEPDIR)/pam-u2f.Plo \
-	./$(DEPDIR)/util.Plo fuzz/$(DEPDIR)/wrap.Plo
+	./$(DEPDIR)/expand.Plo ./$(DEPDIR)/explicit_bzero.Plo \
+	./$(DEPDIR)/pam-u2f.Plo ./$(DEPDIR)/util.Plo \
+	fuzz/$(DEPDIR)/wrap.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -523,7 +524,7 @@ AM_CFLAGS = $(CWFLAGS) $(CSFLAGS)
 AM_CPPFLAGS = $(LIBFIDO2_CFLAGS) $(LIBCRYPTO_CFLAGS) $(am__append_3)
 noinst_LTLIBRARIES = libmodule.la
 libmodule_la_SOURCES = pam-u2f.c b64.c b64.h debug.c debug.h \
-	drop_privs.h explicit_bzero.c util.c util.h
+	drop_privs.h expand.c explicit_bzero.c util.c util.h
 libmodule_la_LIBADD = -lpam $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS)
 pampluginexecdir = $(PAMDIR)
 pampluginexec_LTLIBRARIES = pam_u2f.la
@@ -723,6 +724,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/b64.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/explicit_bzero.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pam-u2f.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Plo@am__quote@ # am--include-marker
@@ -1114,6 +1116,7 @@ distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 		-rm -f ./$(DEPDIR)/b64.Plo
 	-rm -f ./$(DEPDIR)/debug.Plo
+	-rm -f ./$(DEPDIR)/expand.Plo
 	-rm -f ./$(DEPDIR)/explicit_bzero.Plo
 	-rm -f ./$(DEPDIR)/pam-u2f.Plo
 	-rm -f ./$(DEPDIR)/util.Plo
@@ -1168,6 +1171,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -rf $(top_srcdir)/autom4te.cache
 		-rm -f ./$(DEPDIR)/b64.Plo
 	-rm -f ./$(DEPDIR)/debug.Plo
+	-rm -f ./$(DEPDIR)/expand.Plo
 	-rm -f ./$(DEPDIR)/explicit_bzero.Plo
 	-rm -f ./$(DEPDIR)/pam-u2f.Plo
 	-rm -f ./$(DEPDIR)/util.Plo

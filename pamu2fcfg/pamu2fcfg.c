@@ -7,6 +7,13 @@
 #define TIMEOUT 15
 #define FREQUENCY 1
 
+#define PIN_SET 0x01
+#define PIN_UNSET 0x02
+#define UV_SET 0x04
+#define UV_UNSET 0x08
+#define UV_REQD 0x10
+#define UV_NOT_REQD 0x20
+
 #include <fido.h>
 
 #include <stdio.h>
@@ -22,6 +29,10 @@
 #include "util.h"
 
 #include "openbsd-compat.h"
+
+#ifndef FIDO_ERR_UV_BLOCKED /* XXX: compat libfido2 <1.5.0 */
+#define FIDO_ERR_UV_BLOCKED 0x3c
+#endif
 
 struct args {
   const char *appid;
@@ -159,7 +170,8 @@ err:
   return cred;
 }
 
-static int make_cred(const char *path, fido_dev_t *dev, fido_cred_t *cred) {
+static int make_cred(const struct args *args, const char *path, fido_dev_t *dev,
+                     fido_cred_t *cred, int devopts) {
   char prompt[BUFSIZE];
   char pin[BUFSIZE];
   int n;
@@ -170,8 +182,25 @@ static int make_cred(const char *path, fido_dev_t *dev, fido_cred_t *cred) {
     return -1;
   }
 
-  r = fido_dev_make_cred(dev, cred, NULL);
-  if (r == FIDO_ERR_PIN_REQUIRED) {
+  /* Some form of UV required; built-in UV is available. */
+  if (args->user_verification || (devopts & (UV_SET | UV_NOT_REQD)) == UV_SET) {
+    if ((r = fido_cred_set_uv(cred, FIDO_OPT_TRUE)) != FIDO_OK) {
+      fprintf(stderr, "error: fido_cred_set_uv: %s (%d)\n", fido_strerr(r), r);
+      return -1;
+    }
+  }
+
+  /* Let built-in UV have precedence over PIN. No UV also handled here. */
+  if (args->user_verification || !args->pin_verification) {
+    r = fido_dev_make_cred(dev, cred, NULL);
+  } else {
+    r = FIDO_ERR_PIN_REQUIRED;
+  }
+
+  /* Some form of UV required; built-in UV failed or is not available. */
+  if ((devopts & PIN_SET) &&
+      (r == FIDO_ERR_PIN_REQUIRED || r == FIDO_ERR_UV_BLOCKED ||
+       r == FIDO_ERR_PIN_BLOCKED)) {
     n = snprintf(prompt, sizeof(prompt), "Enter PIN for %s: ", path);
     if (n < 0 || (size_t) n >= sizeof(prompt)) {
       fprintf(stderr, "error: snprintf prompt");
@@ -280,6 +309,44 @@ err:
   free(b64_pk);
 
   return ok;
+}
+
+static int get_device_options(fido_dev_t *dev, int *devopts) {
+  char *const *opts;
+  const bool *vals;
+  fido_cbor_info_t *info;
+  int r;
+
+  *devopts = 0;
+
+  if (!fido_dev_is_fido2(dev))
+    return 0;
+
+  if ((info = fido_cbor_info_new()) == NULL) {
+    fprintf(stderr, "fido_cbor_info_new failed\n");
+    return -1;
+  }
+  if ((r = fido_dev_get_cbor_info(dev, info)) != FIDO_OK) {
+    fprintf(stderr, "fido_dev_get_cbor_info: %s (%d)\n", fido_strerr(r), r);
+    fido_cbor_info_free(&info);
+    return -1;
+  }
+
+  opts = fido_cbor_info_options_name_ptr(info);
+  vals = fido_cbor_info_options_value_ptr(info);
+  for (size_t i = 0; i < fido_cbor_info_options_len(info); i++) {
+    if (strcmp(opts[i], "clientPin") == 0) {
+      *devopts |= vals[i] ? PIN_SET : PIN_UNSET;
+    } else if (strcmp(opts[i], "uv") == 0) {
+      *devopts |= vals[i] ? UV_SET : UV_UNSET;
+    } else if (strcmp(opts[i], "makeCredUvNotRqd") == 0) {
+      *devopts |= vals[i] ? UV_NOT_REQD : UV_REQD;
+    }
+  }
+
+  fido_cbor_info_free(&info);
+
+  return 0;
 }
 
 static void parse_args(int argc, char *argv[], struct args *args) {
@@ -394,13 +461,11 @@ int main(int argc, char *argv[]) {
   const fido_dev_info_t *di = NULL;
   const char *path = NULL;
   size_t ndevs = 0;
+  int devopts = 0;
   int r;
 
   parse_args(argc, argv, &args);
   fido_init(args.debug ? FIDO_DEBUG : 0);
-
-  if ((cred = prepare_cred(&args)) == NULL)
-    goto err;
 
   devlist = fido_dev_info_new(64);
   if (!devlist) {
@@ -468,8 +533,30 @@ int main(int argc, char *argv[]) {
     goto err;
   }
 
-  if (make_cred(path, dev, cred) != 0 || verify_cred(cred) != 0 ||
-      print_authfile_line(&args, cred) != 0)
+  if (get_device_options(dev, &devopts) != 0) {
+    goto err;
+  }
+  if (args.pin_verification && !(devopts & PIN_SET)) {
+    warnx("%s", devopts & PIN_UNSET ? "device has no PIN"
+                                    : "device does not support PIN");
+    goto err;
+  }
+  if (args.user_verification && !(devopts & UV_SET)) {
+    warnx("%s", devopts & UV_UNSET
+                  ? "device has no built-in user verification configured"
+                  : "device does not support built-in user verification");
+    goto err;
+  }
+  if ((devopts & (UV_REQD | PIN_SET | UV_SET)) == UV_REQD) {
+    warnx("%s", "some form of user verification required but none configured");
+    goto err;
+  }
+
+  if ((cred = prepare_cred(&args)) == NULL)
+    goto err;
+
+  if (make_cred(&args, path, dev, cred, devopts) != 0 ||
+      verify_cred(cred) != 0 || print_authfile_line(&args, cred) != 0)
     goto err;
 
   exit_code = EXIT_SUCCESS;
