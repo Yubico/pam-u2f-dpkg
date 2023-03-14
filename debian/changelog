@@ -1,3 +1,10 @@
+pam-u2f (1.3.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Added basic support for pam-auth-update.
+
+ -- Ludvig Michaelsson <ludvig.michaelsson@yubico.com>  Tue, 14 Mar 2023 10:16:29 +0100
+
 pam-u2f (1.2.1-1) unstable; urgency=medium
 
   * New upstream release.
