@@ -15,6 +15,7 @@
 #include <openssl/ec.h>
 #include <fido.h>
 
+#include "debug.h"
 #include "drop_privs.h"
 #include "fuzz/fuzz.h"
 
@@ -65,7 +66,6 @@ WRAP(int, gethostname, (char *name, size_t len), -1, (name, len))
 WRAP(ssize_t, getline, (char **s, size_t *n, FILE *fp), -1, (s, n, fp))
 WRAP(FILE *, fdopen, (int fd, const char *mode), NULL, (fd, mode))
 WRAP(int, fstat, (int fd, struct stat *st), -1, (fd, st))
-WRAP(ssize_t, read, (int fd, void *buf, size_t count), -1, (fd, buf, count))
 WRAP(BIO *, BIO_new, (const BIO_METHOD *type), NULL, (type))
 WRAP(int, BIO_write, (BIO * b, const void *data, int len), -1, (b, data, len))
 WRAP(int, BIO_read, (BIO * b, void *data, int len), -1, (b, data, len))
@@ -75,7 +75,16 @@ WRAP(BIO *, BIO_new_mem_buf, (const void *buf, int len), NULL, (buf, len))
 WRAP(EC_KEY *, EC_KEY_new_by_curve_name, (int nid), NULL, (nid))
 WRAP(const EC_GROUP *, EC_KEY_get0_group, (const EC_KEY *key), NULL, (key))
 
-extern int __wrap_asprintf(char **strp, const char *fmt, ...);
+extern ssize_t __real_read(int fildes, void *buf, size_t nbyte);
+extern ssize_t __wrap_read(int fildes, void *buf, size_t nbyte);
+extern ssize_t __wrap_read(int fildes, void *buf, size_t nbyte) {
+  assert(fildes >= 0);
+  assert(buf != NULL);
+  return __real_read(fildes, buf, nbyte);
+}
+
+extern int __wrap_asprintf(char **strp, const char *fmt, ...)
+  ATTRIBUTE_FORMAT(printf, 2, 3);
 extern int __wrap_asprintf(char **strp, const char *fmt, ...) {
   va_list ap;
   int r;

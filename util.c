@@ -678,7 +678,7 @@ out:
 int get_devices_from_authfile(const cfg_t *cfg, const char *username,
                               device_t *devices, unsigned *n_devs) {
 
-  int retval = 0;
+  int r = PAM_AUTHINFO_UNAVAIL;
   int fd = -1;
   struct stat st;
   struct passwd *pw = NULL, pw_s;
@@ -693,6 +693,9 @@ int get_devices_from_authfile(const cfg_t *cfg, const char *username,
 
   fd = open(cfg->auth_file, O_RDONLY | O_CLOEXEC | O_NOCTTY);
   if (fd < 0) {
+    if (errno == ENOENT && cfg->nouserok) {
+      r = PAM_IGNORE;
+    }
     debug_dbg(cfg, "Cannot open authentication file: %s", strerror(errno));
     goto err;
   }
@@ -707,10 +710,11 @@ int get_devices_from_authfile(const cfg_t *cfg, const char *username,
     goto err;
   }
 
-  if (st.st_size == 0) {
-    debug_dbg(cfg, "Authentication file is empty");
+  if ((st.st_mode & (S_IWGRP | S_IWOTH)) != 0) {
+    debug_dbg(cfg, "Authentication file has insecure permissions");
     goto err;
   }
+
   opwfile_size = st.st_size;
 
   gpu_ret = getpwuid_r(st.st_uid, &pw_s, buffer, sizeof(buffer), &pw);
@@ -740,26 +744,26 @@ int get_devices_from_authfile(const cfg_t *cfg, const char *username,
   }
 
   if (cfg->sshformat == 0) {
-    retval = parse_native_format(cfg, username, opwfile, devices, n_devs);
+    if (parse_native_format(cfg, username, opwfile, devices, n_devs) != 1) {
+      goto err;
+    }
   } else {
-    retval = parse_ssh_format(cfg, opwfile, opwfile_size, devices, n_devs);
-  }
-
-  if (retval != 1) {
-    // NOTE(adma): error message is logged by the previous function
-    goto err;
+    if (parse_ssh_format(cfg, opwfile, opwfile_size, devices, n_devs) != 1) {
+      goto err;
+    }
   }
 
   debug_dbg(cfg, "Found %d device(s) for user %s", *n_devs, username);
-
-  retval = 1;
+  r = PAM_SUCCESS;
 
 err:
-  if (retval != 1) {
+  if (r != PAM_SUCCESS) {
     for (i = 0; i < *n_devs; i++) {
       reset_device(&devices[i]);
     }
     *n_devs = 0;
+  } else if (*n_devs == 0) {
+    r = cfg->nouserok ? PAM_IGNORE : PAM_USER_UNKNOWN;
   }
 
   if (opwfile)
@@ -768,7 +772,7 @@ err:
   if (fd != -1)
     close(fd);
 
-  return retval;
+  return r;
 }
 
 void free_devices(device_t *devices, const unsigned n_devs) {
@@ -1139,7 +1143,7 @@ int do_authentication(const cfg_t *cfg, const device_t *devices,
   fido_dev_t **authlist = NULL;
   int cued = 0;
   int r;
-  int retval = -2;
+  int retval = PAM_AUTH_ERR;
   size_t ndevs = 0;
   size_t ndevs_prev = 0;
   unsigned i = 0;
@@ -1155,13 +1159,13 @@ int do_authentication(const cfg_t *cfg, const device_t *devices,
 #endif
   memset(&pk, 0, sizeof(pk));
 
-  devlist = fido_dev_info_new(64);
+  devlist = fido_dev_info_new(DEVLIST_LEN);
   if (!devlist) {
     debug_dbg(cfg, "Unable to allocate devlist");
     goto out;
   }
 
-  r = fido_dev_info_manifest(devlist, 64, &ndevs);
+  r = fido_dev_info_manifest(devlist, DEVLIST_LEN, &ndevs);
   if (r != FIDO_OK) {
     debug_dbg(cfg, "Unable to discover device(s), %s (%d)", fido_strerr(r), r);
     goto out;
@@ -1171,7 +1175,7 @@ int do_authentication(const cfg_t *cfg, const device_t *devices,
 
   debug_dbg(cfg, "Device max index is %zu", ndevs);
 
-  authlist = calloc(64 + 1, sizeof(fido_dev_t *));
+  authlist = calloc(DEVLIST_LEN + 1, sizeof(fido_dev_t *));
   if (!authlist) {
     debug_dbg(cfg, "Unable to allocate authenticator list");
     goto out;
@@ -1183,8 +1187,6 @@ int do_authentication(const cfg_t *cfg, const device_t *devices,
 
   i = 0;
   while (i < n_devs) {
-    retval = -2;
-
     debug_dbg(cfg, "Attempting authentication with device number %d", i + 1);
 
     init_opts(&opts); /* used during authenticator discovery */
@@ -1254,7 +1256,7 @@ int do_authentication(const cfg_t *cfg, const device_t *devices,
           }
           r = fido_assert_verify(assert, 0, pk.type, pk.ptr);
           if (r == FIDO_OK) {
-            retval = 1;
+            retval = PAM_SUCCESS;
             goto out;
           }
         }
@@ -1267,13 +1269,13 @@ int do_authentication(const cfg_t *cfg, const device_t *devices,
 
     fido_dev_info_free(&devlist, ndevs);
 
-    devlist = fido_dev_info_new(64);
+    devlist = fido_dev_info_new(DEVLIST_LEN);
     if (!devlist) {
       debug_dbg(cfg, "Unable to allocate devlist");
       goto out;
     }
 
-    r = fido_dev_info_manifest(devlist, 64, &ndevs);
+    r = fido_dev_info_manifest(devlist, DEVLIST_LEN, &ndevs);
     if (r != FIDO_OK) {
       debug_dbg(cfg, "Unable to discover device(s), %s (%d)", fido_strerr(r),
                 r);
@@ -1379,7 +1381,7 @@ int do_manual_authentication(const cfg_t *cfg, const device_t *devices,
   char *b64_challenge = NULL;
   char prompt[MAX_PROMPT_LEN];
   char buf[MAX_PROMPT_LEN];
-  int retval = -2;
+  int retval = PAM_AUTH_ERR;
   int n;
   int r;
   unsigned i = 0;
@@ -1446,8 +1448,6 @@ int do_manual_authentication(const cfg_t *cfg, const device_t *devices,
            "Please pass the challenge(s) above to fido2-assert, and "
            "paste the results in the prompt below.");
 
-  retval = -1;
-
   for (i = 0; i < n_devs; ++i) {
     n = snprintf(prompt, sizeof(prompt), "Response #%d: ", i + 1);
     if (n <= 0 || (size_t) n >= sizeof(prompt)) {
@@ -1462,7 +1462,7 @@ int do_manual_authentication(const cfg_t *cfg, const device_t *devices,
 
     r = fido_assert_verify(assert[i], 0, pk[i].type, pk[i].ptr);
     if (r == FIDO_OK) {
-      retval = 1;
+      retval = PAM_SUCCESS;
       break;
     }
   }
