@@ -176,7 +176,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   cfg_t *cfg = &cfg_st;
   char buffer[BUFSIZE];
   int pgu_ret, gpn_ret;
-  int retval = PAM_IGNORE;
+  int retval = PAM_ABORT;
   device_t *devices = NULL;
   unsigned n_devices = 0;
   int openasuser = 0;
@@ -192,10 +192,10 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   if (!cfg->origin) {
     if (!cfg->sshformat) {
       strcpy(buffer, DEFAULT_ORIGIN_PREFIX);
-
       if (gethostname(buffer + strlen(DEFAULT_ORIGIN_PREFIX),
                       BUFSIZE - strlen(DEFAULT_ORIGIN_PREFIX)) == -1) {
         debug_dbg(cfg, "Unable to get host name");
+        retval = PAM_SYSTEM_ERR;
         goto done;
       }
     } else {
@@ -205,6 +205,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     cfg->origin = strdup(buffer);
     if (!cfg->origin) {
       debug_dbg(cfg, "Unable to allocate memory");
+      retval = PAM_BUF_ERR;
       goto done;
     } else {
       should_free_origin = 1;
@@ -212,11 +213,12 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   }
 
   if (!cfg->appid) {
-    debug_dbg(cfg, "Appid not specified, using the same value of origin (%s)",
+    debug_dbg(cfg, "Appid not specified, using the value of origin (%s)",
               cfg->origin);
     cfg->appid = strdup(cfg->origin);
     if (!cfg->appid) {
       debug_dbg(cfg, "Unable to allocate memory");
+      retval = PAM_BUF_ERR;
       goto done;
     } else {
       should_free_appid = 1;
@@ -224,7 +226,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   }
 
   if (cfg->max_devs == 0) {
-    debug_dbg(cfg, "Maximum devices number not set. Using default (%d)",
+    debug_dbg(cfg, "Maximum number of devices not set. Using default (%d)",
               MAX_DEVS);
     cfg->max_devs = MAX_DEVS;
   }
@@ -236,13 +238,13 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   devices = calloc(cfg->max_devs, sizeof(device_t));
   if (!devices) {
     debug_dbg(cfg, "Unable to allocate memory");
-    retval = PAM_IGNORE;
+    retval = PAM_BUF_ERR;
     goto done;
   }
 
   pgu_ret = pam_get_user(pamh, &user, NULL);
   if (pgu_ret != PAM_SUCCESS || user == NULL) {
-    debug_dbg(cfg, "Unable to access user %s", user);
+    debug_dbg(cfg, "Unable to get username from PAM");
     retval = PAM_CONV_ERR;
     goto done;
   }
@@ -254,7 +256,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
       pw->pw_dir[0] != '/') {
     debug_dbg(cfg, "Unable to retrieve credentials for user %s, (%s)", user,
               strerror(errno));
-    retval = PAM_USER_UNKNOWN;
+    retval = PAM_SYSTEM_ERR;
     goto done;
   }
 
@@ -265,7 +267,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   if (cfg->expand && cfg->auth_file) {
     if ((cfg->auth_file = expand_variables(cfg->auth_file, user)) == NULL) {
       debug_dbg(cfg, "Failed to perform variable expansion");
-      retval = PAM_AUTHINFO_UNAVAIL;
+      retval = PAM_BUF_ERR;
       goto done;
     }
     should_free_auth_file = 1;
@@ -275,7 +277,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     char *tmp = resolve_authfile_path(cfg, pw, &openasuser);
     if (tmp == NULL) {
       debug_dbg(cfg, "Could not resolve authfile path");
-      retval = PAM_IGNORE;
+      retval = PAM_BUF_ERR;
       goto done;
     }
     if (should_free_auth_file) {
@@ -294,7 +296,7 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
     debug_dbg(cfg, "Dropping privileges");
     if (pam_modutil_drop_priv(pamh, &privs, pw)) {
       debug_dbg(cfg, "Unable to switch user to uid %i", pw->pw_uid);
-      retval = PAM_IGNORE;
+      retval = PAM_SYSTEM_ERR;
       goto done;
     }
     debug_dbg(cfg, "Switched to uid %i", pw->pw_uid);
@@ -304,33 +306,14 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
   if (openasuser) {
     if (pam_modutil_regain_priv(pamh, &privs)) {
       debug_dbg(cfg, "could not restore privileges");
-      retval = PAM_IGNORE;
+      retval = PAM_SYSTEM_ERR;
       goto done;
     }
     debug_dbg(cfg, "Restored privileges");
   }
 
-  if (retval != 1) {
-    // for nouserok; make sure errors in get_devices_from_authfile don't
-    // result in valid devices
-    n_devices = 0;
-  }
-
-  if (n_devices == 0) {
-    if (cfg->nouserok) {
-      debug_dbg(cfg, "Found no devices but nouserok specified. Skipping "
-                     "authentication");
-      retval = PAM_SUCCESS;
-      goto done;
-    } else if (retval != 1) {
-      debug_dbg(cfg, "Unable to get devices from authentication file");
-      retval = PAM_AUTHINFO_UNAVAIL;
-      goto done;
-    } else {
-      debug_dbg(cfg, "Found no devices. Aborting.");
-      retval = PAM_AUTHINFO_UNAVAIL;
-      goto done;
-    }
+  if (retval != PAM_SUCCESS) {
+    goto done;
   }
 
   // Determine the full path for authpending_file in order to emit touch request
@@ -387,14 +370,6 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
                 strerror(errno));
     }
   }
-
-  if (retval != 1) {
-    debug_dbg(cfg, "do_authentication returned %d", retval);
-    retval = PAM_AUTH_ERR;
-    goto done;
-  }
-
-  retval = PAM_SUCCESS;
 
 done:
   free_devices(devices, n_devices);

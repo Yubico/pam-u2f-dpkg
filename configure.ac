@@ -1,6 +1,6 @@
 #  Copyright (C) 2014-2022 Yubico AB
 AC_PREREQ([2.65])
-AC_INIT([pam_u2f], [1.3.0], [https://github.com/Yubico/pam-u2f/issues],
+AC_INIT([pam_u2f], [1.3.1], [https://github.com/Yubico/pam-u2f/issues],
   [pam_u2f], [https://developers.yubico.com/pam-u2f/])
 
 AC_CONFIG_AUX_DIR([build-aux])
@@ -144,6 +144,7 @@ AC_CONFIG_FILES([tests/credentials/new_-V.cred])
 AC_CONFIG_FILES([tests/credentials/old_credential.cred])
 AC_CONFIG_FILES([tests/credentials/ssh_credential.cred])
 AC_CONFIG_FILES([tests/credentials/new_limited_count.cred])
+AC_CONFIG_FILES([tests/credentials/empty.cred])
 AC_OUTPUT
 
 
