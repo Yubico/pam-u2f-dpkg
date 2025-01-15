@@ -14,3 +14,14 @@ Default: cue
 Description: Module options:
  The behavior of pam-u2f can be further customized using a space-separated list
  of options. Available options are described in the pam_u2f(8) manual page.
+
+Template: libpam-u2f/authfile
+Type: note
+Description:
+ As part of pam-u2f 1.3.1, permission checks of the authentication
+ file were hardened. If your users' authentication file(s) is writable
+ by the file's group (g) or other users (o), pam-u2f will refuse to
+ authenticate. Please ensure that these file mode bits are not set by
+ issuing
+ .
+     $ chmod g-w,o-w /path/to/authfile
