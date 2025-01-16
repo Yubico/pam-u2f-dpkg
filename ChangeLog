@@ -1,3 +1,22 @@
+2025-01-16  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* NEWS: release 1.3.2
+
+2025-01-15  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* NEWS: NEWS: prepare for 1.3.2
+
+2025-01-15  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* util.c: util: soften authfile permission check to a warning We'd like to make this a hard error but it has proven to break
+	existing installations. To avoid breaking changes, revert to trying
+	our hardest to inform the administrator that this user is
+	authenticating with a potentially unsafe authfile.
+
+2025-01-14  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* NEWS, configure.ac: Bump version
+
 2025-01-14  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
 
 	* NEWS: release 1.3.1
