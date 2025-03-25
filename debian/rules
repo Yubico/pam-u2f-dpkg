@@ -3,9 +3,7 @@
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 %:
-	dh $@ --parallel --with autoreconf --builddirectory=build
+	dh $@ --parallel --buildsystem=cmake --builddirectory=build
 
 override_dh_auto_configure:
-	dh_auto_configure -- \
-		--disable-silent-rules \
-		--with-pam-dir=$(DESTDIR)/lib/$(DEB_HOST_MULTIARCH)/security
+	dh_auto_configure -- -DPAM_DIR=$(DESTDIR)/lib/$(DEB_HOST_MULTIARCH)/security
