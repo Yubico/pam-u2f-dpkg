@@ -197,7 +197,6 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@
 CSCOPE = @CSCOPE@
-CSFLAGS = @CSFLAGS@
 CTAGS = @CTAGS@
 CWFLAGS = @CWFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -256,6 +255,7 @@ PKG_CONFIG = @PKG_CONFIG@
 PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 RANLIB = @RANLIB@
+SCONFDIR = @SCONFDIR@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -323,6 +323,7 @@ pamu2fcfg_SOURCES = pamu2fcfg.c readpassphrase.c _readpassphrase.h \
 	strlcpy.c openbsd-compat.h ../util.c ../b64.c \
 	../explicit_bzero.c
 pamu2fcfg_LDADD = $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS)
+EXTRA_DIST = CMakeLists.txt
 all: all-am
 
 .SUFFIXES:

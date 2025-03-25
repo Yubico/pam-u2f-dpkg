@@ -194,7 +194,6 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@
 CSCOPE = @CSCOPE@
-CSFLAGS = @CSFLAGS@
 CTAGS = @CTAGS@
 CWFLAGS = @CWFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -253,6 +252,7 @@ PKG_CONFIG = @PKG_CONFIG@
 PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 RANLIB = @RANLIB@
+SCONFDIR = @SCONFDIR@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -316,14 +316,16 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # Copyright (C) 2020 Yubico AB - See COPYING
-AM_CFLAGS = $(CWFLAGS) $(CSFLAGS) -fsanitize=fuzzer
-AM_CPPFLAGS = $(LIBFIDO2_CFLAGS) $(LIBCRYPTO_CFLAGS) -I$(srcdir)/..
+AM_CFLAGS = $(CWFLAGS) -fsanitize=fuzzer
+AM_CPPFLAGS = $(LIBFIDO2_CFLAGS) $(LIBCRYPTO_CFLAGS) -I$(srcdir)/.. -D \
+	SCONFDIR='"@SCONFDIR@"'
 AM_LDFLAGS = -no-install -fsanitize=fuzzer
 fuzz_format_parsers_SOURCES = fuzz_format_parsers.c
 fuzz_format_parsers_LDADD = -lpam $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS) ../pam_u2f.la
 fuzz_auth_SOURCES = fuzz_auth.c pack.c fuzz.h authfile.h wiredata.h
 fuzz_auth_LDADD = -lpam $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS) ../pam_u2f.la
-EXTRA_DIST = coverage.sh make_seed.py export.sym
+EXTRA_DIST = coverage.sh make_seed.py export.sym export.gnu \
+	CMakeLists.txt
 all: all-am
 
 .SUFFIXES:
