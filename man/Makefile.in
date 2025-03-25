@@ -171,7 +171,6 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@
 CSCOPE = @CSCOPE@
-CSFLAGS = @CSFLAGS@
 CTAGS = @CTAGS@
 CWFLAGS = @CWFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -230,6 +229,7 @@ PKG_CONFIG = @PKG_CONFIG@
 PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 RANLIB = @RANLIB@
+SCONFDIR = @SCONFDIR@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -294,7 +294,7 @@ top_srcdir = @top_srcdir@
 dist_man1_MANS = pamu2fcfg.1
 dist_man8_MANS = pam_u2f.8
 MAINTAINERCLEANFILES = $(MANS)
-EXTRA_DIST = $(MANS:=.txt)
+EXTRA_DIST = $(MANS:=.txt) CMakeLists.txt
 SUFFIXES = .1.txt .1 .8.txt .8
 all: all-am
 
@@ -581,7 +581,10 @@ uninstall-man: uninstall-man1 uninstall-man8
 
 
 .1.txt.1 .8.txt.8:
-	$(AM_V_GEN)$(A2X) --format=manpage -L -a revdate="Version $(VERSION)" $<
+	$(AM_V_GEN)$(A2X) --format=manpage -L   \
+		-a sconfdir="$(SCONFDIR)"       \
+		-a revdate="Version $(VERSION)" \
+		$<
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

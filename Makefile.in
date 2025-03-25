@@ -100,10 +100,11 @@ host_triplet = @host@
 @ENABLE_FUZZING_TRUE@	$(srcdir)/fuzz/export.sym \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=asprintf -Wl,--wrap=strdup \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=calloc -Wl,--wrap=malloc \
-@ENABLE_FUZZING_TRUE@	-Wl,--wrap=open -Wl,--wrap=close \
-@ENABLE_FUZZING_TRUE@	-Wl,--wrap=fdopen -Wl,--wrap=fstat \
-@ENABLE_FUZZING_TRUE@	-Wl,--wrap=read -Wl,--wrap=gethostname \
-@ENABLE_FUZZING_TRUE@	-Wl,--wrap=getline -Wl,--wrap=getpwnam_r \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=open -Wl,--wrap=openat \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=close -Wl,--wrap=fdopen \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=fstat -Wl,--wrap=read \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=gethostname -Wl,--wrap=getline \
+@ENABLE_FUZZING_TRUE@	-Wl,--wrap=getpwnam_r \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=getpwuid_r -Wl,--wrap=geteuid \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=secure_getenv \
 @ENABLE_FUZZING_TRUE@	-Wl,--wrap=pam_get_user \
@@ -201,7 +202,7 @@ am__DEPENDENCIES_1 =
 libmodule_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am_libmodule_la_OBJECTS = pam-u2f.lo b64.lo debug.lo expand.lo \
-	explicit_bzero.lo util.lo
+	explicit_bzero.lo util.lo cfg.lo
 libmodule_la_OBJECTS = $(am_libmodule_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -231,10 +232,10 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/b64.Plo ./$(DEPDIR)/debug.Plo \
-	./$(DEPDIR)/expand.Plo ./$(DEPDIR)/explicit_bzero.Plo \
-	./$(DEPDIR)/pam-u2f.Plo ./$(DEPDIR)/util.Plo \
-	fuzz/$(DEPDIR)/wrap.Plo
+am__depfiles_remade = ./$(DEPDIR)/b64.Plo ./$(DEPDIR)/cfg.Plo \
+	./$(DEPDIR)/debug.Plo ./$(DEPDIR)/expand.Plo \
+	./$(DEPDIR)/explicit_bzero.Plo ./$(DEPDIR)/pam-u2f.Plo \
+	./$(DEPDIR)/util.Plo fuzz/$(DEPDIR)/wrap.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -407,7 +408,6 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@
 CSCOPE = @CSCOPE@
-CSFLAGS = @CSFLAGS@
 CTAGS = @CTAGS@
 CWFLAGS = @CWFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -466,6 +466,7 @@ PKG_CONFIG = @PKG_CONFIG@
 PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 RANLIB = @RANLIB@
+SCONFDIR = @SCONFDIR@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -529,11 +530,13 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = . pamu2fcfg tests $(am__append_1) $(am__append_2)
 ACLOCAL_AMFLAGS = -I m4
-AM_CFLAGS = $(CWFLAGS) $(CSFLAGS)
-AM_CPPFLAGS = $(LIBFIDO2_CFLAGS) $(LIBCRYPTO_CFLAGS) $(am__append_3)
+AM_CFLAGS = $(CWFLAGS)
+AM_CPPFLAGS = $(LIBFIDO2_CFLAGS) $(LIBCRYPTO_CFLAGS) $(am__append_3) \
+	-D SCONFDIR='"@SCONFDIR@"'
 noinst_LTLIBRARIES = libmodule.la
 libmodule_la_SOURCES = pam-u2f.c b64.c b64.h debug.c debug.h \
-	drop_privs.h expand.c explicit_bzero.c util.c util.h
+	drop_privs.h expand.c explicit_bzero.c util.c util.h cfg.c \
+	cfg.h
 libmodule_la_LIBADD = -lpam $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS)
 pampluginexecdir = $(PAMDIR)
 pampluginexec_LTLIBRARIES = pam_u2f.la
@@ -541,7 +544,8 @@ pam_u2f_la_SOURCES = $(am__append_6)
 pam_u2f_la_LIBADD = libmodule.la
 pam_u2f_la_LDFLAGS = -module -avoid-version $(am__append_4) \
 	$(am__append_5)
-EXTRA_DIST = export.sym
+EXTRA_DIST = export.sym export.gnu export.llvm CMakeLists.txt \
+	cmake/FindPAM.cmake
 
 # Release
 
@@ -730,6 +734,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/b64.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cfg.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expand.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/explicit_bzero.Plo@am__quote@ # am--include-marker
@@ -1127,6 +1132,7 @@ clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f ./$(DEPDIR)/b64.Plo
+	-rm -f ./$(DEPDIR)/cfg.Plo
 	-rm -f ./$(DEPDIR)/debug.Plo
 	-rm -f ./$(DEPDIR)/expand.Plo
 	-rm -f ./$(DEPDIR)/explicit_bzero.Plo
@@ -1182,6 +1188,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
 	-rm -f ./$(DEPDIR)/b64.Plo
+	-rm -f ./$(DEPDIR)/cfg.Plo
 	-rm -f ./$(DEPDIR)/debug.Plo
 	-rm -f ./$(DEPDIR)/expand.Plo
 	-rm -f ./$(DEPDIR)/explicit_bzero.Plo

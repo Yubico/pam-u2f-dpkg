@@ -2,12 +2,12 @@
 .\"     Title: pam_u2f
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: Version 1.3.2
+.\"      Date: Version 1.4.0
 .\"    Manual: PAM U2F Module Manual
 .\"    Source: pam-u2f
 .\"  Language: English
 .\"
-.TH "PAM_U2F" "8" "Version 1\&.3\&.2" "pam\-u2f" "PAM U2F Module Manual"
+.TH "PAM_U2F" "8" "Version 1\&.4\&.0" "pam\-u2f" "PAM U2F Module Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -59,7 +59,7 @@ Set the relying party ID for the FIDO authentication procedure\&. If no value is
 .PP
 \fBappid\fR=\fIappid\fR
 .RS 4
-Set the application ID for the U2F authentication procedure\&. If no value is specified, the same value used for origin is taken ("pam://$HOSTNAME" if also origin is not specified)\&. This setting is only applicable for U2F credentials created with pamu2fcfg versions v1\&.0\&.8 or earlier\&. Note that on v1\&.1\&.0 and v1\&.1\&.1 of pam\-u2f, handling of this setting was temporarily broken if the value was not the same as the value of origin\&.
+Set the application ID for the FIDO authentication procedure\&. If no value is specified, the same value used for origin is taken ("pam://$HOSTNAME" if also origin is not specified)\&. This setting is only applicable for FIDO credentials created with pamu2fcfg versions v1\&.0\&.8 or earlier\&. Note that on v1\&.1\&.0 and v1\&.1\&.1 of pam\-u2f, handling of this setting was temporarily broken if the value was not the same as the value of origin\&.
 .RE
 .PP
 \fBauthfile\fR=\fIfile\fR
@@ -80,7 +80,7 @@ openasuser\&.
 .PP
 \fBauthpending_file\fR=\fIfile\fR
 .RS 4
-Set the location of the file that is used for touch request notifications\&. This file will be opened when pam\-u2f starts waiting for a user to touch the device, and will be closed when it no longer waits for a touch\&. Use inotify to listen on these events, or a more high\-level tool like yubikey\-touch\-detector\&. Default value: /var/run/user/$UID/pam\-u2f\-authpending\&. Set an empty value in order to disable this functionality, like so: "authpending_file="\&.
+Set the location of the file that is used for touch request notifications\&. This file will be opened when pam\-u2f starts waiting for a user to touch the FIDO authenticator, and will be closed when it no longer waits for a touch\&. Use inotify to listen on these events, or a more high\-level tool like yubikey\-touch\-detector\&. Default value: /var/run/user/$UID/pam\-u2f\-authpending\&. Set an empty value in order to disable this functionality, like so: "authpending_file="\&.
 .RE
 .PP
 \fBnouserok\fR
@@ -100,12 +100,12 @@ Set to enable all authentication attempts to succeed (aka presentation mode)\&.
 .PP
 \fBmax_devices\fR=\fIn_devices\fR
 .RS 4
-Maximum number of devices (credentials) allowed per user (default is 24)\&. Devices specified in the authorization mapping file that exceed this value will be ignored\&.
+Maximum number of FIDO authenticators allowed per user (default is 24)\&. FIDO authenticators specified in the authorization mapping file that exceed this value will be ignored\&.
 .RE
 .PP
 \fBinteractive\fR
 .RS 4
-Set to prompt a message and wait before testing the presence of a U2F device\&. Recommended if your device doesn\(cqt have tactile trigger\&.
+Set to prompt a message and wait before testing the presence of a FIDO authenticator\&. Recommended if your authenticator doesn\(cqt have tactile trigger\&.
 .RE
 .PP
 \fB[prompt=your prompt here]\fR
@@ -115,12 +115,12 @@ Set individual prompt message for interactive mode\&. Watch the square brackets 
 .PP
 \fBmanual\fR
 .RS 4
-Set to drop to a manual console where challenges are printed on screen and response read from standard input\&. Useful for debugging and SSH sessions without U2F\-support from the SSH client/server\&. If enabled, interactive mode becomes redundant and has no effect\&.
+Set to drop to a manual console where challenges are printed on screen and response read from standard input\&. Useful for debugging and SSH sessions without FIDO support from the SSH client/server\&. If enabled, interactive mode becomes redundant and has no effect\&.
 .RE
 .PP
 \fBcue\fR
 .RS 4
-Set to prompt a message to remind to touch the device\&.
+Set to prompt a message to remind to touch the FIDO authenticator\&.
 .RE
 .PP
 \fB[cue_prompt=your prompt here]\fR
@@ -130,7 +130,7 @@ Set individual prompt message for the cue option\&. Watch the square brackets ar
 .PP
 \fBnodetect\fR
 .RS 4
-Skip detecting if a suitable key is inserted before performing a full authentication\&. See
+Skip detecting if a suitable FIDO authenticator is inserted before performing a full authentication\&. See
 \fBNOTES\fR
 below\&.
 .RE
@@ -152,7 +152,13 @@ If 1, require PIN verification during authentication\&. If 0, do not request PIN
 .PP
 \fBsshformat\fR
 .RS 4
-Use credentials produced by versions of OpenSSH that have support for FIDO devices\&. It is not possible to mix native credentials and SSH credentials\&. Once this option is enabled all credentials will be parsed as SSH\&.
+Use credentials produced by versions of OpenSSH that have support for FIDO authenticator\&. It is not possible to mix native credentials and SSH credentials\&. Once this option is enabled all credentials will be parsed as SSH\&.
+.RE
+.PP
+\fBconf\fR=\fIpath/to/pam_u2f\&.conf\fR
+.RS 4
+Set an alternative location for the configuration file\&. The supplied path must be absolute and must correspond to an existing regular file\&. See
+\fBCONFIGURATION FILE\fR\&.
 .RE
 .SH "EXAMPLES"
 .sp
@@ -197,13 +203,91 @@ auth sufficient pam_u2f\&.so authfile=/etc/u2f_mappings cue pinverification=1 us
 By default, relative paths to the authfile will be opened as the target user, whereas absolute paths will be opened as "root"\&. If the "XDG_CONFIG_HOME" variable is set, privileges will not be dropped unless the "openasuser" configuration setting is set\&.
 .sp
 Using pam\-u2f to secure the login to a computer while storing the mapping file in an encrypted home directory, will result in the impossibility of logging into the system\&. The partition is decrypted after login and the mapping file can not be accessed\&.
+.SH "CONFIGURATION FILE"
+.sp
+A configuration file can be used to set the default module arguments\&.
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+The file has a
+name = value
+format, with comments starting with the
+#
+character\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+White spaces at the beginning of line, end of line, and around the
+=
+sign are ignored\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Any
+conf
+argument in the configuration file is ignored\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+The maximum size for the configuration file is 4 KiB\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+The default path for the configuration file is
+/usr/local/etc/security/pam_u2f\&.conf\&. The default file is allowed to not exist\&. An alternative path may be set in the module command line options\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+The options specified on the module command line override the values from the configuration file\&.
+.RE
 .SH "NOTES"
 .sp
 \fBNodetect\fR
 .sp
 The "nodetect" option should be used with caution\&. pam_u2f checks that a key configured for the user is inserted before performing the full tactile authentication\&. This detection is done by sending a "check\-only" authentication request to all inserted tokens to so see if at least one of them responds affirmatively to one or more of the keyhandles configured for the user\&. By doing this, pam_u2f can avoid emitting the "cue" prompt (if configured), which can cause some confusing UI issues if the cue is emitted followed by the underlying library immediately failing the tactile authentication\&. This option is also useful to avoid an unintended 1\-second delay prior to the tactile authentication caused by versions of libu2f\-host <= 1\&.1\&.5\&.
 .sp
-If pam_u2f is configured to "cue" and "nodetect", an attacker can determine that pam_u2f is part of the authentication stack by inserting any random U2F token and performing an authentication attempt\&. In this scenario, the attacker would see the cue message followed by an immediate failure, whereas with detection enabled, the U2F authentication will fail silently\&. Understand that an attacker could choose a U2F token that alerts him or her in some way to the "check\-only" authentication attempt, so this precaution only pushes the issue back a step\&.
+If pam_u2f is configured to "cue" and "nodetect", an attacker can determine that pam_u2f is part of the authentication stack by inserting any random U2F token and performing an authentication attempt\&. In this scenario, the attacker would see the cue message followed by an immediate failure, whereas with detection enabled, the authentication will fail silently\&. Understand that an attacker could choose an authenticator that alerts him or her in some way to the "check\-only" authentication attempt, so this precaution only pushes the issue back a step\&.
 .sp
 In summary, the detection feature was added to avoid confusing UI issues and to prevent leaking information about the authentication stack in very specific scenario when "cue" is configured\&. The "nodetect" option was added to avoid buggy sleep behavior in older versions of libu2f\-host and for hypothetical tokens that do not tolerate the double authentication\&. Detection is performed, and likewise "nodetect" honored, regardless of whether "cue" is also specified\&.
 .sp

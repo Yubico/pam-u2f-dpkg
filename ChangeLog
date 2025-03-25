@@ -1,3 +1,317 @@
+2025-03-25  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* NEWS: release 1.4.0
+
+2025-03-18  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* CMakeLists.txt, configure.ac: Bump version (1.4.0)
+
+2025-03-18  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* NEWS: NEWS: prepare for 1.4.0
+
+2025-03-21  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* .github/workflows/linux_fuzz.yml, build-aux/ci/fuzz-linux-asan.sh: 
+	fuzz: enable fuzzing reports Generate the file-level coverage summary report (`llvm-cov report`)
+	and print it on stdout.  Optionally generate the line-oriented coverage report (`llvm-cov
+	show`).  This is enabled if the WITH_COVERAGE_REPORT environment
+	variable is defined.  The report will be generated in a directory
+	called "cov-report" under $WORKDIR.
+
+2025-03-20  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* build-aux/ci/fuzz-linux-asan.sh: fuzz: reuse data in multiple runs
+	of fuzz-linux-asan.sh - clone libfido2 and libcbor only if not previously done - libcbor is patched with libfido2/fuzz/README only on first clone - use existing corpus if available
+
+2025-03-20  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* fuzz/CMakeLists.txt: fuzz: Add missing compile options This fixes the following warning by libfuzzer:   WARNING: no interesting inputs were found so far. Is the code
+	  instrumented for coverage?
+
+2025-03-10  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* build-aux/ci/fuzz-linux-asan.sh: fuzz: script shebang + copyright The current revision of the script does not use any bashism nor
+	pipes that require 'pipefail'. We can downgrade to the plain sh
+	interpreter.
+
+2025-03-17  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* .github/workflows/linux_fuzz.yml, build-aux/ci/fuzz-linux-asan.sh: 
+	fuzz: Use ninja(1) for building Use ninja for faster build.  Drop autoconf/automake/libtool from
+	workflow dependencies, and add ninja.
+
+2025-03-17  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* build-aux/ci/fuzz-linux-asan.sh: fuzz: use cmake to build pam_u2f
+
+2025-03-10  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* build-aux/ci/fuzz-linux-asan.sh: fuzz: Improved cmake invocations
+	for libcbor and libfido2 Split options on multiple lines and sort Invoke 'cmake --build' instead of 'make' (drop assumptions on
+	underlying build system) Drop pushd/popd in favour of supplied build and source directories.
+	Use subshell when necessary.  Cache `nproc` into a variable
+
+2025-03-17  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* build-aux/ci/fuzz-linux-asan.sh: fuzz: fix FAKEROOT Ensure path is absolute if provided (the script would fail if
+	FAKEROOT is supplied as relative path) Erase FAKEROOT before exiting if created with `mktemp -d`
+
+2025-03-14  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* man/pam_u2f.8.txt: man: update terminology
+
+2025-03-14  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* README: README: update terminology
+
+2025-03-14  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* pamu2fcfg/pamu2fcfg.c, util.h: Fix terminology in prompts
+
+2025-03-14  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* util.c: Reduce string redundancy While fixing terminology, I noticed redundant variations of the same
+	logging message in strings(1).  This is not very important, but less
+	is more.
+
+2025-02-28  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* README: README: cmake info
+
+2025-02-28  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* README: README: little tweaks
+
+2025-02-28  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* README: README: minimal dependencies
+
+2025-02-27  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* README: README: Distinguish source tarball vs git deps autoconf/automake/libtool are only needed if building from git, as
+	the dist tarball is not depending on autotools.  The reference to GNU Autotools has been moved under "Building from
+	Git", since this detail is interesting only for those who clone the
+	project.
+
+2025-02-27  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* README: README: re-format command line instructions Drop the `[source, console]` tags. Doing so produces the right
+	results on both Github and developers.yubico.com.  `apt install` instructions are broken on multiple lines, and package
+	names sorted alphabetically.
+
+2025-02-28  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* cmake/FindPAM.cmake: Work-around cmake bug As it turns out, the cmake version shipped with ubuntu 24.04 can not
+	correctly handle ALIAS targets as CMAKE_REQUIRED_LIBRARIES.  We didn't realize before because the ubuntu 24.04 vm available for
+	github actions ships another version of cmake, (3.31.5 instead of
+	3.28)
+
+2025-02-26  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* contrib/gen-news: contrib: Introuce gen_news Leveraging the git trailers, we have now a tool that builds the
+	content of the NEWS file directly from the git history.
+
+2025-02-25  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* .github/workflows/check-commit-hooks.yml,
+	build-aux/ci/check-commit-hooks, contrib/hooks/commit-msg: ci: Check
+	git trailers with git actions We are going to enforce the use of git trailers, as we want to
+	automate the construction of a changelog.  See
+	git-interpret-trailers(1).  The check is achieved by running the contrib/hooks/commit-msg script
+	on the individual commits that constitute the pull request.
+
+2025-02-26  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* contrib/allowed-trailers.txt, contrib/hooks-setup,
+	contrib/hooks/commit-msg: contrib: Add git hooks contrib/hooks now contains a collection of git hooks that the
+	developer can use to get faster feedback.  contrib/hooks-setup is a script that allows the developer to do a
+	quick set up of the provided hook. It is intended to be executed
+	right after cloning the repo.  The contrib/hooks/commit-msg hook checks the commit message to
+	ensure that the git trailers in use are allowed, that is they are
+	listed in contrib/allowed-trailers.txt.
+
+2025-02-27  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* build-aux/ci/cmake.sh: ci: consistent she-bang, #!/{ ->
+	usr/}bin/env sh
+
+2025-02-26  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README: README: specify source tarballs for the Building heading
+
+2025-02-26  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README: README: add a heading for installing using a package
+	manager
+
+2025-02-26  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README: README: move build-from-source installation steps
+
+2025-02-26  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README: README: create a Releases heading
+
+2025-02-26  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* CMakeLists.txt: cmake: fix CMAKE_MODULE_PATH assignment using
+	list(APPEND ...) Using a list allow the user to specify additional search paths for
+	Find Modules.  Allegedly this might be useful when dealing with uncommon build
+	environments, e.g. when cross compiling
+
+2025-02-26  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* Makefile.am, fuzz/Makefile.am, man/Makefile.am,
+	pamu2fcfg/Makefile.am, tests/Makefile.am: autotools: add CMake
+	sources to dist
+
+2025-02-13  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* .github/workflows/alpine_builds.yml,
+	.github/workflows/linux_builds.yml,
+	.github/workflows/macos_builds.yml: github: update workflows Added call to build-aux/ci/cmake.sh and build-time dependencies.
+
+2025-02-10  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* build-aux/ci/cmake.sh: build-aux: add cmake.sh
+
+2025-02-12  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* CMakeLists.txt, cmake/FindPAM.cmake, export.gnu, export.llvm,
+	fuzz/CMakeLists.txt, fuzz/export.gnu, man/CMakeLists.txt,
+	pamu2fcfg/CMakeLists.txt, tests/CMakeLists.txt: CMake-based build
+	system
+
+2025-02-21  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* Makefile.am, configure.ac, fuzz/Makefile.am, tests/Makefile.am: 
+	misc: re-enable -Wunused-but-set-variable There should be other ways around this when necessary.
+
+2025-02-21  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* tests/Makefile.am, tests/get_devices.c: Remove spurious dependency
+
+2025-02-17  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* configure.ac, explicit_bzero.c: Move __STDC_WANT_LIB_EXT1__ at
+	build system level
+
+2025-02-06  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* pamu2fcfg/readpassphrase.c: Fix warning: ISO C forbids an empty
+	translation unit
+
+2025-02-06  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* explicit_bzero.c: Fix warning: ISO C forbids an empty translation
+	unit
+
+2025-02-05  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* README: README: remove literal newline
+
+2024-12-18  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* man/Makefile.am, man/pam_u2f.8.txt: man: update with info about
+	conf file The SCONFDIR variable is expanded by the build system within the
+	pam_u2f.8 manpage.
+
+2024-12-18  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* README: README: update with info about conf file
+
+2024-12-11  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* Makefile.am, fuzz/Makefile.am, fuzz/export.sym, fuzz/fuzz.h,
+	fuzz/fuzz_auth.c, fuzz/wrap.c: fuzz: Integrate cfg with libfuzzer
+	testing - split-input format: add trailing blob for config file   The corpus needs some update.  - wrappers (-Wl,--wrap) integrate fuzzing of the configuration file.    The configuration file, mutated by the fuzzer, is made   available to the cfg.c implementation.    The mock-up works under the assumption that only the cfg.c   module works by opening "/" with open(3), and follows up with an   alternation of openat(3) and fstat(3) calls.
+
+2024-12-05  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* .gitignore, tests/Makefile.am, tests/cfg.c: tests: Add unit tests
+	for conf file
+
+2024-12-16  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* Makefile.am, cfg.c, cfg.h, configure.ac, pam-u2f.c: pam: Config
+	file support The configuration file defines the default behaviour of pam_u2f.
+	Individual module invocations under /etc/pam.d can override
+	settings.  The file-system location of the config file is by default
+	$sysconfdir/security/pam_u2f.conf, where $sysconfdir is supplied at
+	build time.  A new module configuration, "conf=", allows to override it at
+	runtime. Only absolute paths are accepted.
+
+2024-12-03  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* Makefile.am, cfg.c, cfg.h, pam-u2f.c, util.h: pam: Introduce cfg
+	module Having it into another module will prevent the code from being messy
+	later.  The parsing procedure is taken verbatim: no semantic change, no
+	behavioural change.
+
+2025-01-28  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* configure.ac: configure.ac: fix -W{ => sign-}conversion
+
+2025-01-28  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* util.c: util: fix sign-conversion warning
+
+2025-01-28  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* expand.c: expand: fix sign-conversion warning
+
+2025-01-23  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* explicit_bzero.c: Enable __STDC_WANT_LIB_EXT1__ to get memset_s As we switch to C11, the availability of the memset_s function under
+	Macos is detected by autoconf. The explicit_bzero.c module will use
+	it to implement explicit_bzero(3) on that system.  According to N1570, Annex K, in order for the string.h header to
+	declare memset_s(), we need to define __STDC_WANT_LIB_EXT1__ as 1
+	before including the header file.  The libc implementation is in
+	turn supposed to define __STDC_LIB_EXT1__ in the header, to claim
+	that the interfaces of Annex K are implemented as dictated by the
+	standard.  In theory, we should be using memset_s() only if __STDC_LIB_EXT1__
+	is defined, but we know that memset_s() exists thanks to autoconf.
+	Since the Macos libc does not define __STDC_LIB_EXT1__, we can not
+	be 100% sure that the memset_s() function is implemented in a
+	standard way.
+
+2025-01-22  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* configure.ac: Require -std=c11
+
+2025-01-16  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* tests/get_devices.c: test: use const pointer
+
+2025-01-16  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* util.c: util: use %u for unsigned integer
+
+2025-01-16  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* util.c: util: reduce the scope of variable
+
+2025-01-16  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* util.c: util: remove assignment that has no effect
+
+2025-01-16  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* util.c: util: pointer can be const
+
+2025-01-16  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* .gitignore: gitignore: add tests/expand
+
+2025-01-16  Giovanni Simoni <giovanni.simoni@yubico.com>
+
+	* .gitignore: gitignore: sort alphabetically
+
+2025-01-16  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
+
+	* NEWS, configure.ac: Bump version
+
 2025-01-16  Ludvig Michaelsson <ludvig.michaelsson@yubico.com>
 
 	* NEWS: release 1.3.2

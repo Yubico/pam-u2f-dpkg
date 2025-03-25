@@ -92,7 +92,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = dlsym_check$(EXEEXT) get_devices$(EXEEXT) \
-	expand$(EXEEXT)
+	expand$(EXEEXT) cfg$(EXEEXT)
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
@@ -105,22 +105,28 @@ DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-dlsym_check_SOURCES = dlsym_check.c
-dlsym_check_OBJECTS = dlsym_check.$(OBJEXT)
-dlsym_check_LDADD = $(LDADD)
+am__dirstamp = $(am__leading_dot)dirstamp
+am_cfg_OBJECTS = ./cfg-cfg.$(OBJEXT) ../cfg-cfg.$(OBJEXT) \
+	../cfg-debug.$(OBJEXT)
+cfg_OBJECTS = $(am_cfg_OBJECTS)
+cfg_LDADD = $(LDADD)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+cfg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(cfg_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+dlsym_check_SOURCES = dlsym_check.c
+dlsym_check_OBJECTS = dlsym_check.$(OBJEXT)
+dlsym_check_LDADD = $(LDADD)
 dlsym_check_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(dlsym_check_LDFLAGS) $(LDFLAGS) -o $@
 expand_SOURCES = expand.c
 expand_OBJECTS = expand.$(OBJEXT)
 expand_DEPENDENCIES = $(top_builddir)/libmodule.la
-am__dirstamp = $(am__leading_dot)dirstamp
-am_get_devices_OBJECTS = get_devices-get_devices.$(OBJEXT) \
-	../pamu2fcfg/get_devices-strlcpy.$(OBJEXT)
+am_get_devices_OBJECTS = get_devices.$(OBJEXT)
 get_devices_OBJECTS = $(am_get_devices_OBJECTS)
 get_devices_DEPENDENCIES = $(top_builddir)/libmodule.la
 AM_V_P = $(am__v_P_@AM_V@)
@@ -138,9 +144,10 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ../pamu2fcfg/$(DEPDIR)/get_devices-strlcpy.Po \
+am__depfiles_remade = ../$(DEPDIR)/cfg-cfg.Po \
+	../$(DEPDIR)/cfg-debug.Po ./$(DEPDIR)/cfg-cfg.Po \
 	./$(DEPDIR)/dlsym_check.Po ./$(DEPDIR)/expand.Po \
-	./$(DEPDIR)/get_devices-get_devices.Po
+	./$(DEPDIR)/get_devices.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -160,8 +167,9 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = dlsym_check.c expand.c $(get_devices_SOURCES)
-DIST_SOURCES = dlsym_check.c expand.c $(get_devices_SOURCES)
+SOURCES = $(cfg_SOURCES) dlsym_check.c expand.c $(get_devices_SOURCES)
+DIST_SOURCES = $(cfg_SOURCES) dlsym_check.c expand.c \
+	$(get_devices_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -412,7 +420,6 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@
 CSCOPE = @CSCOPE@
-CSFLAGS = @CSFLAGS@
 CTAGS = @CTAGS@
 CWFLAGS = @CWFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -471,6 +478,7 @@ PKG_CONFIG = @PKG_CONFIG@
 PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 RANLIB = @RANLIB@
+SCONFDIR = @SCONFDIR@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -533,15 +541,17 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_TESTS_ENVIRONMENT = PAM_U2F_MODULE='$(top_builddir)/.libs/pam_u2f.so'
-AM_CFLAGS = $(CWFLAGS) $(CSFLAGS)
+AM_CFLAGS = $(CWFLAGS)
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = -no-install
 dlsym_check_LDFLAGS = -ldl $(AM_LDFLAGS)
-get_devices_SOURCES = get_devices.c ../pamu2fcfg/strlcpy.c
-get_devices_CPPFLAGS = -I$(srcdir)/../pamu2fcfg
+get_devices_SOURCES = get_devices.c
 get_devices_LDADD = $(top_builddir)/libmodule.la
 expand_LDADD = $(top_builddir)/libmodule.la
+cfg_SOURCES = ./cfg.c ../cfg.c ../debug.c
+cfg_CFLAGS = -DPAM_U2F_TESTING -DSCONFDIR='"@SCONFDIR@"' $(AM_CFLAGS)
 TESTS = $(check_PROGRAMS)
+EXTRA_DIST = CMakeLists.txt
 all: all-am
 
 .SUFFIXES:
@@ -579,6 +589,26 @@ $(am__aclocal_m4_deps):
 clean-checkPROGRAMS:
 	$(am__rm_f) $(check_PROGRAMS)
 	test -z "$(EXEEXT)" || $(am__rm_f) $(check_PROGRAMS:$(EXEEXT)=)
+./$(am__dirstamp):
+	@$(MKDIR_P) .
+	@: >>./$(am__dirstamp)
+$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ./$(DEPDIR)
+	@: >>$(DEPDIR)/$(am__dirstamp)
+./cfg-cfg.$(OBJEXT): ./$(am__dirstamp) $(DEPDIR)/$(am__dirstamp)
+../$(am__dirstamp):
+	@$(MKDIR_P) ..
+	@: >>../$(am__dirstamp)
+../$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ../$(DEPDIR)
+	@: >>../$(DEPDIR)/$(am__dirstamp)
+../cfg-cfg.$(OBJEXT): ../$(am__dirstamp) ../$(DEPDIR)/$(am__dirstamp)
+../cfg-debug.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+
+cfg$(EXEEXT): $(cfg_OBJECTS) $(cfg_DEPENDENCIES) $(EXTRA_cfg_DEPENDENCIES) 
+	@rm -f cfg$(EXEEXT)
+	$(AM_V_CCLD)$(cfg_LINK) $(cfg_OBJECTS) $(cfg_LDADD) $(LIBS)
 
 dlsym_check$(EXEEXT): $(dlsym_check_OBJECTS) $(dlsym_check_DEPENDENCIES) $(EXTRA_dlsym_check_DEPENDENCIES) 
 	@rm -f dlsym_check$(EXEEXT)
@@ -587,15 +617,6 @@ dlsym_check$(EXEEXT): $(dlsym_check_OBJECTS) $(dlsym_check_DEPENDENCIES) $(EXTRA
 expand$(EXEEXT): $(expand_OBJECTS) $(expand_DEPENDENCIES) $(EXTRA_expand_DEPENDENCIES) 
 	@rm -f expand$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(expand_OBJECTS) $(expand_LDADD) $(LIBS)
-../pamu2fcfg/$(am__dirstamp):
-	@$(MKDIR_P) ../pamu2fcfg
-	@: >>../pamu2fcfg/$(am__dirstamp)
-../pamu2fcfg/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) ../pamu2fcfg/$(DEPDIR)
-	@: >>../pamu2fcfg/$(DEPDIR)/$(am__dirstamp)
-../pamu2fcfg/get_devices-strlcpy.$(OBJEXT):  \
-	../pamu2fcfg/$(am__dirstamp) \
-	../pamu2fcfg/$(DEPDIR)/$(am__dirstamp)
 
 get_devices$(EXEEXT): $(get_devices_OBJECTS) $(get_devices_DEPENDENCIES) $(EXTRA_get_devices_DEPENDENCIES) 
 	@rm -f get_devices$(EXEEXT)
@@ -603,15 +624,18 @@ get_devices$(EXEEXT): $(get_devices_OBJECTS) $(get_devices_DEPENDENCIES) $(EXTRA
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f ../pamu2fcfg/*.$(OBJEXT)
+	-rm -f ../*.$(OBJEXT)
+	-rm -f ./*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@../pamu2fcfg/$(DEPDIR)/get_devices-strlcpy.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/cfg-cfg.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/cfg-debug.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cfg-cfg.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlsym_check.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expand.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/get_devices-get_devices.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/get_devices.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -643,33 +667,47 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-get_devices-get_devices.o: get_devices.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(get_devices_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT get_devices-get_devices.o -MD -MP -MF $(DEPDIR)/get_devices-get_devices.Tpo -c -o get_devices-get_devices.o `test -f 'get_devices.c' || echo '$(srcdir)/'`get_devices.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/get_devices-get_devices.Tpo $(DEPDIR)/get_devices-get_devices.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='get_devices.c' object='get_devices-get_devices.o' libtool=no @AMDEPBACKSLASH@
+./cfg-cfg.o: ./cfg.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cfg_CFLAGS) $(CFLAGS) -MT ./cfg-cfg.o -MD -MP -MF $(DEPDIR)/cfg-cfg.Tpo -c -o ./cfg-cfg.o `test -f './cfg.c' || echo '$(srcdir)/'`./cfg.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cfg-cfg.Tpo $(DEPDIR)/cfg-cfg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='./cfg.c' object='./cfg-cfg.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(get_devices_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o get_devices-get_devices.o `test -f 'get_devices.c' || echo '$(srcdir)/'`get_devices.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cfg_CFLAGS) $(CFLAGS) -c -o ./cfg-cfg.o `test -f './cfg.c' || echo '$(srcdir)/'`./cfg.c
 
-get_devices-get_devices.obj: get_devices.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(get_devices_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT get_devices-get_devices.obj -MD -MP -MF $(DEPDIR)/get_devices-get_devices.Tpo -c -o get_devices-get_devices.obj `if test -f 'get_devices.c'; then $(CYGPATH_W) 'get_devices.c'; else $(CYGPATH_W) '$(srcdir)/get_devices.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/get_devices-get_devices.Tpo $(DEPDIR)/get_devices-get_devices.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='get_devices.c' object='get_devices-get_devices.obj' libtool=no @AMDEPBACKSLASH@
+./cfg-cfg.obj: ./cfg.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cfg_CFLAGS) $(CFLAGS) -MT ./cfg-cfg.obj -MD -MP -MF $(DEPDIR)/cfg-cfg.Tpo -c -o ./cfg-cfg.obj `if test -f './cfg.c'; then $(CYGPATH_W) './cfg.c'; else $(CYGPATH_W) '$(srcdir)/./cfg.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cfg-cfg.Tpo $(DEPDIR)/cfg-cfg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='./cfg.c' object='./cfg-cfg.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(get_devices_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o get_devices-get_devices.obj `if test -f 'get_devices.c'; then $(CYGPATH_W) 'get_devices.c'; else $(CYGPATH_W) '$(srcdir)/get_devices.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cfg_CFLAGS) $(CFLAGS) -c -o ./cfg-cfg.obj `if test -f './cfg.c'; then $(CYGPATH_W) './cfg.c'; else $(CYGPATH_W) '$(srcdir)/./cfg.c'; fi`
 
-../pamu2fcfg/get_devices-strlcpy.o: ../pamu2fcfg/strlcpy.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(get_devices_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../pamu2fcfg/get_devices-strlcpy.o -MD -MP -MF ../pamu2fcfg/$(DEPDIR)/get_devices-strlcpy.Tpo -c -o ../pamu2fcfg/get_devices-strlcpy.o `test -f '../pamu2fcfg/strlcpy.c' || echo '$(srcdir)/'`../pamu2fcfg/strlcpy.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../pamu2fcfg/$(DEPDIR)/get_devices-strlcpy.Tpo ../pamu2fcfg/$(DEPDIR)/get_devices-strlcpy.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../pamu2fcfg/strlcpy.c' object='../pamu2fcfg/get_devices-strlcpy.o' libtool=no @AMDEPBACKSLASH@
+../cfg-cfg.o: ../cfg.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cfg_CFLAGS) $(CFLAGS) -MT ../cfg-cfg.o -MD -MP -MF ../$(DEPDIR)/cfg-cfg.Tpo -c -o ../cfg-cfg.o `test -f '../cfg.c' || echo '$(srcdir)/'`../cfg.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/cfg-cfg.Tpo ../$(DEPDIR)/cfg-cfg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../cfg.c' object='../cfg-cfg.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(get_devices_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../pamu2fcfg/get_devices-strlcpy.o `test -f '../pamu2fcfg/strlcpy.c' || echo '$(srcdir)/'`../pamu2fcfg/strlcpy.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cfg_CFLAGS) $(CFLAGS) -c -o ../cfg-cfg.o `test -f '../cfg.c' || echo '$(srcdir)/'`../cfg.c
 
-../pamu2fcfg/get_devices-strlcpy.obj: ../pamu2fcfg/strlcpy.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(get_devices_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../pamu2fcfg/get_devices-strlcpy.obj -MD -MP -MF ../pamu2fcfg/$(DEPDIR)/get_devices-strlcpy.Tpo -c -o ../pamu2fcfg/get_devices-strlcpy.obj `if test -f '../pamu2fcfg/strlcpy.c'; then $(CYGPATH_W) '../pamu2fcfg/strlcpy.c'; else $(CYGPATH_W) '$(srcdir)/../pamu2fcfg/strlcpy.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../pamu2fcfg/$(DEPDIR)/get_devices-strlcpy.Tpo ../pamu2fcfg/$(DEPDIR)/get_devices-strlcpy.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../pamu2fcfg/strlcpy.c' object='../pamu2fcfg/get_devices-strlcpy.obj' libtool=no @AMDEPBACKSLASH@
+../cfg-cfg.obj: ../cfg.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cfg_CFLAGS) $(CFLAGS) -MT ../cfg-cfg.obj -MD -MP -MF ../$(DEPDIR)/cfg-cfg.Tpo -c -o ../cfg-cfg.obj `if test -f '../cfg.c'; then $(CYGPATH_W) '../cfg.c'; else $(CYGPATH_W) '$(srcdir)/../cfg.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/cfg-cfg.Tpo ../$(DEPDIR)/cfg-cfg.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../cfg.c' object='../cfg-cfg.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(get_devices_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../pamu2fcfg/get_devices-strlcpy.obj `if test -f '../pamu2fcfg/strlcpy.c'; then $(CYGPATH_W) '../pamu2fcfg/strlcpy.c'; else $(CYGPATH_W) '$(srcdir)/../pamu2fcfg/strlcpy.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cfg_CFLAGS) $(CFLAGS) -c -o ../cfg-cfg.obj `if test -f '../cfg.c'; then $(CYGPATH_W) '../cfg.c'; else $(CYGPATH_W) '$(srcdir)/../cfg.c'; fi`
+
+../cfg-debug.o: ../debug.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cfg_CFLAGS) $(CFLAGS) -MT ../cfg-debug.o -MD -MP -MF ../$(DEPDIR)/cfg-debug.Tpo -c -o ../cfg-debug.o `test -f '../debug.c' || echo '$(srcdir)/'`../debug.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/cfg-debug.Tpo ../$(DEPDIR)/cfg-debug.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../debug.c' object='../cfg-debug.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cfg_CFLAGS) $(CFLAGS) -c -o ../cfg-debug.o `test -f '../debug.c' || echo '$(srcdir)/'`../debug.c
+
+../cfg-debug.obj: ../debug.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cfg_CFLAGS) $(CFLAGS) -MT ../cfg-debug.obj -MD -MP -MF ../$(DEPDIR)/cfg-debug.Tpo -c -o ../cfg-debug.obj `if test -f '../debug.c'; then $(CYGPATH_W) '../debug.c'; else $(CYGPATH_W) '$(srcdir)/../debug.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../$(DEPDIR)/cfg-debug.Tpo ../$(DEPDIR)/cfg-debug.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../debug.c' object='../cfg-debug.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cfg_CFLAGS) $(CFLAGS) -c -o ../cfg-debug.obj `if test -f '../debug.c'; then $(CYGPATH_W) '../debug.c'; else $(CYGPATH_W) '$(srcdir)/../debug.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -916,6 +954,13 @@ expand.log: expand$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+cfg.log: cfg$(EXEEXT)
+	@p='cfg$(EXEEXT)'; \
+	b='cfg'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 .test.log:
 	@p='$<'; \
 	$(am__set_b); \
@@ -998,8 +1043,10 @@ clean-generic:
 distclean-generic:
 	-$(am__rm_f) $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || $(am__rm_f) $(CONFIG_CLEAN_VPATH_FILES)
-	-$(am__rm_f) ../pamu2fcfg/$(DEPDIR)/$(am__dirstamp)
-	-$(am__rm_f) ../pamu2fcfg/$(am__dirstamp)
+	-$(am__rm_f) $(DEPDIR)/$(am__dirstamp)
+	-$(am__rm_f) ../$(DEPDIR)/$(am__dirstamp)
+	-$(am__rm_f) ../$(am__dirstamp)
+	-$(am__rm_f) ./$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1010,10 +1057,12 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -f ../pamu2fcfg/$(DEPDIR)/get_devices-strlcpy.Po
+	-rm -f ../$(DEPDIR)/cfg-cfg.Po
+	-rm -f ../$(DEPDIR)/cfg-debug.Po
+	-rm -f ./$(DEPDIR)/cfg-cfg.Po
 	-rm -f ./$(DEPDIR)/dlsym_check.Po
 	-rm -f ./$(DEPDIR)/expand.Po
-	-rm -f ./$(DEPDIR)/get_devices-get_devices.Po
+	-rm -f ./$(DEPDIR)/get_devices.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1059,10 +1108,12 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -f ../pamu2fcfg/$(DEPDIR)/get_devices-strlcpy.Po
+	-rm -f ../$(DEPDIR)/cfg-cfg.Po
+	-rm -f ../$(DEPDIR)/cfg-debug.Po
+	-rm -f ./$(DEPDIR)/cfg-cfg.Po
 	-rm -f ./$(DEPDIR)/dlsym_check.Po
 	-rm -f ./$(DEPDIR)/expand.Po
-	-rm -f ./$(DEPDIR)/get_devices-get_devices.Po
+	-rm -f ./$(DEPDIR)/get_devices.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

@@ -1,6 +1,7 @@
 # Copyright (C) 2020 Yubico AB - See COPYING
-AM_CFLAGS    = $(CWFLAGS) $(CSFLAGS) -fsanitize=fuzzer
+AM_CFLAGS    = $(CWFLAGS) -fsanitize=fuzzer
 AM_CPPFLAGS  = $(LIBFIDO2_CFLAGS) $(LIBCRYPTO_CFLAGS) -I$(srcdir)/..
+AM_CPPFLAGS += -D SCONFDIR='"@SCONFDIR@"'
 AM_LDFLAGS   = -no-install -fsanitize=fuzzer
 
 fuzz_format_parsers_SOURCES = fuzz_format_parsers.c
@@ -13,3 +14,4 @@ fuzz_auth_LDADD = -lpam $(LIBFIDO2_LIBS) $(LIBCRYPTO_LIBS) ../pam_u2f.la
 noinst_PROGRAMS = fuzz_format_parsers fuzz_auth
 
 EXTRA_DIST = coverage.sh make_seed.py export.sym
+EXTRA_DIST += export.gnu CMakeLists.txt

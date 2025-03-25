@@ -213,8 +213,8 @@ static int parse_native_format(const cfg_t *cfg, const char *username,
                                FILE *opwfile, device_t *devices,
                                unsigned *n_devs) {
 
-  char *s_user, *s_credential;
-  char *buf = NULL;
+  const char *s_user;
+  char *buf = NULL, *s_credential;
   size_t bufsiz = 0;
   ssize_t len;
   unsigned i;
@@ -633,10 +633,11 @@ static int parse_ssh_format(const cfg_t *cfg, FILE *opwfile,
     goto out;
   }
 
-  debug_dbg(cfg, "KeyHandle for device number 1: %s", devices[0].keyHandle);
-  debug_dbg(cfg, "publicKey for device number 1: %s", devices[0].publicKey);
-  debug_dbg(cfg, "COSE type for device number 1: %s", devices[0].coseType);
-  debug_dbg(cfg, "Attributes for device number 1: %s", devices[0].attributes);
+  debug_dbg(cfg, "KeyHandle for device number %u: %s", 1, devices[0].keyHandle);
+  debug_dbg(cfg, "publicKey for device number %u: %s", 1, devices[0].publicKey);
+  debug_dbg(cfg, "COSE type for device number %u: %s", 1, devices[0].coseType);
+  debug_dbg(cfg, "Attributes for device number %u: %s", 1,
+            devices[0].attributes);
 
   // reserved (skip)
   if (!ssh_get_string_ref(&decoded, &decoded_len, NULL, NULL)) {
@@ -730,7 +731,12 @@ int get_devices_from_authfile(const cfg_t *cfg, const char *username,
 #endif
   }
 
-  opwfile_size = st.st_size;
+  if (st.st_size < 0) {
+    debug_dbg(cfg, "Invalid stat size for %s: %jd", cfg->auth_file,
+              (intmax_t) st.st_size);
+    goto err;
+  }
+  opwfile_size = (size_t) st.st_size;
 
   gpu_ret = getpwuid_r(st.st_uid, &pw_s, buffer, sizeof(buffer), &pw);
   if (gpu_ret != 0 || pw == NULL) {
@@ -801,7 +807,6 @@ void free_devices(device_t *devices, const unsigned n_devs) {
   }
 
   free(devices);
-  devices = NULL;
 }
 
 static int get_authenticators(const cfg_t *cfg, const fido_dev_info_t *devlist,
@@ -900,13 +905,14 @@ static void parse_opts(const cfg_t *cfg, const char *attr, struct opts *opts) {
 
 static int get_device_opts(fido_dev_t *dev, int *pin, int *uv) {
   fido_cbor_info_t *info = NULL;
-  char *const *ptr;
   const bool *val;
-  size_t len;
 
   *pin = *uv = -1; /* unsupported */
 
   if (fido_dev_is_fido2(dev)) {
+    char *const *ptr;
+    size_t len;
+
     if ((info = fido_cbor_info_new()) == NULL ||
         fido_dev_get_cbor_info(dev, info) != FIDO_OK) {
       fido_cbor_info_free(&info);
@@ -1438,7 +1444,7 @@ int do_manual_authentication(const cfg_t *cfg, const device_t *devices,
 
     debug_dbg(cfg, "Challenge: %s", b64_challenge);
 
-    n = snprintf(prompt, sizeof(prompt), "Challenge #%d:", i + 1);
+    n = snprintf(prompt, sizeof(prompt), "Challenge #%u:", i + 1);
     if (n <= 0 || (size_t) n >= sizeof(prompt)) {
       debug_dbg(cfg, "Failed to print challenge prompt");
       goto out;
@@ -1464,7 +1470,7 @@ int do_manual_authentication(const cfg_t *cfg, const device_t *devices,
            "paste the results in the prompt below.");
 
   for (i = 0; i < n_devs; ++i) {
-    n = snprintf(prompt, sizeof(prompt), "Response #%d: ", i + 1);
+    n = snprintf(prompt, sizeof(prompt), "Response #%u: ", i + 1);
     if (n <= 0 || (size_t) n >= sizeof(prompt)) {
       debug_dbg(cfg, "Failed to print response prompt");
       goto out;
