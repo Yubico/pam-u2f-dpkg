@@ -1,3 +1,9 @@
+pam-u2f (1.4.0-2) unstable; urgency=medium
+
+  * Removed unrequired dependencies for dh-cmake
+
+ -- Giovanni Simoni <giovanni.simoni@yubico.com>  Wed, 26 Mar 2025 09:35:18 +0000
+
 pam-u2f (1.4.0-1) unstable; urgency=medium
 
   * New upstream version 1.4.0
